@@ -52,7 +52,20 @@ public class StratoGame {
      */
     static boolean isPlacementWellFormed(String placement) {
         // FIXME Task 4: determine whether a placement is well-formed
-        String foo;
+
+        char[] placementArray = placement.toCharArray();
+        char[] tempArray = new char[4];
+
+        for (int i=0; i<placementArray.length; i+= TILE_PLACEMENT_LENGTH) {
+            tempArray[0] = placementArray[i];
+            tempArray[1] = placementArray[i+1];
+            tempArray[2] = placementArray[i+2];
+            tempArray[3] = placementArray[i+3];
+
+            if (isTilePlacementWellFormed(tempArray.toString()) == false) {
+                return false;
+            }
+        }
         return false;
     }
 
