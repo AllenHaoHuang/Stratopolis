@@ -8,6 +8,7 @@ package comp1110.ass2;
  */
 public class StratoGame {
 
+    private static final int TILE_PLACEMENT_LENGTH = 4;
     /**
      * Determine whether a tile placement is well-formed according to the following:
      * - it consists of exactly four characters
@@ -23,7 +24,8 @@ public class StratoGame {
         // FIXME Task 3: determine whether a tile placement is well-formed
 
         // Return false if length of string does not equal 4
-        if (tilePlacement.length() != 4) return false;
+        if (tilePlacement.length() != TILE_PLACEMENT_LENGTH)
+            return false;
 
         // Read in characters at their positions in the string
         char c1 = tilePlacement.charAt(0);
