@@ -21,18 +21,19 @@ public class StratoGame {
      */
     static boolean isTilePlacementWellFormed(String tilePlacement) {
         // FIXME Task 3: determine whether a tile placement is well-formed
-        if (    tilePlacement.length() == 4     &&
-                tilePlacement.charAt(0) >= 'A'  &&
-                tilePlacement.charAt(0) <= 'Z'  &&
-                tilePlacement.charAt(1) >= 'A'  &&
-                tilePlacement.charAt(1) <= 'Z'  &&
-                tilePlacement.charAt(2) >= 'A'  &&
-                tilePlacement.charAt(2) <= 'U'  &&
-                tilePlacement.charAt(3) >= 'A'  &&
-                tilePlacement.charAt(3) <= 'D'  ) {
-            return true;
-        }
-        return false;
+
+        // Return false if length of string does not equal 4
+        if (tilePlacement.length() != 4) return false;
+
+        // Read in characters at their positions in the string
+        char c1 = tilePlacement.charAt(0);
+        char c2 = tilePlacement.charAt(1);
+        char c3 = tilePlacement.charAt(2);
+        char c4 = tilePlacement.charAt(3);
+
+        // Compare the characters to the relevant conditions and return
+        return (c1 >= 'A' && c1 <= 'Z' && c2 >= 'A' && c2 <= 'Z' &&
+                c3 >= 'A' && c3 <= 'U' && c4 >= 'A' && c4 <= 'D');
     }
 
     /**
