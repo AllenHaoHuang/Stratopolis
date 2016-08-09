@@ -1,6 +1,4 @@
-# General Information 
-
----
+# General Information
 
 ## Members and uIDs 
 William Shen - u6096655
@@ -9,7 +7,7 @@ Marvin Yang - u5894100
 
 ---
 
-## Weekly Meeting Time 
+## Weekly Meeting Time
 Tuesday 3pm - 4pm.
 
 ---
@@ -23,8 +21,7 @@ Marvin - Human-Computer Interaction Expert, Chair Testing Engineer
 ---
 
 ## Contact Details 
-The team members will mainly communicate with each other using the
-`Facebook` platform.
+The team members will mainly communicate with each other using the `Facebook` platform.
 
 ### Email Addresses 
 William - u6096655@anu.edu.au
