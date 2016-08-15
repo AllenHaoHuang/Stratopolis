@@ -5,18 +5,18 @@ package comp1110.ass2.bots;
  */
 
 public class HardBot extends Bot {
-    private String game;
+    private String game; // Is this even needed?
 
     public HardBot(String game) {
         super(game);
     }
 
-    /* This will hopefully use Minimax with Alpha-Beta Pruning */
+    // This will hopefully use Minimax with Alpha-Beta Pruning
     public String getMove() {
         return "";
     }
 
-    /* How we score the board at a given game state */
+    // How we score the board at a given game state
     private Integer getHeuristic(String move) {
         return 0;
     }

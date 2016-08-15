@@ -1,7 +1,7 @@
 package comp1110.ass2.gui;
 
 /**
- * Created by allen on 15/08/2016.
+ * Created by Allen Huang on 15/08/2016.
  */
 
 import javafx.application.Application;
