@@ -2,6 +2,8 @@ package comp1110.ass2.gui;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import comp1110.ass2.logic.*;
+import comp1110.ass2.bots.*;
 
 public class Board extends Application {
     private static final int BOARD_WIDTH = 933;

@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import comp1110.ass2.logic.*;
 
 /**
  * A very simple viewer for piece placements in the link game.
