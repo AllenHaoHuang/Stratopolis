@@ -10,7 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import comp1110.ass2.logic.*;
+import comp1110.ass2.StratoGame;
 
 /**
  * A very simple viewer for piece placements in the link game.
@@ -38,7 +38,7 @@ public class Viewer extends Application {
      * @param placement  A valid placement string
      */
     void makePlacement(String placement) {
-        // FIXME Task 5: implement the simple placement viewer
+
     }
 
 

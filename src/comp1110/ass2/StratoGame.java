@@ -1,5 +1,8 @@
 package comp1110.ass2;
 
+import comp1110.ass2.logic.Colour;
+import comp1110.ass2.logic.Score;
+
 /**
  * This class provides the text interface for the Strato Game
  *
@@ -91,7 +94,10 @@ public class StratoGame {
      */
     static int getScoreForPlacement(String placement, boolean green) {
         // FIXME Task 7: determine the score for a player given a placement
-        return 0;
+        if (green == true)
+            return Score.getScore(placement, Colour.Green);
+        else
+            return Score.getScore(placement, Colour.Red);
     }
 
     /**
