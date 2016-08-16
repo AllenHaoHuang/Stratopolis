@@ -3,6 +3,8 @@ package comp1110.ass2;
 import comp1110.ass2.logic.Colour;
 import comp1110.ass2.logic.Score;
 
+import java.util.Arrays;
+
 /**
  * This class provides the text interface for the Strato Game
  *
@@ -10,7 +12,7 @@ import comp1110.ass2.logic.Score;
  * (http://boardgamegeek.com/boardgame/125022/stratopolis)
  */
 public class StratoGame {
-
+    
     private static final int TILE_PLACEMENT_LENGTH = 4;
     private static final int MAX_TILE_PLACEMENTS = 41;
 
@@ -59,22 +61,60 @@ public class StratoGame {
         // We check the placement string length is a multiple of 4, is non-empty, and contains a maximum of 41
         if (placement.length() % TILE_PLACEMENT_LENGTH != 0 ||
             placement.length() == 0 ||
-            placement.length() > TILE_PLACEMENT_LENGTH * MAX_TILE_PLACEMENTS)
-                return false;
-
-        // i is our index in the string. We check the first tile placement is 'MMUA'
-        int i = 0;
-        if (!placement.substring(i, i+3).equals("MMUA")) return false;
-
-
-        // FIX THIS
-        for(i = 0; i < placement.length(); i+=4) {
-            if (!isTilePlacementWellFormed(placement.substring(i, i+3)))
-                return false;
+            placement.length() > TILE_PLACEMENT_LENGTH * MAX_TILE_PLACEMENTS) {
+            return false;
         }
 
-        return true;
+        // i is our index in the string. We check that the first tile placement is 'MMUA'
+        if (!placement.substring(0, 3).equals("MMUA")) {
+            return false;
+        }
 
+        // The flag used to indicate which player's piece we expect next
+        boolean isGreen = true;
+
+        /** The array used to store the count of pieces. Recall that the characters 'A' to 'T'
+         *  represent the Green and Red Player's Pieces. This means there are 20 pieces.
+         *  We initialise the array to 2, as we subtract 1 each time we encounter a piece.
+         *  Therefore, if we encounter a 0 as an element, we know there have been 2 pieces
+         *  of a same type already.
+         *  Index 0 refers to 'A', 1 refers to 'B', ... , 19 refers to 'T'
+         */
+        int[] letterCount = new int[20];
+        Arrays.fill(letterCount, 2);
+
+        // Here we loop through the placement string excluding the first tile placement
+        for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
+            if (!isTilePlacementWellFormed(placement.substring(i, i+3)))
+                return false;
+            // The third character in a tile placement - i.e. the piece ID
+            char pieceID = placement.charAt(i+2);
+            if (isGreen) {
+                // We check that the piece belongs to the Green Player
+                if (!(pieceID >= 'K' && pieceID <= 'T')) return false;
+                // We check if there have been 2 of the same pieces already
+                if (letterCount[pieceID - 'A'] == 0) {
+                    return false;
+                } else {
+                    letterCount[pieceID - 'A'] -= 1;
+                }
+                // Alternate players - now it's Red's turn
+                isGreen = false;
+            } else {
+                // We check that the piece belongs to the Red Player
+                if (!(pieceID >= 'A' && pieceID <= 'J')) return false;
+                // We check if there have been 2 of the same pieces already
+                if (letterCount[pieceID - 'A'] == 0) {
+                    return false;
+                } else {
+                    letterCount[pieceID - 'A'] -= 1;
+                }
+                // Alternate players - now it is Green's turn
+                isGreen = true;
+            }
+        }
+        // The placement string passes all the tests
+        return true;
     }
 
     /**
@@ -100,7 +140,7 @@ public class StratoGame {
      */
     static int getScoreForPlacement(String placement, boolean green) {
         // FIXME Task 7: determine the score for a player given a placement
-        if (green == true)
+        if (green)
             return Score.getScore(placement, Colour.Green);
         else
             return Score.getScore(placement, Colour.Red);

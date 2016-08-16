@@ -12,9 +12,8 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-
-import javafx.scene.layout.GridPane;
 import comp1110.ass2.StratoGame;
+
 /**
  * A very simple viewer for piece placements in the link game.
  *
@@ -42,15 +41,17 @@ public class Viewer extends Application {
      * @param placement  A valid placement string
      */
     void makePlacement(String placement) {
+        // FIXME Task 5
         GridPane grid = new GridPane();
 
         GridPane.setConstraints(grid, GRID_SIZE, GRID_SIZE);
 
-        
+
 
         for (int i = 0; i < GRID_SIZE; i++) {
             grid.getColumnConstraints().add(new ColumnConstraints(100));
         }
+
     }
 
 
@@ -83,6 +84,7 @@ public class Viewer extends Application {
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
         root.getChildren().add(controls);
+
         makeControls();
 
         primaryStage.setScene(scene);
