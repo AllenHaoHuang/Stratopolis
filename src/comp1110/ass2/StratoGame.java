@@ -66,42 +66,55 @@ public class StratoGame {
             return false;
         }
 
-        // i is our index in the string. We check the first tile placement is 'MMUA'
+        // i is our index in the string. We check that the first tile placement is 'MMUA'
         if (!placement.substring(0, 3).equals("MMUA")) {
             return false;
         }
 
+        // The flag used to indicate which player's piece we expect next
         boolean isGreen = true;
 
+        /** The array used to store the count of pieces. Recall that the characters 'A' to 'T'
+         *  represent the Green and Red Player's Pieces. This means there are 20 pieces.
+         *  We initialise the array to 2, as we subtract 1 each time we encounter a piece.
+         *  Therefore, if we encounter a 0 as an element, we know there have been 2 pieces
+         *  of a same type already.
+         *  Index 0 refers to 'A', 1 refers to 'B', ... , 19 refers to 'T'
+         */
         int[] letterCount = new int[20];
         Arrays.fill(letterCount, 2);
 
-        // FIX THIS
-        for(int i = 0; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
-            if (!isTilePlacementWellFormed(placement.substring(i, i+3))) {
+        // Here we loop through the placement string excluding the first tile placement
+        for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
+            if (!isTilePlacementWellFormed(placement.substring(i, i+3)))
                 return false;
-            }
+            // The third character in a tile placement - i.e. the piece ID
             char pieceID = placement.charAt(i+2);
             if (isGreen) {
-                if (!(pieceID >= 'K' || pieceID <= 'T')) {
+                // We check that the piece belongs to the Green Player
+                if (!(pieceID >= 'K' && pieceID <= 'T')) return false;
+                // We check if there have been 2 of the same pieces already
+                if (letterCount[pieceID - 'A'] == 0) {
                     return false;
+                } else {
+                    letterCount[pieceID - 'A'] -= 1;
                 }
-                if ((int)pieceID-(int)'A' == 0) {
-                    return false;
-                }
-                letterCount[(int)pieceID-(int)'A'] -= 1;
+                // Alternate players
                 isGreen = false;
             } else {
-                if (!(pieceID >= 'A' || pieceID <= 'J')) {
+                // We check that the piece belongs to the Red Player
+                if (!(pieceID >= 'A' && pieceID <= 'J')) return false;
+                // We check if there have been 2 of the same pieces already
+                if (letterCount[pieceID - 'A'] == 0) {
                     return false;
+                } else {
+                    letterCount[pieceID - 'A'] -= 1;
                 }
-                if ((int)pieceID-(int)'A' == 0) {
-                    return false;
-                }
-                letterCount[(int)pieceID-(int)'A'] -= 1;
+                // Alternate players - now it is Red's turn
                 isGreen = true;
             }
         }
+        // The placement string passes all the tests
         return true;
     }
 
@@ -128,7 +141,7 @@ public class StratoGame {
      */
     static int getScoreForPlacement(String placement, boolean green) {
         // FIXME Task 7: determine the score for a player given a placement
-        if (green == true)
+        if (green)
             return Score.getScore(placement, Colour.Green);
         else
             return Score.getScore(placement, Colour.Red);
