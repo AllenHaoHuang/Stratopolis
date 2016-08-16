@@ -5,11 +5,20 @@ package comp1110.ass2.logic;
  */
 
 public class Position {
-    // FIXME Represent the 26x26 grid, how should we do this?
+    private char x;
+    private char y;
 
-    // This needs to return a position properly, i.e. AA, JK, etc.
+    public Position(char x, char y) throws Exception {
+        if (x >= 'A' && x <= 'Z' && y >= 'A' && y <= 'Z') {
+            this.x = x;
+            this.y = y;
+        } else {
+            throw new Exception("Invalid x or y position");
+        }
+    }
+
     @Override
     public String toString() {
-        return "";
+        return Character.toString(x) + Character.toString(y);
     }
 }
