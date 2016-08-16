@@ -3,6 +3,8 @@ package comp1110.ass2;
 import comp1110.ass2.logic.Colour;
 import comp1110.ass2.logic.Score;
 
+import java.util.Arrays;
+
 /**
  * This class provides the text interface for the Strato Game
  *
@@ -13,6 +15,7 @@ public class StratoGame {
 
     private static final int TILE_PLACEMENT_LENGTH = 4;
     private static final int MAX_TILE_PLACEMENTS = 41;
+    private static final int MAX_NUMBER_OF_TILES = 40;
 
     /**
      * Determine whether a tile placement is well-formed according to the following:
@@ -59,22 +62,47 @@ public class StratoGame {
         // We check the placement string length is a multiple of 4, is non-empty, and contains a maximum of 41
         if (placement.length() % TILE_PLACEMENT_LENGTH != 0 ||
             placement.length() == 0 ||
-            placement.length() > TILE_PLACEMENT_LENGTH * MAX_TILE_PLACEMENTS)
-                return false;
-
-        // i is our index in the string. We check the first tile placement is 'MMUA'
-        int i = 0;
-        if (!placement.substring(i, i+3).equals("MMUA")) return false;
-
-
-        // FIX THIS
-        for(i = 0; i < placement.length(); i+=4) {
-            if (!isTilePlacementWellFormed(placement.substring(i, i+3)))
-                return false;
+            placement.length() > TILE_PLACEMENT_LENGTH * MAX_TILE_PLACEMENTS) {
+            return false;
         }
 
-        return true;
+        // i is our index in the string. We check the first tile placement is 'MMUA'
+        if (!placement.substring(0, 3).equals("MMUA")) {
+            return false;
+        }
 
+        boolean isGreen = true;
+
+        int[] letterCount = new int[20];
+        Arrays.fill(letterCount, 2);
+
+        // FIX THIS
+        for(int i = 0; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
+            if (!isTilePlacementWellFormed(placement.substring(i, i+3))) {
+                return false;
+            }
+            char pieceID = placement.charAt(i+2);
+            if (isGreen) {
+                if (!(pieceID >= 'K' || pieceID <= 'T')) {
+                    return false;
+                }
+                if ((int)pieceID-(int)'A' == 0) {
+                    return false;
+                }
+                letterCount[(int)pieceID-(int)'A'] -= 1;
+                isGreen = false;
+            } else {
+                if (!(pieceID >= 'A' || pieceID <= 'J')) {
+                    return false;
+                }
+                if ((int)pieceID-(int)'A' == 0) {
+                    return false;
+                }
+                letterCount[(int)pieceID-(int)'A'] -= 1;
+                isGreen = true;
+            }
+        }
+        return true;
     }
 
     /**
