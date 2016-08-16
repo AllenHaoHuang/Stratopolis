@@ -12,10 +12,9 @@ import java.util.Arrays;
  * (http://boardgamegeek.com/boardgame/125022/stratopolis)
  */
 public class StratoGame {
-
+    
     private static final int TILE_PLACEMENT_LENGTH = 4;
     private static final int MAX_TILE_PLACEMENTS = 41;
-    private static final int MAX_NUMBER_OF_TILES = 40;
 
     /**
      * Determine whether a tile placement is well-formed according to the following:
@@ -99,7 +98,7 @@ public class StratoGame {
                 } else {
                     letterCount[pieceID - 'A'] -= 1;
                 }
-                // Alternate players
+                // Alternate players - now it's Red's turn
                 isGreen = false;
             } else {
                 // We check that the piece belongs to the Red Player
@@ -110,7 +109,7 @@ public class StratoGame {
                 } else {
                     letterCount[pieceID - 'A'] -= 1;
                 }
-                // Alternate players - now it is Red's turn
+                // Alternate players - now it is Green's turn
                 isGreen = true;
             }
         }
