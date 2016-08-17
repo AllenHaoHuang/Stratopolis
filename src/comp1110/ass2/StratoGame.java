@@ -233,6 +233,15 @@ public class StratoGame {
                 heightArray[index0.getX()][index0.getY()] == heightArray[index2.getX()][index2.getY()]);
     }
 
+    /* TODO:
+    Tiles may be placed adjacent to any other tile (edge touching edge).
+    When tiles are stacked:
+        - Green and red cannot be stacked on top of each other. (simple)
+        - Black (neutral) can be stacked with green and red. (simple)
+        - Each color may be stacked on top of itself. (simple)
+        - Each square of the tile must be stacked upon a square below (no overhangs allowed). (simple)
+        - Each stacked tile must straddle at least two tiles below. (hard - how do we tell which tiles have been placed where?)
+    */
 
     /* FIXME: Fix and clean all the code here */
     /* We check if a tile is adjacent to another tile */
