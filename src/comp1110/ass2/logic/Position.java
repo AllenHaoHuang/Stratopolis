@@ -8,24 +8,16 @@ public class Position {
     private char x;
     private char y;
 
+    /* We assume inputs are correctly formatted,
+       i.e. 'A' <= x <= 'Z' and 'A' <= y <= 'Z' */
     public Position (char x, char y) {
         this.x = x;
         this.y = y;
     }
 
-    public char getx() {return x;}
-    public char gety() {return y;}
-
-    /*
-    public Position(char x, char y) throws Exception {
-        if (x >= 'A' && x <= 'Z' && y >= 'A' && y <= 'Z') {
-            this.x = x;
-            this.y = y;
-        } else {
-            throw new Exception("Invalid x or y position");
-        }
-    }
-*/
+    // Return the fields of a Position object
+    public char getX() {return x;}
+    public char getY() {return y;}
 
     @Override
     public String toString() {

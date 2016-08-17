@@ -7,12 +7,12 @@ package comp1110.ass2.logic;
 
 public class Score {
     // Find the number of the largest valid area achieved
-    static int getLargestArea(String board, Colour player) {
+    private static int getLargestArea(String board, Colour player) {
         return 1;
     }
 
     // Finds the maximum height on the board
-    static int maximumHeight(String board, Colour player){
+    private static int maximumHeight(String board, Colour player){
         return 1;
     }
 
