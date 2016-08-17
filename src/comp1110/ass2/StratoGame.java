@@ -1,7 +1,6 @@
 package comp1110.ass2;
 
-import comp1110.ass2.logic.Colour;
-import comp1110.ass2.logic.Score;
+import comp1110.ass2.logic.*;
 
 import java.util.Arrays;
 
@@ -15,6 +14,7 @@ public class StratoGame {
     
     private static final int TILE_PLACEMENT_LENGTH = 4;
     private static final int MAX_TILE_PLACEMENTS = 41;
+    private static final int BOARD_SIZE = 26;
 
     /**
      * Determine whether a tile placement is well-formed according to the following:
@@ -126,7 +126,221 @@ public class StratoGame {
      */
     static boolean isPlacementValid(String placement) {
         // FIXME Task 6: determine whether a placement is valid
+        int[][] heightArray = initialiseZeroArray();
+        Colour[][] colorArray = initialiseBlackArray();
+
+        String subString = "    ";
+        Tile subStringTile = new Tile(charsToPosition(subString.charAt(0), subString.charAt(1)),
+                                      charToShape(subString.charAt(2)),
+                                      charToOrientation(subString.charAt(3)));
+
         return false;
+    }
+
+    // checks if positions tile placed on have same height
+    static boolean isHeightsValid(Tile tile, int[][] heightArray) {
+        Position index0 = tile.getPosition();
+        Position index1 = tilePosition(tile, 1);
+        Position index2 = tilePosition(tile, 2);
+
+        if (heightArray[index0.getx()][index0.gety()] == heightArray[index1.getx()][index1.gety()] &&
+            heightArray[index0.getx()][index0.gety()] == heightArray[index1.getx()][index2.gety()]) {
+            return true;
+        }
+        return false;
+    }
+
+    // initials 26*26 size colour array with all being black
+    static Colour[][] initialiseBlackArray() {
+        Colour[][] array = new Colour[BOARD_SIZE][BOARD_SIZE];
+        for (int i=0; i<BOARD_SIZE; i++ ) {
+            for (int j=0; i<BOARD_SIZE; j++ ) {
+                array[i][j] = Colour.Black;
+            }
+        }
+        return array;
+    }
+
+    // initials 26*26 size int array with all being zero
+    static int[][] initialiseZeroArray() {
+        int[][] array = new int[BOARD_SIZE][BOARD_SIZE];
+        for (int i=0; i<BOARD_SIZE; i++ ) {
+            for (int j=0; i<BOARD_SIZE; j++ ) {
+                array[i][j] = 0;
+            }
+        }
+        return array;
+    }
+
+    // gives tile position, index is as follows
+    // for in a orientation
+    // 0 1
+    // 2 #
+    // returns a tile position given the origin, orientation and index
+    static Position tilePosition (Tile tile, int index) {
+        Orientation orientation = tile.getOrientation();
+        Position origin = tile.getPosition();
+        char originX = origin.getx();
+        char originY = origin.gety();
+
+        switch (orientation) {
+            case A:
+                switch (index) {
+                    // returns origin position
+                    case 0:
+                        return origin;
+                    // returns x coord + 1
+                    case 1:
+                        return new Position((char)(originX+1), originY);
+                    // returns y coord + 1
+                    case 2:
+                        return new Position(originX, (char)(originY+1));
+                }
+            case B:
+                switch (index) {
+                    // returns origin position
+                    case 0:
+                        return origin;
+                    // returns y coord + 1
+                    case 1:
+                        return new Position(originX, (char)(originY+1));
+                    // returns x coord - 1
+                    case 2:
+                        return new Position((char)(originX-1), originY);
+                }
+            case C:
+                switch (index) {
+                    // returns origin position
+                    case 0:
+                        return origin;
+                    // returns x coord - 1
+                    case 1:
+                        return new Position((char)(originX-1), originY);
+                    // returns y coord - 1
+                    case 2:
+                        return new Position(originX, (char)(originY-1));
+                }
+            case D:
+                switch (index) {
+                    // returns origin position
+                    case 0:
+                        return origin;
+                    // returns y coord - 1
+                    case 1:
+                        return new Position(originX, (char)(originY-1));
+                    // returns x coord + 1
+                    case 2:
+                        return new Position((char)(originX+1), originY);
+                }
+        }
+        // not needed
+        return origin;
+    }
+
+    // takes in string of length 4 and returns true if on board
+    static boolean isOnBoard (Tile tile) {
+        Position position = tile.getPosition();
+        Orientation orientation = tile.getOrientation();
+
+        switch (orientation) {
+            case A:
+                // at right or bottom edge return false
+                if (position.getx() == BOARD_SIZE || position.gety() == BOARD_SIZE) {
+                    return false;
+                }
+                break;
+            case B:
+                // at left or bottom edge return false
+                if (position.getx() == 1 || position.gety() == BOARD_SIZE) {
+                    return false;
+                }
+                break;
+            case C:
+                // at left or top edge return false
+                if (position.getx() == 1 || position.gety() == 1) {
+                    return false;
+                }
+                break;
+            case D:
+                // at right or top edge return false
+                if (position.getx() == BOARD_SIZE || position.gety() == 1) {
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
+    // takes in 2 chars and returns a position
+    static Position charsToPosition (char row, char column) {
+        Position position = new Position(row, column);
+        return position;
+    }
+
+    // takes in a char and returns orientation
+    static Orientation charToOrientation (char ch) {
+        switch (ch) {
+            case 'A':
+                return Orientation.A;
+            case 'B':
+                return Orientation.B;
+            case 'C':
+                return Orientation.C;
+            case 'D':
+                return Orientation.D;
+        }
+        // not necessary
+        return Orientation.A;
+    }
+
+    // takes in a character and returns the shape it refers to
+    static Shape charToShape (char ch) {
+        switch (ch) {
+            case 'A':
+                return Shape.A;
+            case 'B':
+                return Shape.B;
+            case 'C':
+                return Shape.C;
+            case 'D':
+                return Shape.D;
+            case 'E':
+                return Shape.E;
+            case 'F':
+                return Shape.F;
+            case 'G':
+                return Shape.G;
+            case 'H':
+                return Shape.H;
+            case 'I':
+                return Shape.I;
+            case 'J':
+                return Shape.J;
+            case 'K':
+                return Shape.K;
+            case 'L':
+                return Shape.L;
+            case 'M':
+                return Shape.M;
+            case 'N':
+                return Shape.N;
+            case 'O':
+                return Shape.O;
+            case 'P':
+                return Shape.P;
+            case 'Q':
+                return Shape.Q;
+            case 'R':
+                return Shape.R;
+            case 'S':
+                return Shape.S;
+            case 'T':
+                return Shape.T;
+            case 'U':
+                return Shape.U;
+        }
+        // not necessary
+        return Shape.A;
     }
 
     /**

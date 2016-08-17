@@ -8,6 +8,15 @@ public class Position {
     private char x;
     private char y;
 
+    public Position (char x, char y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public char getx() {return x;}
+    public char gety() {return y;}
+
+    /*
     public Position(char x, char y) throws Exception {
         if (x >= 'A' && x <= 'Z' && y >= 'A' && y <= 'Z') {
             this.x = x;
@@ -16,6 +25,7 @@ public class Position {
             throw new Exception("Invalid x or y position");
         }
     }
+*/
 
     @Override
     public String toString() {

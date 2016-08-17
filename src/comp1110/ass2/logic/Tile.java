@@ -5,19 +5,24 @@ package comp1110.ass2.logic;
  */
 
 public class Tile {
-    Position position;
-    Shape shape;
-    Orientation orientation;
-    Integer height;
+    private Position position;
+    private Shape shape;
+    private Orientation orientation;
+
+    public Position getPosition() {return position;}
+    public Shape getShape() {return shape;}
+    public Orientation getOrientation() {return orientation;}
+
+    //Integer height;
 
     /* Constructor for a Tile - includes where the tile is located,
        which tile it represents, and its orientation */
-    public Tile(Position p, Shape s, Orientation o, Integer h) {
+    public Tile(Position p, Shape s, Orientation o) {
         // Needs better parameter names
         this.position = p;
         this.shape = s;
         this.orientation = o;
-        this.height = h;
+       // this.height = h;
     }
 
     // To implement - hopefully...
