@@ -128,12 +128,71 @@ public class StratoGame {
         // FIXME Task 6: determine whether a placement is valid
         int[][] heightArray = initialiseZeroArray();
         Colour[][] colorArray = initialiseBlackArray();
-
-        String subString = "    ";
+        
         Tile subStringTile = new Tile(charsToPosition(subString.charAt(0), subString.charAt(1)),
                                       charToShape(subString.charAt(2)),
                                       charToOrientation(subString.charAt(3)));
 
+
+
+        return false;
+    }
+
+    // given a tile and array of colours, changes colours
+    static Colour[][] placeTileColour(Tile tile, Colour[][] colourArray) {
+        Position index0 = tile.getPosition();
+        Position index1 = tilePosition(tile, 1);
+        Position index2 = tilePosition(tile, 2);
+        Shape shape = tile.getShape();
+
+        colourArray[index0.getx()][index0.gety()]=getColour(shape,0);
+        colourArray[index1.getx()][index1.gety()]=getColour(shape,1);
+        colourArray[index2.getx()][index2.gety()]=getColour(shape,2);
+
+        return colourArray;
+    }
+
+    // gets colour from shape
+    static Colour getColour(Shape shape, int index) {
+
+    }
+
+    // given a tile and array of heights, changes tile height array
+    static int[][] placeTileHeight(Tile tile, int[][] heightArray) {
+        Position index0 = tile.getPosition();
+        Position index1 = tilePosition(tile, 1);
+        Position index2 = tilePosition(tile, 2);
+
+        heightArray[index0.getx()][index0.gety()]++;
+        heightArray[index1.getx()][index1.gety()]++;
+        heightArray[index2.getx()][index2.gety()]++;
+
+        return heightArray;
+    }
+
+    // checks if tile is adjacent to another tile
+    static boolean isAdjacent(Tile tile, int[][] heightArray) {
+        Position index0 = tile.getPosition();
+        Position index1 = tilePosition(tile, 1);
+        Position index2 = tilePosition(tile, 2);
+
+        if (heightArray[index0.getx()][index0.gety()] > 0   ||
+            heightArray[index0.getx()+1][index0.gety()] > 0 ||
+            heightArray[index0.getx()-1][index0.gety()] > 0 ||
+            heightArray[index0.getx()][index0.gety()+1] > 0 ||
+            heightArray[index0.getx()][index0.gety()-1] > 0 ||
+            heightArray[index1.getx()][index1.gety()] > 0   ||
+            heightArray[index1.getx()+1][index1.gety()] > 0 ||
+            heightArray[index1.getx()-1][index1.gety()] > 0 ||
+            heightArray[index1.getx()][index1.gety()+1] > 0 ||
+            heightArray[index1.getx()][index1.gety()-1] > 0 ||
+            heightArray[index2.getx()][index2.gety()] > 0   ||
+            heightArray[index2.getx()+1][index2.gety()] > 0 ||
+            heightArray[index2.getx()-1][index2.gety()] > 0 ||
+            heightArray[index2.getx()][index2.gety()+1] > 0 ||
+            heightArray[index2.getx()][index2.gety()-1] > 0) {
+            return true
+        }
         return false;
     }
 
