@@ -16,8 +16,8 @@ public class Position {
     }
 
     // Return the fields of a Position object
-    public char getX() {return x;}
-    public char getY() {return y;}
+    public int getX() { return x - 'A'; }
+    public int getY() { return y - 'A'; }
 
     @Override
     public String toString() {

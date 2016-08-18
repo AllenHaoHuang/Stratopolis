@@ -130,6 +130,8 @@ public class StratoGame {
 
         // We first check if the input Placement String is well-formed itself
         if (!isPlacementWellFormed(placement)) return false;
+        // If the placement string is just 'MMUA'
+        if (placement.equals("MMUA")) return true;
 
         /* Initialise the 2-dimensional array (which represents the board) to store the
          * maximum height of the stacked pieces (if any) to 0. */
@@ -150,9 +152,13 @@ public class StratoGame {
         /* Since we already checked if the placement string is well formed, we know
            the first four characters are "MMUA". Update the arrays accordingly */
         Tile initialTile = new Tile(new Position('M','M'), Shape.U, Orientation.A);
-        colourArray = updateBoardColours(initialTile, colourArray);
-        heightArray = updateBoardHeights(initialTile, heightArray);
-        pieceIDArray = updateIdentifier(initialTile, pieceIDArray, pieceID++);
+        heightArray[12][12]++;
+        heightArray[12][13]++;
+        colourArray[12][12] = Colour.Red;
+        colourArray[12][13] = Colour.Green;
+        pieceIDArray[12][12] = pieceID;
+        pieceIDArray[12][13] = pieceID;
+        pieceID++;
 
         /* Loop over the rest of the placement string, bar "MMUA" */
         for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
@@ -160,7 +166,6 @@ public class StratoGame {
             Tile substringTile = new Tile(new Position(placement.charAt(i), placement.charAt(i+1)),
                                           Shape.fromChar(placement.charAt(i+2)),
                                           Orientation.fromChar(placement.charAt(i+3)));
-
             // We check if all the rules are fulfilled. If so, then update the arrays and continue looping
             if (isOnBoard(substringTile) &&
                 isAdjacent(substringTile, heightArray) &&
@@ -172,6 +177,9 @@ public class StratoGame {
                     heightArray = updateBoardHeights(substringTile, heightArray);
                     pieceIDArray = updateIdentifier(substringTile, pieceIDArray, pieceID++);
             } else {
+                System.out.println("isOnBoard: " + isOnBoard(substringTile) + ", isAdjacent: " + isAdjacent(substringTile,heightArray)
+                        + ", areColoursValid: " + areColoursValid(substringTile, colourArray) + ", areHeightsValid: "
+                        + areHeightsValid(substringTile, heightArray) + ", isOverTwoTiles: " + isOverTwoTiles(substringTile, pieceIDArray, heightArray));
                 return false;
             }
         }
@@ -251,29 +259,49 @@ public class StratoGame {
      * isAdjacent checks if it is next to a tile, if the heights directly on or next to the position
      * of the tile placed is larger than 0, it is next to a piece */
     private static boolean isAdjacent(Tile tile, int[][] heightArray) {
-        /* Get position coordinates for each of the 3 cells on our tile */
+        /* Get position coordinates for each of the origin cell on our tile */
         Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 0);
-        Position index2 = cellPosition(tile, 0);
+        int x = index0.getX();
+        int y = index0.getY();
 
-        return (// checks if index0 next to a piece
-                heightArray[index0.getX()][index0.getY()]   > 0 ||
-                        heightArray[index0.getX()+1][index0.getY()] > 0 ||
-                        heightArray[index0.getX()-1][index0.getY()] > 0 ||
-                        heightArray[index0.getX()][index0.getY()+1] > 0 ||
-                        heightArray[index0.getX()][index0.getY()-1] > 0 ||
-                        // checks if index1 next to a piece
-                        heightArray[index1.getX()][index1.getY()]   > 0 ||
-                        heightArray[index1.getX()+1][index1.getY()] > 0 ||
-                        heightArray[index1.getX()-1][index1.getY()] > 0 ||
-                        heightArray[index1.getX()][index1.getY()+1] > 0 ||
-                        heightArray[index1.getX()][index1.getY()-1] > 0 ||
-                        // checks if index2 next to a piece
-                        heightArray[index2.getX()][index2.getY()]   > 0 ||
-                        heightArray[index2.getX()+1][index2.getY()] > 0 ||
-                        heightArray[index2.getX()-1][index2.getY()] > 0 ||
-                        heightArray[index2.getX()][index2.getY()+1] > 0 ||
-                        heightArray[index2.getX()][index2.getY()-1] > 0);
+        // TODO: Need to account for boundaries
+        // We take the relevant x and y positions about the origin cell using maths
+        switch(tile.getOrientation()) {
+            case A:
+                return (heightArray[x-1][y] > 0 ||
+                        heightArray[x+2][y] > 0 ||
+                        heightArray[x][y-1] > 0 ||
+                        heightArray[x+1][y-1] > 0 ||
+                        heightArray[x-1][y+1] > 0 ||
+                        heightArray[x+1][y+1] > 0 ||
+                        heightArray[x][y+2] > 0);
+            case B:
+                return (heightArray[x-2][y] > 0 ||
+                        heightArray[x+1][y] > 0 ||
+                        heightArray[x][y-1] > 0 ||
+                        heightArray[x-1][y-1] > 0 ||
+                        heightArray[x-1][y+1] > 0 ||
+                        heightArray[x+1][y+1] > 0 ||
+                        heightArray[x][y+2] > 0);
+            case C:
+                return (heightArray[x+1][y] > 0 ||
+                        heightArray[x-2][y] > 0 ||
+                        heightArray[x+1][y-1] > 0 ||
+                        heightArray[x-1][y-1] > 0 ||
+                        heightArray[x][y+1] > 0 ||
+                        heightArray[x-1][y+1] > 0 ||
+                        heightArray[x][y-2] > 0);
+            case D:
+                return (heightArray[x-1][y] > 0 ||
+                        heightArray[x+2][y] > 0 ||
+                        heightArray[x-1][y-1] > 0 ||
+                        heightArray[x+1][y-1] > 0 ||
+                        heightArray[x][y+1] > 0 ||
+                        heightArray[x+1][y+1] > 0 ||
+                        heightArray[x][y-2] > 0);
+            default:
+                return false;
+        }
     }
 
     /* Determine whether the colour placement of a tile is valid on the given board */
@@ -287,6 +315,7 @@ public class StratoGame {
         Colour colour0 = tile.getShape().colourAtIndex(0);
         Colour colour1 = tile.getShape().colourAtIndex(1);
         Colour colour2 = tile.getShape().colourAtIndex(2);
+
         return (isColourValidOnTile(index0, colour0, colourArray) &&
                 isColourValidOnTile(index1, colour1, colourArray) &&
                 isColourValidOnTile(index2, colour2, colourArray));
@@ -298,9 +327,9 @@ public class StratoGame {
             case Black:
                 return true;
             case Green:
-                return (colourArray[position.getX()][position.getY()] == Colour.Green);
+                return (!(colourArray[position.getX()][position.getY()] == Colour.Red));
             case Red:
-                return (colourArray[position.getX()][position.getY()] == Colour.Red);
+                return (!(colourArray[position.getX()][position.getY()] == Colour.Green));
             default:
                 return false;
         }
@@ -346,23 +375,23 @@ public class StratoGame {
 
         /* We retrieve the X and Y character coordinates of
            the origin index - i.e. at index = 0. */
-        char originX = tile.getPosition().getX();
-        char originY = tile.getPosition().getY();
+        int originX = tile.getPosition().getX();
+        int originY = tile.getPosition().getY();
 
-        // Here, we check the Orientation of our tile and return the relevant Positions
+        //Here, we check the Orientation of our tile and return the relevant Positions
         switch (tile.getOrientation()) {
             case A:
-                if (index == 1) return new Position((char)(originX+1), originY);
-                if (index == 2) return new Position(originX, (char)(originY+1));
+                if (index == 1) return new Position((char)(originX+1+'A'), (char)(originY+'A'));
+                if (index == 2) return new Position((char)(originX+'A'), (char)(originY+1+'A'));
             case B:
-                if (index == 1) return new Position(originX, (char)(originY+1));
-                if (index == 2) return new Position((char)(originX-1), originY);
+                if (index == 1) return new Position((char)(originX+'A'), (char)(originY+1+'A'));
+                if (index == 2) return new Position((char)(originX-1+'A'), (char)(originY+'A'));
             case C:
-                if (index == 1) return new Position((char)(originX-1), originY);
-                if (index == 2) return new Position(originX, (char)(originY-1));
+                if (index == 1) return new Position((char)(originX-1+'A'), (char)(originY+'A'));
+                if (index == 2) return new Position((char)(originX+'A'), (char)(originY-1+'A'));
             case D:
-                if (index == 1) return new Position(originX, (char)(originY-1));
-                if (index == 2) return new Position((char)(originX+1), originY);
+                if (index == 1) return new Position((char)(originX+'A'), (char)(originY-1+'A'));
+                if (index == 2) return new Position((char)(originX+1+'A'), (char)(originY+'A'));
             default:
                 // Something went wrong...
                 return new Position('#','#'); // need more appropriate return
@@ -402,10 +431,24 @@ public class StratoGame {
 
     /* TESTING */
     public static void main(String[] args) {
-        boolean b1 = isTilePlacementWellFormed("MMUA");
-        boolean b2 = isPlacementWellFormed("MMUA");
-        boolean b3 = isPlacementValid("MMUA");
-
-        System.out.println("b1: " + b1 + ", b2: " + b2 + ", b3: " + b3);
+        System.out.println("----------------------------");
+        String[] strArr = {"MMUA","MMUANLOB","MMUANLOBLNBC","MMUANLOBLNBCONSCKLDAPOTCMLEBPLMBKNJDOLNBMLDANPLDNNBAONMCLOFAPQTC"};
+        for (String str : strArr) {
+            if (str.length() > 4) {
+                System.out.println("String being tested: " + str);
+                boolean b2 = isPlacementWellFormed(str);
+                boolean b3 = isPlacementValid(str);
+                System.out.println("isPlacementWellFormed: " + b2 + ", isPlacementValid: " + b3);
+                System.out.println("----------------------------");
+            } else {
+                boolean b1 = isTilePlacementWellFormed(str);
+                boolean b2 = isPlacementWellFormed(str);
+                boolean b3 = isPlacementValid(str);
+                System.out.println("String being tested: " + str);
+                System.out.println("isTilePlacementWellFormed: " + b1 + ", isPlacementWellFormed: " + b2
+                        + ", isPlacementValid: " + b3);
+                System.out.println("----------------------------");
+            }
+        }
     }
 }
