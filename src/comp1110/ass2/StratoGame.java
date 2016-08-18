@@ -128,7 +128,9 @@ public class StratoGame {
         // FIXME Task 6: determine whether a placement is valid
         int[][] heightArray = initialiseZeroArray();
         Colour[][] colorArray = initialiseBlackArray();
-        
+
+        // temporary
+        String subString;
         Tile subStringTile = new Tile(charsToPosition(subString.charAt(0), subString.charAt(1)),
                                       charToShape(subString.charAt(2)),
                                       charToOrientation(subString.charAt(3)));
