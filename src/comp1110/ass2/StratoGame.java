@@ -270,7 +270,7 @@ public class StratoGame {
 
         // returns true if over 2 different tiles, if all equal return false
         // != is glitchy in java
-        if (pieceIdentifierArray[index0.getX()][index0.getY()] == pieceIdentifierArray[index0.getX()][index1.getY()] ||
+        if (pieceIdentifierArray[index0.getX()][index0.getY()] == pieceIdentifierArray[index0.getX()][index1.getY()] &&
             pieceIdentifierArray[index0.getX()][index1.getY()] == pieceIdentifierArray[index0.getX()][index2.getY()]) {
             return false;
         }
