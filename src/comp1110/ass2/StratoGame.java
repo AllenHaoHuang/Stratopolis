@@ -64,9 +64,12 @@ public class StratoGame {
         }
 
         // i is our index in the string. We check that the first tile placement is 'MMUA'
-        if (!placement.substring(0, 3).equals("MMUA")) {
+        if (!(placement.substring(0, 4).equals("MMUA"))) {
             return false;
         }
+
+        // If the length of the placement string is 4, then it only contains 'MMUA'
+        if (placement.length() == 4) return true;
 
         // The flag used to indicate which player's piece we expect next
         boolean isGreen = true;
@@ -83,7 +86,7 @@ public class StratoGame {
 
         // Here we loop through the placement string excluding the first tile placement
         for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
-            if (!isTilePlacementWellFormed(placement.substring(i, i+3)))
+            if (!isTilePlacementWellFormed(placement.substring(i, i+4)))
                 return false;
             // The third character in a tile placement - i.e. the piece ID
             char pieceID = placement.charAt(i+2);
@@ -136,54 +139,200 @@ public class StratoGame {
          * tile colour. Recall, that Black is neutral - i.e. it can be stacked on top of
          * Red, Green and itself. */
         Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
-        Arrays.fill(colourArray, Colour.Black);
+        for (Colour[] row : colourArray)
+            Arrays.fill(row, Colour.Black);
 
-        // have another array filling up positions taken by tiles for a piece, increment after each piece placed
-        // initially at 0
-        int[][] pieceIdentifierArray = new int [BOARD_SIZE][BOARD_SIZE];
-        int pieceIdentifier = 1;
+        /* This array identifies the pieces which are placed at a position based on a unique pieceID.
+         * The whole array is initially set to 0 (by default) */
+        int[][] pieceIDArray = new int [BOARD_SIZE][BOARD_SIZE];
+        int pieceID = 1; // pieceID is incremented each time a tile is valid and placed on the 'board'
 
-        for (int i=0; i<placement.length(); i+=TILE_PLACEMENT_LENGTH) {
-            Tile subStringTile = new Tile(new Position( placement.charAt(0), placement.charAt(1)),
-                                                        Shape.fromChar(placement.charAt(2)),
-                                                        Orientation.fromChar(placement.charAt(3)));
+        /* Since we already checked if the placement string is well formed, we know
+           the first four characters are "MMUA". Update the arrays accordingly */
+        Tile initialTile = new Tile(new Position('M','M'), Shape.U, Orientation.A);
+        colourArray = updateBoardColours(initialTile, colourArray);
+        heightArray = updateBoardHeights(initialTile, heightArray);
+        pieceIDArray = updateIdentifier(initialTile, pieceIDArray, pieceID++);
 
-            // conditions to check if substring is valid
-            if (    areHeightsValid(subStringTile, heightArray) ||
-                    isAdjacent(subStringTile, heightArray)  ||
-                    isOverTwoTiles(subStringTile, pieceIdentifierArray, heightArray) ||
-                    isColoursValid(subStringTile, colourArray)) {
-                // tile is placed, updates arrays
-                colourArray = updateBoardColours(subStringTile, colourArray);
-                heightArray = updateBoardHeights(subStringTile, heightArray);
-                pieceIdentifierArray = updateIdentifier(subStringTile, pieceIdentifierArray, pieceIdentifier);
-                pieceIdentifier++;
+        /* Loop over the rest of the placement string, bar "MMUA" */
+        for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
+            // Create a new tile from the placement string
+            Tile substringTile = new Tile(new Position(placement.charAt(i), placement.charAt(i+1)),
+                                          Shape.fromChar(placement.charAt(i+2)),
+                                          Orientation.fromChar(placement.charAt(i+3)));
+
+            // We check if all the rules are fulfilled. If so, then update the arrays and continue looping
+            if (isOnBoard(substringTile) &&
+                isAdjacent(substringTile, heightArray) &&
+                areColoursValid(substringTile, colourArray) &&
+                areHeightsValid(substringTile, heightArray) &&
+                isOverTwoTiles(substringTile, pieceIDArray, heightArray)) {
+                    // Update the arrays
+                    colourArray = updateBoardColours(substringTile, colourArray);
+                    heightArray = updateBoardHeights(substringTile, heightArray);
+                    pieceIDArray = updateIdentifier(substringTile, pieceIDArray, pieceID++);
             } else {
                 return false;
             }
         }
 
-        // if whole string checks out return true
+        // When we are here, the whole placement string has been parsed and is thus valid
         return true;
-
-        // old code
-        /* Some for loop here to go over the placement string?
-        Tile subStringTile = new Tile(new Position(placement.charAt(0), placement.charAt(1)),
-                                      Shape.fromChar(placement.charAt(2)),
-                                      Orientation.fromChar(placement.charAt(3)));
-
-
-        // Only here for demonstration
-        colourArray = updateBoardColours(subStringTile, colourArray);
-        heightArray = updateBoardHeights(subStringTile, heightArray);
-        pieceIdentifierArray = updateIdentifier(subStringTile, pieceIdentifierArray);
-        Orientation or = Orientation.fromChar('A');
-        Shape shp = Shape.fromChar('B');
-        boolean meme = areHeightsValid(subStringTile, heightArray);
-        // If all the above tests have failed*/
     }
 
-    /* THESE FUNCTIONS CAN BE MORE PRIVATE UNLESS WE NEED TO ACCESS THEM FROM THE OUTSIDE */
+    /* Given a tile and the board (array) of colours, change the colours */
+    private static Colour[][] updateBoardColours(Tile tile, Colour[][] colourArray) {
+        /* Get position coordinates for each of the 3 cells on our tile */
+        Position index0 = cellPosition(tile, 0);
+        Position index1 = cellPosition(tile, 1);
+        Position index2 = cellPosition(tile, 2);
+
+        /* Set the relevant cells in the colourArray to their corresponding cell
+         * colours given their Shape ID, and return */
+        colourArray[index0.getX()][index0.getY()]= tile.getShape().colourAtIndex(0);
+        colourArray[index1.getX()][index1.getY()]= tile.getShape().colourAtIndex(1);
+        colourArray[index2.getX()][index2.getY()]= tile.getShape().colourAtIndex(2);
+        return colourArray;
+    }
+
+    /* Given a tile and the board (array) of heights, increase the height */
+    private static int[][] updateBoardHeights(Tile tile, int[][] heightArray) {
+        /* Get position coordinates for each of the 3 cells on our tile */
+        Position index0 = cellPosition(tile, 0);
+        Position index1 = cellPosition(tile, 1);
+        Position index2 = cellPosition(tile, 2);
+
+        /* Increment the corresponding positions in the heightArray by 1 and return */
+        heightArray[index0.getX()][index0.getY()]++;
+        heightArray[index1.getX()][index1.getY()]++;
+        heightArray[index2.getX()][index2.getY()]++;
+        return heightArray;
+    }
+
+    /* Updates the pieceID array with the new Tile */
+    private static int[][] updateIdentifier(Tile tile, int[][] pieceIDArray, int pieceID) {
+        /* Get position coordinates for each of the 3 cells on our tile */
+        Position index0 = cellPosition(tile, 0);
+        Position index1 = cellPosition(tile, 1);
+        Position index2 = cellPosition(tile, 2);
+
+        // Update the array with the new Tile piece we have placed down
+        pieceIDArray[index0.getX()][index0.getY()] = pieceID;
+        pieceIDArray[index1.getX()][index1.getY()] = pieceID;
+        pieceIDArray[index2.getX()][index2.getY()] = pieceID;
+        return pieceIDArray;
+    }
+
+    /* Checks that no part of the tile extends beyond the board */
+    private static boolean isOnBoard (Tile tile) {
+        // Get the position coordinates of our Tile
+        Position position = tile.getPosition();
+        /* We check the Tile over the orientation. Recall that a coordinate on the board
+         * is encoded as (x,y) where 'A' <= x <= 'Z' and 'A' <= y <= 'Z' */
+        switch (tile.getOrientation()) {
+            case A:
+                // At right or bottom edge of the board
+                return (!(position.getX() == 'Z' || position.getY() == 'Z'));
+            case B:
+                // At left or bottom edge of the board
+                return (!(position.getX() == 'A' || position.getY() == 'Z'));
+            case C:
+                // At left or top edge of the board
+                return (!(position.getX() == 'A' || position.getY() == 'A'));
+            case D:
+                // At right or top edge of the board
+                return (!(position.getX() == 'Z' || position.getY() == 'A'));
+            default:
+                return false;
+        }
+    }
+
+    /* We check if a tile is adjacent to another tile:
+     * isAdjacent checks if it is next to a tile, if the heights directly on or next to the position
+     * of the tile placed is larger than 0, it is next to a piece */
+    private static boolean isAdjacent(Tile tile, int[][] heightArray) {
+        /* Get position coordinates for each of the 3 cells on our tile */
+        Position index0 = cellPosition(tile, 0);
+        Position index1 = cellPosition(tile, 0);
+        Position index2 = cellPosition(tile, 0);
+
+        return (// checks if index0 next to a piece
+                heightArray[index0.getX()][index0.getY()]   > 0 ||
+                        heightArray[index0.getX()+1][index0.getY()] > 0 ||
+                        heightArray[index0.getX()-1][index0.getY()] > 0 ||
+                        heightArray[index0.getX()][index0.getY()+1] > 0 ||
+                        heightArray[index0.getX()][index0.getY()-1] > 0 ||
+                        // checks if index1 next to a piece
+                        heightArray[index1.getX()][index1.getY()]   > 0 ||
+                        heightArray[index1.getX()+1][index1.getY()] > 0 ||
+                        heightArray[index1.getX()-1][index1.getY()] > 0 ||
+                        heightArray[index1.getX()][index1.getY()+1] > 0 ||
+                        heightArray[index1.getX()][index1.getY()-1] > 0 ||
+                        // checks if index2 next to a piece
+                        heightArray[index2.getX()][index2.getY()]   > 0 ||
+                        heightArray[index2.getX()+1][index2.getY()] > 0 ||
+                        heightArray[index2.getX()-1][index2.getY()] > 0 ||
+                        heightArray[index2.getX()][index2.getY()+1] > 0 ||
+                        heightArray[index2.getX()][index2.getY()-1] > 0);
+    }
+
+    /* Determine whether the colour placement of a tile is valid on the given board */
+    private static boolean areColoursValid (Tile tile, Colour[][] colourArray) {
+        /* Get position coordinates for each of the 3 cells on our tile */
+        Position index0 = cellPosition(tile, 0);
+        Position index1 = cellPosition(tile, 1);
+        Position index2 = cellPosition(tile, 2);
+
+        // We check over all the cells of the tile
+        Colour colour0 = tile.getShape().colourAtIndex(0);
+        Colour colour1 = tile.getShape().colourAtIndex(1);
+        Colour colour2 = tile.getShape().colourAtIndex(2);
+        return (isColourValidOnTile(index0, colour0, colourArray) &&
+                isColourValidOnTile(index1, colour1, colourArray) &&
+                isColourValidOnTile(index2, colour2, colourArray));
+    }
+
+    /* Checks if the colour placement is valid on a single cell of a tile */
+    private static boolean isColourValidOnTile (Position position, Colour colour, Colour[][] colourArray) {
+        switch (colour) {
+            case Black:
+                return true;
+            case Green:
+                return (colourArray[position.getX()][position.getY()] == Colour.Green);
+            case Red:
+                return (colourArray[position.getX()][position.getY()] == Colour.Red);
+            default:
+                return false;
+        }
+    }
+
+    /* Check if a placement is valid height-wise, i.e. the heights of each of the three cells are equal */
+    private static boolean areHeightsValid(Tile tile, int[][] heightArray) {
+        /* Get position coordinates for each of the 3 cells on our tile */
+        Position index0 = cellPosition(tile, 0);
+        Position index1 = cellPosition(tile, 1);
+        Position index2 = cellPosition(tile, 2);
+
+        /* Check whether all the heights of all three cells are equal */
+        return (heightArray[index0.getX()][index0.getY()] == heightArray[index1.getX()][index1.getY()] &&
+                heightArray[index0.getX()][index0.getY()] == heightArray[index2.getX()][index2.getY()]);
+    }
+
+    /* Check if a Tile is placed over two tiles (i.e. straddled) */
+    private static boolean isOverTwoTiles (Tile tile, int[][] pieceIDArray, int[][] heightArray) {
+        /* Get position coordinates for each of the 3 cells on our tile */
+        Position index0 = cellPosition(tile, 0);
+        Position index1 = cellPosition(tile, 1);
+        Position index2 = cellPosition(tile, 2);
+
+        /* Check if the tile is placed at height = 0, then we don't need to check if it is
+         *  straddled over 2 different tiles */
+        if (heightArray[index0.getX()][index0.getY()] == 0) return true;
+
+        // Check if our new tile would be placed over 2 different tiles
+        return (!(pieceIDArray[index0.getX()][index0.getY()] == pieceIDArray[index1.getX()][index1.getY()] &&
+                  pieceIDArray[index1.getX()][index1.getY()] == pieceIDArray[index2.getX()][index2.getY()]));
+    }
 
     /**
      *  Return the position of a specific cell of a Tile on the board.
@@ -191,7 +340,7 @@ public class StratoGame {
      *     [0]  [1]
      *     [2]
      */
-    static Position cellPosition (Tile tile, int index) {
+    private static Position cellPosition (Tile tile, int index) {
         // Return the position of the origin cell if zero index is requested
         if (index == 0) return tile.getPosition();
 
@@ -214,205 +363,11 @@ public class StratoGame {
             case D:
                 if (index == 1) return new Position(originX, (char)(originY-1));
                 if (index == 2) return new Position((char)(originX+1), originY);
+            default:
+                // Something went wrong...
+                return new Position('#','#'); // need more appropriate return
         }
-
-        // FIXME: Return something appropriate or create exception? We know that all input is valid
-        return new Position('A','A');
     }
-
-    // takes in tile and colour array and checks each position to see if colour placement valid
-    static boolean isColoursValid (Tile tile, Colour[][] colourArray) {
-        /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
-
-        // get colours at each of the indexs
-        Colour colour0 = tile.getShape().colourAtIndex(0);
-        Colour colour1 = tile.getShape().colourAtIndex(1);
-        Colour colour2 = tile.getShape().colourAtIndex(2);
-
-        return (isColourValidOnTile(index0, colour0, colourArray) &&
-                isColourValidOnTile(index1, colour1, colourArray) &&
-                isColourValidOnTile(index2, colour2, colourArray));
-    }
-
-    // checks single tile to see if colour placement is valid
-    static boolean isColourValidOnTile (Position position, Colour colour, Colour[][] colourArray) {
-        switch (colour) {
-            case Black:
-                return true;
-            case Green:
-                if (colourArray[position.getX()][position.getY()] == Colour.Red) {
-                return false;
-                }
-                return true;
-            case Red:
-                if (colourArray[position.getX()][position.getY()] == Colour.Green) {
-                    return false;
-                }
-                return true;
-        }
-        return true;
-    }
-
-    // returns true if no tiles under or if over two tiles
-    static boolean isOverTwoTiles (Tile tile, int[][] pieceIdentifierArray, int[][] heightArray) {
-        /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
-
-        // returns true if no tile under
-        if (areHeightsValid(tile, heightArray) && heightArray[index0.getX()][index0.getY()] == 0) {
-            return true;
-        }
-
-        // returns true if over 2 different tiles, if all equal return false
-        // != is glitchy in java
-        if (pieceIdentifierArray[index0.getX()][index0.getY()] == pieceIdentifierArray[index0.getX()][index1.getY()] &&
-            pieceIdentifierArray[index0.getX()][index1.getY()] == pieceIdentifierArray[index0.getX()][index2.getY()]) {
-            return false;
-        }
-        return true;
-    }
-
-    static int[][] updateIdentifier(Tile tile, int[][] pieceIdentifierArray, int pieceIdentifier) {
-        /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
-
-        pieceIdentifierArray[index0.getX()][index0.getY()] = pieceIdentifier;
-        pieceIdentifierArray[index1.getX()][index1.getY()] = pieceIdentifier;
-        pieceIdentifierArray[index2.getX()][index2.getY()] = pieceIdentifier;
-
-        return pieceIdentifierArray;
-    }
-
-
-    // Given a tile and the board (array) of colours, change the colours
-    static Colour[][] updateBoardColours(Tile tile, Colour[][] colourArray) {
-        /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
-
-        /* Set the relevant cells in the colourArray to their corresponding cell
-         * colours given their Shape ID, and return */
-        colourArray[index0.getX()][index0.getY()]= tile.getShape().colourAtIndex(0);
-        colourArray[index1.getX()][index1.getY()]= tile.getShape().colourAtIndex(1);
-        colourArray[index2.getX()][index2.getY()]= tile.getShape().colourAtIndex(2);
-        return colourArray;
-    }
-
-    // Given a tile and the board (array) of heights, increase the height
-    static int[][] updateBoardHeights(Tile tile, int[][] heightArray) {
-        /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
-
-        /* Increment the corresponding positions in the heightArray by 1 and return */
-        heightArray[index0.getX()][index0.getY()]++;
-        heightArray[index1.getX()][index1.getY()]++;
-        heightArray[index2.getX()][index2.getY()]++;
-        return heightArray;
-    }
-
-    /* Check if a placement is valid height-wise, i.e. the heights of each of the three cells are equal */
-    static boolean areHeightsValid(Tile tile, int[][] heightArray) {
-        /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
-
-        /* Check whether all the heights of all three cells are equal */
-        return (heightArray[index0.getX()][index0.getY()] == heightArray[index1.getX()][index1.getY()] &&
-                heightArray[index0.getX()][index0.getY()] == heightArray[index2.getX()][index2.getY()]);
-    }
-
-    /* TODO:
-    Tiles may be placed adjacent to any other tile (edge touching edge).
-    When tiles are stacked:
-        - Green and red cannot be stacked on top of each other. (simple)
-        - Black (neutral) can be stacked with green and red. (simple)
-        - Each color may be stacked on top of itself. (simple)
-        - Each square of the tile must be stacked upon a square below (no overhangs allowed). (simple)
-        - Each stacked tile must straddle at least two tiles below. (hard - how do we tell which tiles have been placed where?)
-    */
-
-    /* FIXME: Fix and clean all the code here */
-    /* We check if a tile is adjacent to another tile */
-    // isAdjacent checks if it is next to a tile, if the heights directly on or next to the position
-    // of the tile placed is larger than 0, it is next to a piece
-    private static boolean isAdjacent(Tile tile, int[][] heightArray) {
-        /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 0);
-        Position index2 = cellPosition(tile, 0);
-
-        return (// checks if index0 next to a piece
-                heightArray[index0.getX()][index0.getY()]   > 0 ||
-                heightArray[index0.getX()+1][index0.getY()] > 0 ||
-                heightArray[index0.getX()-1][index0.getY()] > 0 ||
-                heightArray[index0.getX()][index0.getY()+1] > 0 ||
-                heightArray[index0.getX()][index0.getY()-1] > 0 ||
-                // checks if index1 next to a piece
-                heightArray[index1.getX()][index1.getY()]   > 0 ||
-                heightArray[index1.getX()+1][index1.getY()] > 0 ||
-                heightArray[index1.getX()-1][index1.getY()] > 0 ||
-                heightArray[index1.getX()][index1.getY()+1] > 0 ||
-                heightArray[index1.getX()][index1.getY()-1] > 0 ||
-                // checks if index2 next to a piece
-                heightArray[index2.getX()][index2.getY()]   > 0 ||
-                heightArray[index2.getX()+1][index2.getY()] > 0 ||
-                heightArray[index2.getX()-1][index2.getY()] > 0 ||
-                heightArray[index2.getX()][index2.getY()+1] > 0 ||
-                heightArray[index2.getX()][index2.getY()-1] > 0);
-    }
-
-
-    /* Checks that no part of the tile extends beyond the board */
-    private static boolean isOnBoard (Tile tile) {
-        // Get the position coordinates of our Tile
-        Position position = tile.getPosition();
-        // We check the Tile over the orientation
-        switch (tile.getOrientation()) {
-            /* FIXME: LOGIC FOR THESE IS INCORRECT
-             *   - char's don't correspond with int's nicely
-             *   - if we have, say orientation 'A' across the most right column
-             *     of the board, it is not on the board for the whole column, not just the corners, use >= <= etc.
-             *   - etc.
-             */
-            case A:
-                // at right or bottom edge return false
-                if (position.getX() == BOARD_SIZE || position.getY() == BOARD_SIZE) {
-                    return false;
-                }
-                break;
-            case B:
-                // at left or bottom edge return false
-                if (position.getX() == 1 || position.getY() == BOARD_SIZE) {
-                    return false;
-                }
-                break;
-            case C:
-                // at left or top edge return false
-                if (position.getX() == 1 || position.getY() == 1) {
-                    return false;
-                }
-                break;
-            case D:
-                // at right or top edge return false
-                if (position.getX() == BOARD_SIZE || position.getY() == 1) {
-                    return false;
-                }
-                break;
-        }
-        return true;
-    }
-
 
     /**
      * Determine the score for a player given a placement, following the
@@ -443,5 +398,14 @@ public class StratoGame {
     static String generateMove(String placement, char piece, char opponentsPiece) {
         // FIXME Task 10: generate a valid move
         return null;
+    }
+
+    /* TESTING */
+    public static void main(String[] args) {
+        boolean b1 = isTilePlacementWellFormed("MMUA");
+        boolean b2 = isPlacementWellFormed("MMUA");
+        boolean b3 = isPlacementValid("MMUA");
+
+        System.out.println("b1: " + b1 + ", b2: " + b2 + ", b3: " + b3);
     }
 }

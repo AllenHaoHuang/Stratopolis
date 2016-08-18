@@ -12,7 +12,7 @@ public class Board extends Application {
     // FIXME Task 8: Implement a basic playable Strato Game in JavaFX that only allows pieces to be placed in valid places
     // This links to PlayGame and Tile, we create a tile for the UML diagram
     private void playGame() {
-        Tile temp = new Tile(null, Shape.A, Orientation.A, 1);
+        Tile temp = new Tile(null, Shape.A, Orientation.A);
     }
 
     // FIXME Task 9: Implement scoring
