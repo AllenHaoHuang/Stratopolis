@@ -9,10 +9,6 @@ public class Tile {
     private Shape shape;
     private Orientation orientation;
 
-    public Position getPosition() {return position;}
-    public Shape getShape() {return shape;}
-    public Orientation getOrientation() {return orientation;}
-
     //Integer height;
 
     /* Constructor for a Tile - includes where the tile is located,
@@ -24,6 +20,11 @@ public class Tile {
         this.orientation = o;
        // this.height = h;
     }
+
+    // Returns the fields of a Tile object
+    public Position getPosition() {return position;}
+    public Shape getShape() {return shape;}
+    public Orientation getOrientation() {return orientation;}
 
     // To implement - hopefully...
     // Note very carefully how we can stack pieces
