@@ -117,7 +117,47 @@ public class Viewer extends Application {
         root.getChildren().add(controls);
     }
 
+    /** We represent the grid as a collection of Cells.
+     *  Each Cell is initially initalised with their respective coordinate positions.
+     *  Cells with colours can be created to fill in a cell
+     */
+    private class Cell extends StackPane {
+        private Cell(String str) {
+            // We create a square with a border
+            Rectangle border = new Rectangle(24, 24);
+            border.setFill(null);
+            border.setStroke(Color.LIGHTGREY);
+            // We create the text to indicate the position
+            Text text = new Text(str);
+            text.setFont(Font.font(12));
+            text.setFill(Color.GRAY);
+            setAlignment(Pos.CENTER);
+            // Combine the square and the text
+            getChildren().addAll(border, text);
+        }
 
+        private Cell(Colour colour) {
+            // Create the cell and fill it with the relevant colour
+            Rectangle cell = new Rectangle(24, 24);
+            cell.setStroke(Color.rgb(54, 54, 54));
+            cell.setStrokeType(StrokeType.INSIDE);
+            cell.setStrokeWidth(2);
+            switch(colour) {
+                case Black:
+                    cell.setFill(Color.rgb(0, 0, 0));
+                    break;
+                case Red:
+                    cell.setFill(Color.rgb(255, 0, 0));
+                    break;
+                case Green:
+                    cell.setFill(Color.rgb(0, 127, 0));
+                    break;
+                default :
+                    cell.setFill(null);
+            }
+            getChildren().add(cell);
+        }
+    }
 
     /**
      * Create a basic text field for input and a refresh button.
@@ -159,47 +199,6 @@ public class Viewer extends Application {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid placement string.");
             alert.showAndWait();
             textField.clear();
-        }
-    }
-
-    /** We represent the grid as a collection of Cells.
-     *  Each Cell is initially initalised with their respective coordinate positions.
-     *  Cells with colours can be created to fill in a cell
-     */
-    private class Cell extends StackPane {
-        public Cell(String str) {
-            Rectangle border = new Rectangle(24, 24);
-            border.setFill(null);
-            border.setStroke(Color.DARKGRAY);
-
-            Text text = new Text(str);
-            text.setFont(Font.font(12));
-            text.setFill(Color.GRAY);
-
-            setAlignment(Pos.CENTER);
-            getChildren().addAll(border, text);
-        }
-
-        public Cell(Colour colour) {
-            Rectangle cell = new Rectangle(24, 24);
-            cell.setStroke(Color.gray(0.1));
-            cell.setStrokeType(StrokeType.INSIDE);
-            cell.setStrokeWidth(2);
-
-            switch(colour) {
-                case Black:
-                    cell.setFill(Color.BLACK);
-                    break;
-                case Red:
-                    cell.setFill(Color.RED);
-                    break;
-                case Green:
-                    cell.setFill(Color.GREEN);
-                    break;
-                default :
-                    cell.setFill(null);
-            }
-            getChildren().add(cell);
         }
     }
 
