@@ -38,10 +38,9 @@ public class Viewer extends Application {
     private static final int TILE_PLACEMENT_LENGTH = 4;
 
     private static final String URI_BASE = "assets/";
-    private TilePane grid = new TilePane();
     private final Group root = new Group();
     private final Group controls = new Group();
-    TextField textField;
+    private TextField textField;
 
     /**
      * Draw a placement in the window, removing any previously drawn one
@@ -51,14 +50,12 @@ public class Viewer extends Application {
     void makePlacement(String placement) {
         // FIXME Task 5
 
-        // We clear an existing grid
+        // We clear an existing grid and set the initial tile "MMUA"
         defaultGrid();
+        setInitialPiece();
 
-        // We know if |placement| = 4, placement = "MMUA"
-        if (placement.length() == 4) {
-            setInitialPiece();
-            return;
-        }
+        // We know if |placement| = 4, placement = "MMUA" only
+        if (placement.length() == 4) { return; }
 
         // Loop through the rest of the placement string
         for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
@@ -91,6 +88,16 @@ public class Viewer extends Application {
     private int translateX(char x) { return (x - 'A')*24 + 63; }
     private int translateY(char y) { return (y - 'A')*24 + 10; }
 
+    // Set the initial "MMUA" for ease
+    private void setInitialPiece() {
+        Cell c1 = new Cell(Colour.Red);
+        Cell c2 = new Cell(Colour.Green);
+        c1.setTranslateX(351); c1.setTranslateY(298);
+        c2.setTranslateX(351); c2.setTranslateY(322);
+        root.getChildren().set(324, c1);
+        root.getChildren().set(350, c2);
+    }
+
     // We create the default grid
     private void defaultGrid() {
         // Clear any existing children
@@ -110,15 +117,7 @@ public class Viewer extends Application {
         root.getChildren().add(controls);
     }
 
-    // Set the initial "MMUA" for ease
-    private void setInitialPiece() {
-        Cell c1 = new Cell(Colour.Red);
-        Cell c2 = new Cell(Colour.Green);
-        c1.setTranslateX(351); c1.setTranslateY(298);
-        c2.setTranslateX(351); c2.setTranslateY(322);
-        root.getChildren().set(324, c1);
-        root.getChildren().set(350, c2);
-    }
+
 
     /**
      * Create a basic text field for input and a refresh button.
@@ -162,19 +161,6 @@ public class Viewer extends Application {
         }
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("StratoGame Viewer");
-        Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
-
-        // First create grid with cell identifiers then enable controls
-        defaultGrid();
-        makeControls();
-
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
     /** We represent the grid as a collection of Cells.
      *  Each Cell is initially initalised with their respective coordinate positions.
      *  Cells with colours can be created to fill in a cell
@@ -214,5 +200,18 @@ public class Viewer extends Application {
             }
             getChildren().add(cell);
         }
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("StratoGame Viewer");
+        Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
+
+        // First create grid with cell identifiers then enable controls
+        defaultGrid();
+        makeControls();
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 }
