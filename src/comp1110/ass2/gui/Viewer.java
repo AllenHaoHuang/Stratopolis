@@ -103,10 +103,10 @@ public class Viewer extends Application {
         // Clear any existing children
         root.getChildren().clear();
         // Create grid with cell identifiers
-        for (int i = 0; i < GRID_SIZE; i++) { // rows
-            for (int j = 0; j < GRID_SIZE; j++) { // columns
-                char x = (char)(i+'A');
-                char y = (char)(j+'A');
+        for (int i = 0; i < GRID_SIZE; i++) { // columns
+            for (int j = 0; j < GRID_SIZE; j++) { // rows
+                char x = (char)(j+'A');
+                char y = (char)(i+'A');
                 StringBuilder sb = new StringBuilder().append(x).append(y);
                 Cell cell = new Cell(sb.toString());
                 cell.setTranslateX(j*24 + 63);
@@ -195,7 +195,6 @@ public class Viewer extends Application {
             makePlacement(textField.getText());
             textField.clear();
         } else {
-            defaultGrid();
             Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid placement string.");
             alert.showAndWait();
             textField.clear();
