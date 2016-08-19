@@ -125,7 +125,7 @@ public class StratoGame {
      * @param placement A placement string
      * @return True if the placement is valid
      */
-    static boolean isPlacementValid(String placement) {
+    public static boolean isPlacementValid(String placement) {
         // FIXME Task 6: determine whether a placement is valid
 
         // We first check if the input Placement String is well-formed itself
