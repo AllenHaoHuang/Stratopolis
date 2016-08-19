@@ -153,6 +153,7 @@ public class Viewer extends Application {
     private void handleRefresh() {
         if(StratoGame.isPlacementValid(textField.getText())) {
             makePlacement(textField.getText());
+            textField.clear();
         } else {
             defaultGrid();
             Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid placement string.");
