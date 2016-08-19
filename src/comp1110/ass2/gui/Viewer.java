@@ -8,9 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import comp1110.ass2.StratoGame;
 
@@ -29,7 +28,7 @@ public class Viewer extends Application {
     private static final int GRID_SIZE = 26;
 
     private static final String URI_BASE = "assets/";
-
+    private TilePane grid = new TilePane();
     private final Group root = new Group();
     private final Group controls = new Group();
     TextField textField;
@@ -42,16 +41,17 @@ public class Viewer extends Application {
      */
     void makePlacement(String placement) {
         // FIXME Task 5
-        GridPane grid = new GridPane();
+        //CREATE THE GRID
+        grid.getChildren().clear();
+        for (int i = 0; i <= GRID_SIZE; i++) {
+            grid.getChildren().add(createElement());
 
-        GridPane.setConstraints(grid, GRID_SIZE, GRID_SIZE);
-
-
-
-        for (int i = 0; i < GRID_SIZE; i++) {
-            grid.getColumnConstraints().add(new ColumnConstraints(100));
         }
-
+    }
+    //CREATE A 20*20 size REC
+    private Rectangle createElement() {
+        Rectangle rec = new Rectangle(20,20);
+        return rec;
     }
 
 
