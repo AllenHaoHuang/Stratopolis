@@ -20,9 +20,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import comp1110.ass2.StratoGame;
+
+import java.util.Arrays;
 
 /**
  * A very simple viewer for piece placements in the link game.
@@ -44,6 +47,9 @@ public class Viewer extends Application {
     private final Group controls = new Group();
     private TextField textField;
 
+    // Array to store heights
+    private int[][] heightArray = new int[GRID_SIZE][GRID_SIZE];
+
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
@@ -56,6 +62,12 @@ public class Viewer extends Application {
         defaultGrid();
         setInitialPiece();
 
+        // Clear the height array and set 'MMUA' height
+        for(int i = 0; i < GRID_SIZE; i++ )
+            Arrays.fill(heightArray[i], 0);
+        heightArray[12][12]++;
+        heightArray[12][13]++;
+
         // We know if |placement| = 4, placement = "MMUA" only
         if (placement.length() == 4) { return; }
 
@@ -66,6 +78,9 @@ public class Viewer extends Application {
             char originY = placement.charAt(i + 1);
             Shape shapeID = Shape.fromChar(placement.charAt(i + 2));
             Orientation orientation = Orientation.fromChar(placement.charAt(i + 3));
+
+            // Update the height array with the new tile
+            updateHeightArray(originX, originY, orientation);
 
             /* We set a cell on the board according to its orientation.
                Recall that we represent a L-tile as a triple (a, b, c) encoded as:
@@ -104,12 +119,45 @@ public class Viewer extends Application {
     /* Set a cell on the board */
     private void setCell(char x, char y, Colour colour) {
         // Create a new Cell based on the given colour
-        Cell cell = new Cell(colour);
+        Cell cell;
+        if (heightArray[x - 'A'][y - 'A'] > 1 && !(colour.equals(Colour.Black)))
+            cell = new Cell(colour, heightArray[x - 'A'][y - 'A']);
+        else
+            cell = new Cell(colour);
         // How much we translate the cell from (0,0)
         cell.setTranslateX(translateX(x));
         cell.setTranslateY(translateY(y));
         // Add the Cell to the group and hence the Scene
         root.getChildren().set(getIndex(x, y), cell);
+    }
+
+    /* Update the height array */
+    private void updateHeightArray(char c1, char c2, Orientation orientation) {
+        int x = c1 - 'A';
+        int y = c2 - 'A';
+        switch(orientation) {
+            case A:
+                heightArray[x][y]++;
+                heightArray[x + 1][y]++;
+                heightArray[x][y + 1]++;
+                return;
+            case B:
+                heightArray[x][y]++;
+                heightArray[x][y + 1]++;
+                heightArray[x - 1][y]++;
+                return;
+            case C:
+                heightArray[x][y]++;
+                heightArray[x - 1][y]++;
+                heightArray[x][y - 1]++;
+                return;
+            case D:
+                heightArray[x][y]++;
+                heightArray[x][y - 1]++;
+                heightArray[x + 1][y]++;
+                return;
+            case NULL:
+        }
     }
 
     /* We get the index in the Scene `root`, of the position given */
@@ -191,6 +239,34 @@ public class Viewer extends Application {
             }
             getChildren().add(cell);
         }
+
+        private Cell(Colour colour, int height) {
+            // Create the cell and fill it with the relevant colour
+            Rectangle cell = new Rectangle(24, 24);
+            cell.setStroke(Color.rgb(54, 54, 54));
+            cell.setStrokeType(StrokeType.INSIDE);
+            cell.setStrokeWidth(2);
+            switch(colour) {
+                case Black:
+                    cell.setFill(Color.rgb(0, 0, 0));
+                    break;
+                case Red:
+                    cell.setFill(Color.rgb(255, 0, 0));
+                    break;
+                case Green:
+                    cell.setFill(Color.rgb(0, 127, 0));
+                    break;
+                case NULL :
+                    cell.setFill(null);
+            }
+            // We create the text to indicate the position
+            Text text = new Text(String.valueOf(height));
+            text.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+            text.setFill(Color.WHITE);
+            setAlignment(Pos.CENTER);
+            // Add the cell with height text
+            getChildren().addAll(cell, text);
+        }
     }
 
     /**
@@ -245,6 +321,7 @@ public class Viewer extends Application {
         makeControls();
 
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 }

@@ -6,5 +6,5 @@ package comp1110.ass2.logic;
 
 public enum Colour {
     // The colours on our pieces
-    Red, Green, Black
+    Red, Green, Black, NULL
 }
