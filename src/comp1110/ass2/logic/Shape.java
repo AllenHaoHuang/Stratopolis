@@ -45,7 +45,9 @@ public enum Shape {
     S(Green, Green, Red),
     T(Green, Green, Green),
     // Starting Shape: 'U'
-    U(Red, Green);
+    U(Red, Green),
+    // Undefined Shape : NULL
+    NULL(Black, Black, Black);
 
     // Array representing colours in a piece/tile
     final Colour[] colours;
@@ -94,7 +96,7 @@ public enum Shape {
             case 'S': return Shape.S;
             case 'T': return Shape.T;
             case 'U': return Shape.U;
+            default : return NULL;
         }
-        return null;  // Invalid char input
     }
 }

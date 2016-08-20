@@ -11,7 +11,7 @@ public enum Orientation {
      *    C: rotated 180 degrees
      *    D: rotate 90 degrees anticlockwise
      */
-    A, B, C, D;
+    A, B, C, D, NULL;
 
     /* Return the Orientation enum given a character input */
     public static Orientation fromChar(char ch) {
@@ -20,7 +20,7 @@ public enum Orientation {
             case 'B': return Orientation.B;
             case 'C': return Orientation.C;
             case 'D': return Orientation.D;
+            default : return NULL; // need to fix
         }
-        return null;  // Invalid char input
     }
 }
