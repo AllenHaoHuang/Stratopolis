@@ -56,8 +56,6 @@ public class Viewer extends Application {
      * @param placement  A valid placement string
      */
     void makePlacement(String placement) {
-        // FIXME Task 5
-
         // We clear an existing grid and set the initial tile "MMUA"
         defaultGrid();
         setInitialPiece();
@@ -305,6 +303,7 @@ public class Viewer extends Application {
             makePlacement(textField.getText());
             textField.clear();
         } else {
+            defaultGrid();
             Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid placement string.");
             alert.showAndWait();
             textField.clear();
