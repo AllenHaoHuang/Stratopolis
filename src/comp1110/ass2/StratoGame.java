@@ -125,7 +125,7 @@ public class StratoGame {
      * @param placement A placement string
      * @return True if the placement is valid
      */
-    static boolean isPlacementValid(String placement) {
+    public static boolean isPlacementValid(String placement) {
         // FIXME Task 6: determine whether a placement is valid
 
         // We first check if the input Placement String is well-formed itself
@@ -138,8 +138,8 @@ public class StratoGame {
         int[][] heightArray = new int[BOARD_SIZE][BOARD_SIZE];
 
         /* Initialise the 2-dimensional array (which represents the board) to the Black
-         * tile colour. Recall, that Black is neutral - i.e. it can be stacked on top of
-         * Red, Green and itself. */
+         * tile colour. Recall, that Black is neutral - i.e. Red, Green and Black can
+         * be stacked upon Black. */
         Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
         for (Colour[] row : colourArray)
             Arrays.fill(row, Colour.Black);
@@ -172,12 +172,13 @@ public class StratoGame {
                 areColoursValid(substringTile, colourArray) &&
                 areHeightsValid(substringTile, heightArray) &&
                 isOverTwoTiles(substringTile, pieceIDArray, heightArray)) {
-                    // Update the arrays
+                    // Update the arrays and increment pieceID
                     colourArray = updateBoardColours(substringTile, colourArray);
                     heightArray = updateBoardHeights(substringTile, heightArray);
                     pieceIDArray = updateIdentifier(substringTile, pieceIDArray, pieceID++);
             } else {
-                System.out.println("isOnBoard: " + isOnBoard(substringTile) + ", isAdjacent: " + isAdjacent(substringTile,heightArray)
+                /* FIXME: Testing code */
+                System.out.println("TEST RESULTS - isOnBoard: " + isOnBoard(substringTile) + ", isAdjacent: " + isAdjacent(substringTile,heightArray)
                         + ", areColoursValid: " + areColoursValid(substringTile, colourArray) + ", areHeightsValid: "
                         + areHeightsValid(substringTile, heightArray) + ", isOverTwoTiles: " + isOverTwoTiles(substringTile, pieceIDArray, heightArray));
                 return false;
@@ -264,10 +265,21 @@ public class StratoGame {
         int x = index0.getX();
         int y = index0.getY();
 
-        // TODO: Need to account for boundaries
+        // TODO: Need to account for boundaries, please do this Marvin
         // We take the relevant x and y positions about the origin cell using maths
         switch(tile.getOrientation()) {
+            // Recall that `&&` will not check the 2nd condition if the 1st is false
             case A:
+                /**
+                 * Recall that x cannot be smaller than 0 or bigger than 25 - i.e. 0 <= x <= 25
+                 * Also, y cannot be smaller than 0 or bigger than 25 - i.e. 0 <= y <= 25
+                 * e.g. heightArray[x-1][y] > 0 translates to
+                 *      if (!(x-1 < 0) && heightArray[x-1][y] > 0) return true;
+                 *
+                 *      heightArray[x+1][y-1] > 0 translates to
+                 *      if (!(x+1 > 25) && !(x-1 < 0) && heightArray[x+1][y-1] > 0) return true;
+                 */
+
                 return (heightArray[x-1][y] > 0 ||
                         heightArray[x+2][y] > 0 ||
                         heightArray[x][y-1] > 0 ||
@@ -429,10 +441,11 @@ public class StratoGame {
         return null;
     }
 
-    /* TESTING */
+    /* FIXME: TESTING Code */
     public static void main(String[] args) {
         System.out.println("----------------------------");
-        String[] strArr = {"MMUA","MMUANLOB","MMUANLOBLNBC","MMUANLOBLNBCONSCKLDAPOTCMLEBPLMBKNJDOLNBMLDANPLDNNBAONMCLOFAPQTC"};
+        String[] strArr = {"MMUA","MMUANLOB","MMUANLOBLNBC","MMUANLOBLNBCONSCKLDAPOTCMLEBPLMBKNJDOLNBMLDANPLDNNBAONMCLOFAPQTC",
+        "MMUANLOBNMHC"};
         for (String str : strArr) {
             if (str.length() > 4) {
                 System.out.println("String being tested: " + str);

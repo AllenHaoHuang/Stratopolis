@@ -1,16 +1,24 @@
 package comp1110.ass2.gui;
 
+import comp1110.ass2.logic.Colour;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import comp1110.ass2.StratoGame;
 
@@ -27,13 +35,12 @@ public class Viewer extends Application {
     private static final int VIEWER_WIDTH = 750;
     private static final int VIEWER_HEIGHT = 700;
     private static final int GRID_SIZE = 26;
+    private static final int TILE_PLACEMENT_LENGTH = 4;
 
     private static final String URI_BASE = "assets/";
-
     private final Group root = new Group();
     private final Group controls = new Group();
-    TextField textField;
-
+    private TextField textField;
 
     /**
      * Draw a placement in the window, removing any previously drawn one
@@ -42,18 +49,779 @@ public class Viewer extends Application {
      */
     void makePlacement(String placement) {
         // FIXME Task 5
-        GridPane grid = new GridPane();
 
-        GridPane.setConstraints(grid, GRID_SIZE, GRID_SIZE);
+        // We clear an existing grid and set the initial tile "MMUA"
+        defaultGrid();
+        setInitialPiece();
+
+        // We know if |placement| = 4, placement = "MMUA" only
+        if (placement.length() == 4) { return; }
+
+        // Loop through the rest of the placement string
+
+        for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
+            char originX = placement.charAt(i);
+            char originY = placement.charAt(i+1);
+            char shapeID = placement.charAt(i+2);
+            char orientation = placement.charAt(i+3);
 
 
+            //for any piece at A direction,I name them with index;
+            // 1 2                        3  1
+            // 3     so if it at B dir;     2      so does C,D
 
-        for (int i = 0; i < GRID_SIZE; i++) {
-            grid.getColumnConstraints().add(new ColumnConstraints(100));
+            //
+
+            //calculate the x and y coordinate for each tile we have
+            int p1 = translateX(originX); //get the x coordinate of the tile
+            int p2 = translateY(originY); //get the y coordinate of the tile
+            int p3 = p1 + 24;  // find the x coordinate of the char that next to originX
+            int p4 = p2 + 24;  // find the y coordinate of the char that below the originY
+            //below are the way that caculate the index of the square that will be replace in the 26*26 grid
+            // those are represent different postion in a square
+            //p6 p7
+            //p9 p8
+            int p6 = getIndex(originX,originY);
+            int p7 = (originX - 'B')+ (originY - 'A')*26;
+            int p8 = (originX - 'B')+ (originY - 'B')*26;
+            int p9 = (originX - 'A')+ (originY - 'B')*26;
+
+            if (shapeID == 'A'){
+                  if (orientation == 'A'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Black);   //i1,i2,i3 represent the color square in position as mentioned above
+                      i1.setTranslateX(p1); i1.setTranslateY(p2);
+                      i2.setTranslateX(p3); i2.setTranslateY(p2);
+                      i3.setTranslateX(p1); i3.setTranslateY(p4);
+                      root.getChildren().set(p6, i1);
+                      root.getChildren().set(p7, i2);
+                      root.getChildren().set(p9, i3);}
+                  else if (orientation == 'B'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Black);
+                      i1.setTranslateX(p3); i1.setTranslateY(p2);
+                      i2.setTranslateX(p3); i2.setTranslateY(p4);
+                      i3.setTranslateX(p1); i3.setTranslateY(p2);
+                      root.getChildren().set(p7, i1);
+                      root.getChildren().set(p8, i2);
+                      root.getChildren().set(p1, i3);}
+                  else if (orientation == 'C'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Black);
+                      i1.setTranslateX(p3); i1.setTranslateY(p4);
+                      i2.setTranslateX(p1); i2.setTranslateY(p4);
+                      i3.setTranslateX(p3); i3.setTranslateY(p2);
+                      root.getChildren().set(p8, i1);
+                      root.getChildren().set(p9, i2);
+                      root.getChildren().set(p7, i3);}
+                  else if (orientation == 'D'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Black);
+                      i1.setTranslateX(p1); i1.setTranslateY(p9);
+                      i2.setTranslateX(p1); i2.setTranslateY(p6);
+                      i3.setTranslateX(p3); i3.setTranslateY(p8);
+                      root.getChildren().set(p9, i1);
+                      root.getChildren().set(p6, i2);
+                      root.getChildren().set(p8, i3);}
+
+              }
+            else if (shapeID == 'B'){
+                  if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Red);
+                      i1.setTranslateX(p1); i1.setTranslateY(p2);
+                      i2.setTranslateX(p3); i2.setTranslateY(p2);
+                      i3.setTranslateX(p1); i3.setTranslateY(p4);
+                      root.getChildren().set(p6, i1);
+                      root.getChildren().set(p7, i2);
+                      root.getChildren().set(p9, i3);}
+                  else if (orientation == 'B'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Red);
+                      i1.setTranslateX(p3); i1.setTranslateY(p2);
+                      i2.setTranslateX(p3); i2.setTranslateY(p4);
+                      i3.setTranslateX(p1); i3.setTranslateY(p2);
+                      root.getChildren().set(p7, i1);
+                      root.getChildren().set(p8, i2);
+                      root.getChildren().set(p1, i3);}
+                  else if (orientation == 'C'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Red);
+                      i1.setTranslateX(p3); i1.setTranslateY(p4);
+                      i2.setTranslateX(p1); i2.setTranslateY(p4);
+                      i3.setTranslateX(p3); i3.setTranslateY(p2);
+                      root.getChildren().set(p8, i1);
+                      root.getChildren().set(p9, i2);
+                      root.getChildren().set(p7, i3);}
+                  else if (orientation == 'D'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Red);
+                      i1.setTranslateX(p1); i1.setTranslateY(p4);
+                      i2.setTranslateX(p1); i2.setTranslateY(p2);
+                      i3.setTranslateX(p3); i3.setTranslateY(p4);
+                      root.getChildren().set(p9, i1);
+                      root.getChildren().set(p6, i2);
+                      root.getChildren().set(p8, i3);}
+            }
+            else if (shapeID == 'C'){if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Black);
+                      i1.setTranslateX(p1); i1.setTranslateY(p2);
+                      i2.setTranslateX(p3); i2.setTranslateY(p2);
+                      i3.setTranslateX(p1); i3.setTranslateY(p4);
+                      root.getChildren().set(p6, i1);
+                      root.getChildren().set(p7, i2);
+                      root.getChildren().set(p9, i3);}
+                  else if (orientation == 'B'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Black);
+                      i1.setTranslateX(p3); i1.setTranslateY(p2);
+                      i2.setTranslateX(p3); i2.setTranslateY(p4);
+                      i3.setTranslateX(p1); i3.setTranslateY(p2);
+                      root.getChildren().set(p7, i1);
+                      root.getChildren().set(p8, i2);
+                      root.getChildren().set(p1, i3);}
+                  else if (orientation == 'C'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Black);
+                      i1.setTranslateX(p3); i1.setTranslateY(p4);
+                      i2.setTranslateX(p1); i2.setTranslateY(p4);
+                      i3.setTranslateX(p3); i3.setTranslateY(p2);
+                      root.getChildren().set(p8, i1);
+                      root.getChildren().set(p9, i2);
+                      root.getChildren().set(p7, i3);}
+                  else if (orientation == 'D'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Black);
+                      i1.setTranslateX(p1); i1.setTranslateY(p4);
+                      i2.setTranslateX(p1); i2.setTranslateY(p2);
+                      i3.setTranslateX(p3); i3.setTranslateY(p4);
+                      root.getChildren().set(p9, i1);
+                      root.getChildren().set(p6, i2);
+                      root.getChildren().set(p8, i3);}
+
+                  }
+
+            }
+            else if (shapeID == 'D'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+            }
+            else if (shapeID == 'E'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+            }
+            else if (shapeID == 'F'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+            }
+            else if (shapeID == 'G'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+
+                  }
+
+            }
+              else if (shapeID == 'H'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'I'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'J'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'K'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'L'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'M'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'N'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Black);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'O'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Black);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+              }
+              else if (shapeID == 'P'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Black);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'Q'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Red);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'R'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Red);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'S'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Red);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                  }
+
+              }
+              else if (shapeID == 'T'){
+                      if (orientation == 'A'){if (orientation == 'A'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p2);
+                          i3.setTranslateX(p1); i3.setTranslateY(p4);
+                          root.getChildren().set(p6, i1);
+                          root.getChildren().set(p7, i2);
+                          root.getChildren().set(p9, i3);}
+                      else if (orientation == 'B'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p2);
+                          i2.setTranslateX(p3); i2.setTranslateY(p4);
+                          i3.setTranslateX(p1); i3.setTranslateY(p2);
+                          root.getChildren().set(p7, i1);
+                          root.getChildren().set(p8, i2);
+                          root.getChildren().set(p1, i3);}
+                      else if (orientation == 'C'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p3); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p4);
+                          i3.setTranslateX(p3); i3.setTranslateY(p2);
+                          root.getChildren().set(p8, i1);
+                          root.getChildren().set(p9, i2);
+                          root.getChildren().set(p7, i3);}
+                      else if (orientation == 'D'){Cell i1 = new Cell(Colour.Green);Cell i2 = new Cell(Colour.Green);Cell i3 = new Cell(Colour.Green);
+                          i1.setTranslateX(p1); i1.setTranslateY(p4);
+                          i2.setTranslateX(p1); i2.setTranslateY(p2);
+                          i3.setTranslateX(p3); i3.setTranslateY(p4);
+                          root.getChildren().set(p9, i1);
+                          root.getChildren().set(p6, i2);
+                          root.getChildren().set(p8, i3);}
+                      else {
+                          System.out.println("invalid input");
+                      }
+                  }
+
+              }
+            // FIXME: Code in how each piece is placed as a cell on the board
+            // check orientation, use Shapes class and use logic
+            //System.out.println(originX+originY+shapeID+orientation);
+            //return;
+        }
         }
 
+        // Translate position rules, here so you can understand
+        char x = 'M', y = 'N';
+        int translateX = translateX(x);
+        int translateY = translateY(y);
+        System.out.println("translateX: " + translateX + ", translateY: "+ translateY);
+        int index = getIndex(x, y);
+        System.out.println("Index for 'MN' in root group: " + index);
     }
 
+    /* We get the index in the Scene `root`, of the position given */
+    private int getIndex(char x, char y) {
+        if (y - 'A' == 0) return x - 'A';
+        else return (x - 'A')+(y - 'A')*26;
+    }
+
+    // Calculate how many pixels to translate x and y by on window
+    private int translateX(char x) { return (x - 'A')*24 + 63; }
+    private int translateY(char y) { return (y - 'A')*24 + 10; }
+
+    // Set the initial "MMUA" for ease
+    private void setInitialPiece() {
+        Cell c1 = new Cell(Colour.Red);
+        Cell c2 = new Cell(Colour.Green);
+        c1.setTranslateX(351); c1.setTranslateY(298);
+        c2.setTranslateX(351); c2.setTranslateY(322);
+        root.getChildren().set(324, c1);
+        root.getChildren().set(350, c2);
+    }
+
+    // We create the default grid
+    private void defaultGrid() {
+        // Clear any existing children
+        root.getChildren().clear();
+        // Create grid with cell identifiers
+        for (int i = 0; i < GRID_SIZE; i++) { // columns
+            for (int j = 0; j < GRID_SIZE; j++) { // rows
+                char x = (char)(j+'A');
+                char y = (char)(i+'A');
+                StringBuilder sb = new StringBuilder().append(x).append(y);
+                Cell cell = new Cell(sb.toString());
+                cell.setTranslateX(j*24 + 63);
+                cell.setTranslateY(i*24 + 10);
+                root.getChildren().add(cell);
+            }
+        }
+        root.getChildren().add(controls);
+    }
+
+    /** We represent the grid as a collection of Cells.
+     *  Each Cell is initially initalised with their respective coordinate positions.
+     *  Cells with colours can be created to fill in a cell
+     */
+    private class Cell extends StackPane {
+        private Cell(String str) {
+            // We create a square with a border
+            Rectangle border = new Rectangle(24, 24);
+            border.setFill(null);
+            border.setStroke(Color.LIGHTGREY);
+            // We create the text to indicate the position
+            Text text = new Text(str);
+            text.setFont(Font.font(12));
+            text.setFill(Color.GRAY);
+            setAlignment(Pos.CENTER);
+            // Combine the square and the text
+            getChildren().addAll(border, text);
+        }
+
+        private Cell(Colour colour) {
+            // Create the cell and fill it with the relevant colour
+            Rectangle cell = new Rectangle(24, 24);
+            cell.setStroke(Color.rgb(54, 54, 54));
+            cell.setStrokeType(StrokeType.INSIDE);
+            cell.setStrokeWidth(2);
+            switch(colour) {
+                case Black:
+                    cell.setFill(Color.rgb(0, 0, 0));
+                    break;
+                case Red:
+                    cell.setFill(Color.rgb(255, 0, 0));
+                    break;
+                case Green:
+                    cell.setFill(Color.rgb(0, 127, 0));
+                    break;
+                default :
+                    cell.setFill(null);
+            }
+            getChildren().add(cell);
+        }
+    }
 
     /**
      * Create a basic text field for input and a refresh button.
@@ -63,11 +831,18 @@ public class Viewer extends Application {
         textField = new TextField ();
         textField.setPrefWidth(300);
         Button button = new Button("Refresh");
+        // Handle <ENTER> key pressed on TextField
+        textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if(event.getCode().equals(KeyCode.ENTER)) handleRefresh();
+            }
+        });
+        // Handle click of `Refresh` button
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                makePlacement(textField.getText());
-                textField.clear();
+                handleRefresh();
             }
         });
         HBox hb = new HBox();
@@ -78,13 +853,25 @@ public class Viewer extends Application {
         controls.getChildren().add(hb);
     }
 
+    // Checks if the placement string is valid. If not, show popup dialog
+    private void handleRefresh() {
+        if(StratoGame.isPlacementValid(textField.getText())) {
+            makePlacement(textField.getText());
+            textField.clear();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid placement string.");
+            alert.showAndWait();
+            textField.clear();
+        }
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("StratoGame Viewer");
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
-        root.getChildren().add(controls);
-
+        // First create grid with cell identifiers then enable controls
+        defaultGrid();
         makeControls();
 
         primaryStage.setScene(scene);
