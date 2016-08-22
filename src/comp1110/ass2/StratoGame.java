@@ -275,6 +275,7 @@ public class StratoGame {
             // Recall that `&&` will not check the 2nd condition if the 1st is false
             case A:
                 /**
+                 * // FIXME: Marvin please read the comments and do this
                  * Recall that x cannot be smaller than 0 or bigger than 25 - i.e. 0 <= x <= 25
                  * Also, y cannot be smaller than 0 or bigger than 25 - i.e. 0 <= y <= 25
                  * e.g. heightArray[x-1][y] > 0 translates to
