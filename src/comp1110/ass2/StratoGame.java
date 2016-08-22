@@ -56,6 +56,9 @@ public class StratoGame {
      * @return True if the placement is well-formed
      */
     static boolean isPlacementWellFormed(String placement) {
+        // We don't want to parse a null string...
+        if (placement == null) return false;
+
         // We check the placement string length is a multiple of 4, is non-empty, and contains a maximum of 41
         if (placement.length() % TILE_PLACEMENT_LENGTH != 0 ||
             placement.length() == 0 ||
