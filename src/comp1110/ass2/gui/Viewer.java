@@ -136,23 +136,23 @@ public class Viewer extends Application {
         switch(orientation) {
             case A:
                 heightArray[x][y]++;
-                heightArray[x + 1][y]++;
-                heightArray[x][y + 1]++;
+                heightArray[x+1][y]++;
+                heightArray[x][y+1]++;
                 return;
             case B:
                 heightArray[x][y]++;
-                heightArray[x][y + 1]++;
-                heightArray[x - 1][y]++;
+                heightArray[x][y+1]++;
+                heightArray[x-1][y]++;
                 return;
             case C:
                 heightArray[x][y]++;
-                heightArray[x - 1][y]++;
-                heightArray[x][y - 1]++;
+                heightArray[x-1][y]++;
+                heightArray[x][y-1]++;
                 return;
             case D:
                 heightArray[x][y]++;
-                heightArray[x][y - 1]++;
-                heightArray[x + 1][y]++;
+                heightArray[x][y-1]++;
+                heightArray[x+1][y]++;
                 return;
             case NULL:
         }

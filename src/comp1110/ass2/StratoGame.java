@@ -180,11 +180,6 @@ public class StratoGame {
                     heightArray = updateBoardHeights(substringTile, heightArray);
                     pieceIDArray = updateIdentifier(substringTile, pieceIDArray, pieceID++);
             } else {
-                /* FIXME: Testing code */
-                System.out.println("Placement String: " + placement);
-                System.out.println("TEST RESULTS - isOnBoard: " + isOnBoard(substringTile) + ", isAdjacent: " + isAdjacent(substringTile,heightArray)
-                        + ", areColoursValid: " + areColoursValid(substringTile, colourArray) + ", areHeightsValid: "
-                        + areHeightsValid(substringTile, heightArray) + ", isOverTwoTiles: " + isOverTwoTiles(substringTile, pieceIDArray, heightArray));
                 return false;
             }
         }
@@ -269,53 +264,42 @@ public class StratoGame {
         int x = index0.getX();
         int y = index0.getY();
 
-        // TODO: Need to account for boundaries, please do this Marvin
         // We take the relevant x and y positions about the origin cell using maths
         switch(tile.getOrientation()) {
-            // Recall that `&&` will not check the 2nd condition if the 1st is false
+                /* We confirm that the calculated term is within the array bounds and
+                   and check if the height is bigger than 0 */
             case A:
-                /**
-                 * // FIXME: Marvin please read the comments and do this
-                 * Recall that x cannot be smaller than 0 or bigger than 25 - i.e. 0 <= x <= 25
-                 * Also, y cannot be smaller than 0 or bigger than 25 - i.e. 0 <= y <= 25
-                 * e.g. heightArray[x-1][y] > 0 translates to
-                 *      if (!(x-1 < 0) && heightArray[x-1][y] > 0) return true;
-                 *
-                 *      heightArray[x+1][y-1] > 0 translates to
-                 *      if (!(x+1 > 25) && !(y-1 < 0) && heightArray[x+1][y-1] > 0) return true;
-                 */
-
-                return (!(x-1 < 0) && heightArray[x-1][y] > 0||
+                return (!(x-1 < 0)  && heightArray[x-1][y] > 0 ||
                         !(x+2 > 25) && heightArray[x+2][y] > 0 ||
-                        !(y-1 < 0)  && heightArray[x][y-1] > 0  ||
+                        !(y-1 < 0)  && heightArray[x][y-1] > 0 ||
                         !(x+1 > 25) && !(y-1 < 0) && heightArray[x+1][y-1] > 0 ||
                         !(x-1 < 0)  && !(y+1 > 25) && heightArray[x-1][y+1] > 0 ||
                         !(x+1 > 25) && !(y+1 > 25) && heightArray[x+1][y+1] > 0 ||
-                        !(y+2 > 25) && heightArray[x][y+2] > 0 )   ;
+                        !(y+2 > 25) && heightArray[x][y+2] > 0);
             case B:
-                return (!(x-2 < 0) && heightArray[x-2][y] > 0   ||
-                        !(x+1 > 25) && heightArray[x+1][y] > 0   ||
-                        !(y-1 < 0)  && heightArray[x][y-1] > 0   ||
-                        !(x-1 < 0)  && !(y-1 < 0)  && heightArray[x-1][y-1] > 0  ||
-                        !(x-1 < 0)  && !(y+1 > 25) && heightArray[x-1][y+1] > 0  ||
+                return (!(x-2 < 0)  && heightArray[x-2][y] > 0 ||
+                        !(x+1 > 25) && heightArray[x+1][y] > 0 ||
+                        !(y-1 < 0)  && heightArray[x][y-1] > 0 ||
+                        !(x-1 < 0)  && !(y-1 < 0)  && heightArray[x-1][y-1] > 0 ||
+                        !(x-1 < 0)  && !(y+1 > 25) && heightArray[x-1][y+1] > 0 ||
                         !(x+1 > 25) && !(y+1 > 25) && heightArray[x+1][y+1] > 0 ||
-                        !(y+2 > 25) && heightArray[x][y+2] > 0)  ;
+                        !(y+2 > 25) && heightArray[x][y+2] > 0);
             case C:
                 return (!(x+1 > 25) && heightArray[x+1][y] > 0 ||
-                        !(x-2 < 0)   && heightArray[x-2][y] > 0   ||
-                        !(x+1 > 25)  && !(y-1 < 0) && heightArray[x+1][y-1] > 0 ||
-                        !(x-1 < 0)   && !(y-1 < 0) && heightArray[x-1][y-1] > 0 ||
-                        !(y+1 > 25)  && heightArray[x][y+1] > 0  ||
-                        !(x-1 < 0)   && !(y+1 > 25)  && heightArray[x-1][y+1] > 0 ||
-                        !(y-2 < 0)   && heightArray[x][y-2] > 0) ;
+                        !(x-2 < 0)  && heightArray[x-2][y] > 0 ||
+                        !(x+1 > 25) && !(y-1 < 0) && heightArray[x+1][y-1] > 0 ||
+                        !(x-1 < 0)  && !(y-1 < 0) && heightArray[x-1][y-1] > 0 ||
+                        !(y+1 > 25) && heightArray[x][y+1] > 0 ||
+                        !(x-1 < 0)  && !(y+1 > 25)  && heightArray[x-1][y+1] > 0 ||
+                        !(y-2 < 0)  && heightArray[x][y-2] > 0);
             case D:
-                return (!(x-1 < 0)  && heightArray[x-1][y] > 0  ||
-                        !(x+2 > 25 ) && heightArray[x+2][y] > 0 ||
-                        !(x-1 < 0) && !(y-1 < 0) && heightArray[x-1][y-1] > 0  ||
-                        !(x+1 > 25)&& !(y-1 < 0) && heightArray[x+1][y-1] > 0  ||
-                        !(y+1 > 25)&& heightArray[x][y+1] > 0   ||
-                        !(x+1 > 25)&& !(y+1 > 25) && heightArray[x+1][y+1] > 0 ||
-                        !(y-2 < 0) && heightArray[x][y-2] > 0) ;
+                return (!(x-1 < 0)  && heightArray[x-1][y] > 0 ||
+                        !(x+2 > 25) && heightArray[x+2][y] > 0 ||
+                        !(x-1 < 0)  && !(y-1 < 0) && heightArray[x-1][y-1] > 0 ||
+                        !(x+1 > 25) && !(y-1 < 0) && heightArray[x+1][y-1] > 0 ||
+                        !(y+1 > 25) && heightArray[x][y+1] > 0 ||
+                        !(x+1 > 25) && !(y+1 > 25) && heightArray[x+1][y+1] > 0 ||
+                        !(y-2 < 0)  && heightArray[x][y-2] > 0);
             default:
                 return false;
         }
@@ -446,27 +430,4 @@ public class StratoGame {
         return null;
     }
 
-    /* FIXME: TESTING Code */
-    public static void main(String[] args) {
-        System.out.println("----------------------------");
-        String[] strArr = {"MMUA","MMUANLOB","MMUANLOBLNBC","MMUANLOBLNBCONSCKLDAPOTCMLEBPLMBKNJDOLNBMLDANPLDNNBAONMCLOFAPQTC",
-        "MMUANLOBNMHC"};
-        for (String str : strArr) {
-            if (str.length() > 4) {
-                System.out.println("String being tested: " + str);
-                boolean b2 = isPlacementWellFormed(str);
-                boolean b3 = isPlacementValid(str);
-                System.out.println("isPlacementWellFormed: " + b2 + ", isPlacementValid: " + b3);
-                System.out.println("----------------------------");
-            } else {
-                boolean b1 = isTilePlacementWellFormed(str);
-                boolean b2 = isPlacementWellFormed(str);
-                boolean b3 = isPlacementValid(str);
-                System.out.println("String being tested: " + str);
-                System.out.println("isTilePlacementWellFormed: " + b1 + ", isPlacementWellFormed: " + b2
-                        + ", isPlacementValid: " + b3);
-                System.out.println("----------------------------");
-            }
-        }
-    }
 }
