@@ -282,40 +282,40 @@ public class StratoGame {
                  *      if (!(x-1 < 0) && heightArray[x-1][y] > 0) return true;
                  *
                  *      heightArray[x+1][y-1] > 0 translates to
-                 *      if (!(x+1 > 25) && !(x-1 < 0) && heightArray[x+1][y-1] > 0) return true;
+                 *      if (!(x+1 > 25) && !(y-1 < 0) && heightArray[x+1][y-1] > 0) return true;
                  */
 
-                return (heightArray[x-1][y] > 0 ||
-                        heightArray[x+2][y] > 0 ||
-                        heightArray[x][y-1] > 0 ||
-                        heightArray[x+1][y-1] > 0 ||
-                        heightArray[x-1][y+1] > 0 ||
-                        heightArray[x+1][y+1] > 0 ||
-                        heightArray[x][y+2] > 0);
+                return (!(x-1 < 0) && heightArray[x-1][y] > 0||
+                        !(x+2 > 25) && heightArray[x+2][y] > 0 ||
+                        !(y-1 < 0)  && heightArray[x][y-1] > 0  ||
+                        !(x+1 > 25) && !(y-1 < 0) && heightArray[x+1][y-1] > 0 ||
+                        !(x-1 < 0)  && !(y+1 > 25) && heightArray[x-1][y+1] > 0 ||
+                        !(x+1 > 25) && !(y+1 > 25) && heightArray[x+1][y+1] > 0 ||
+                        !(y+2 > 25) && heightArray[x][y+2] > 0 )   ;
             case B:
-                return (heightArray[x-2][y] > 0 ||
-                        heightArray[x+1][y] > 0 ||
-                        heightArray[x][y-1] > 0 ||
-                        heightArray[x-1][y-1] > 0 ||
-                        heightArray[x-1][y+1] > 0 ||
-                        heightArray[x+1][y+1] > 0 ||
-                        heightArray[x][y+2] > 0);
+                return (!(x-2 < 0) && heightArray[x-2][y] > 0   ||
+                        !(x+1 > 25) && heightArray[x+1][y] > 0   ||
+                        !(y-1 < 0)  && heightArray[x][y-1] > 0   ||
+                        !(x-1 < 0)  && !(y-1 < 0)  && heightArray[x-1][y-1] > 0  ||
+                        !(x-1 < 0)  && !(y+1 > 25) && heightArray[x-1][y+1] > 0  ||
+                        !(x+1 > 25) && !(y+1 > 25) && heightArray[x+1][y+1] > 0 ||
+                        !(y+2 > 25) && heightArray[x][y+2] > 0)  ;
             case C:
-                return (heightArray[x+1][y] > 0 ||
-                        heightArray[x-2][y] > 0 ||
-                        heightArray[x+1][y-1] > 0 ||
-                        heightArray[x-1][y-1] > 0 ||
-                        heightArray[x][y+1] > 0 ||
-                        heightArray[x-1][y+1] > 0 ||
-                        heightArray[x][y-2] > 0);
+                return (!(x+1 > 25) && heightArray[x+1][y] > 0 ||
+                        !(x-2 < 0)   && heightArray[x-2][y] > 0   ||
+                        !(x+1 > 25)  && !(y-1 < 0) && heightArray[x+1][y-1] > 0 ||
+                        !(x-1 < 0)   && !(y-1 < 0) && heightArray[x-1][y-1] > 0 ||
+                        !(y+1 > 25)  && heightArray[x][y+1] > 0  ||
+                        !(x-1 < 0)   && !(y+1 > 25)  && heightArray[x-1][y+1] > 0 ||
+                        !(y-2 < 0)   && heightArray[x][y-2] > 0) ;
             case D:
-                return (heightArray[x-1][y] > 0 ||
-                        heightArray[x+2][y] > 0 ||
-                        heightArray[x-1][y-1] > 0 ||
-                        heightArray[x+1][y-1] > 0 ||
-                        heightArray[x][y+1] > 0 ||
-                        heightArray[x+1][y+1] > 0 ||
-                        heightArray[x][y-2] > 0);
+                return (!(x-1 < 0)  && heightArray[x-1][y] > 0  ||
+                        !(x+2 > 25 ) && heightArray[x+2][y] > 0 ||
+                        !(x-1 < 0) && !(y-1 < 0) && heightArray[x-1][y-1] > 0  ||
+                        !(x+1 > 25)&& !(y-1 < 0) && heightArray[x+1][y-1] > 0  ||
+                        !(y+1 > 25)&& heightArray[x][y+1] > 0   ||
+                        !(x+1 > 25)&& !(y+1 > 25) && heightArray[x+1][y+1] > 0 ||
+                        !(y-2 < 0) && heightArray[x][y-2] > 0) ;
             default:
                 return false;
         }
