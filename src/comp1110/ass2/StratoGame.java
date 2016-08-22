@@ -178,6 +178,7 @@ public class StratoGame {
                     pieceIDArray = updateIdentifier(substringTile, pieceIDArray, pieceID++);
             } else {
                 /* FIXME: Testing code */
+                System.out.println("Placement String: " + placement);
                 System.out.println("TEST RESULTS - isOnBoard: " + isOnBoard(substringTile) + ", isAdjacent: " + isAdjacent(substringTile,heightArray)
                         + ", areColoursValid: " + areColoursValid(substringTile, colourArray) + ", areHeightsValid: "
                         + areHeightsValid(substringTile, heightArray) + ", isOverTwoTiles: " + isOverTwoTiles(substringTile, pieceIDArray, heightArray));
