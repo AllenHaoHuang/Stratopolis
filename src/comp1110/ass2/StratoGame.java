@@ -170,7 +170,7 @@ public class StratoGame {
                                           Shape.fromChar(placement.charAt(i+2)),
                                           Orientation.fromChar(placement.charAt(i+3)));
             // We check if all the rules are fulfilled. If so, then update the arrays and continue looping
-            if (isOnBoard(substringTile) &&
+            if (substringTile.isOnBoard() &&
                 isAdjacent(substringTile, heightArray) &&
                 areColoursValid(substringTile, colourArray) &&
                 areHeightsValid(substringTile, heightArray) &&
@@ -191,9 +191,9 @@ public class StratoGame {
     /* Given a tile and the board (array) of colours, change the colours */
     private static Colour[][] updateBoardColours(Tile tile, Colour[][] colourArray) {
         /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
+        Position index0 = tile.positionAtIndex(0);
+        Position index1 = tile.positionAtIndex(1);
+        Position index2 = tile.positionAtIndex(2);
 
         /* Set the relevant cells in the colourArray to their corresponding cell
          * colours given their Shape ID, and return */
@@ -206,9 +206,9 @@ public class StratoGame {
     /* Given a tile and the board (array) of heights, increase the height */
     private static int[][] updateBoardHeights(Tile tile, int[][] heightArray) {
         /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
+        Position index0 = tile.positionAtIndex(0);
+        Position index1 = tile.positionAtIndex(1);
+        Position index2 = tile.positionAtIndex(2);
 
         /* Increment the corresponding positions in the heightArray by 1 and return */
         heightArray[index0.getX()][index0.getY()]++;
@@ -220,9 +220,9 @@ public class StratoGame {
     /* Updates the pieceID array with the new Tile */
     private static int[][] updateIdentifier(Tile tile, int[][] pieceIDArray, int pieceID) {
         /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
+        Position index0 = tile.positionAtIndex(0);
+        Position index1 = tile.positionAtIndex(1);
+        Position index2 = tile.positionAtIndex(2);
 
         // Update the array with the new Tile piece we have placed down
         pieceIDArray[index0.getX()][index0.getY()] = pieceID;
@@ -231,36 +231,12 @@ public class StratoGame {
         return pieceIDArray;
     }
 
-    /* Checks that no part of the tile extends beyond the board */
-    private static boolean isOnBoard (Tile tile) {
-        // Get the position coordinates of our Tile
-        Position position = tile.getPosition();
-        /* We check the Tile over the orientation. Recall that a coordinate on the board
-         * is encoded as (x,y) where 'A' <= x <= 'Z' and 'A' <= y <= 'Z' */
-        switch (tile.getOrientation()) {
-            case A:
-                // At right or bottom edge of the board
-                return (!(position.getX() == 'Z' || position.getY() == 'Z'));
-            case B:
-                // At left or bottom edge of the board
-                return (!(position.getX() == 'A' || position.getY() == 'Z'));
-            case C:
-                // At left or top edge of the board
-                return (!(position.getX() == 'A' || position.getY() == 'A'));
-            case D:
-                // At right or top edge of the board
-                return (!(position.getX() == 'Z' || position.getY() == 'A'));
-            default:
-                return false;
-        }
-    }
-
     /* We check if a tile is adjacent to another tile:
      * isAdjacent checks if it is next to a tile, if the heights directly on or next to the position
      * of the tile placed is larger than 0, it is next to a piece */
     private static boolean isAdjacent(Tile tile, int[][] heightArray) {
         /* Get position coordinates for each of the origin cell on our tile */
-        Position index0 = cellPosition(tile, 0);
+        Position index0 = tile.positionAtIndex(0);
         int x = index0.getX();
         int y = index0.getY();
 
@@ -308,9 +284,9 @@ public class StratoGame {
     /* Determine whether the colour placement of a tile is valid on the given board */
     private static boolean areColoursValid (Tile tile, Colour[][] colourArray) {
         /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
+        Position index0 = tile.positionAtIndex(0);
+        Position index1 = tile.positionAtIndex(1);
+        Position index2 = tile.positionAtIndex(2);
 
         // We check over all the cells of the tile
         Colour colour0 = tile.getShape().colourAtIndex(0);
@@ -339,9 +315,9 @@ public class StratoGame {
     /* Check if a placement is valid height-wise, i.e. the heights of each of the three cells are equal */
     private static boolean areHeightsValid(Tile tile, int[][] heightArray) {
         /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
+        Position index0 = tile.positionAtIndex(0);
+        Position index1 = tile.positionAtIndex(1);
+        Position index2 = tile.positionAtIndex(2);
 
         /* Check whether all the heights of all three cells are equal */
         return (heightArray[index0.getX()][index0.getY()] == heightArray[index1.getX()][index1.getY()] &&
@@ -351,9 +327,9 @@ public class StratoGame {
     /* Check if a Tile is placed over two tiles (i.e. straddled) */
     private static boolean isOverTwoTiles (Tile tile, int[][] pieceIDArray, int[][] heightArray) {
         /* Get position coordinates for each of the 3 cells on our tile */
-        Position index0 = cellPosition(tile, 0);
-        Position index1 = cellPosition(tile, 1);
-        Position index2 = cellPosition(tile, 2);
+        Position index0 = tile.positionAtIndex(0);
+        Position index1 = tile.positionAtIndex(1);
+        Position index2 = tile.positionAtIndex(2);
 
         /* Check if the tile is placed at height = 0, then we don't need to check if it is
          *  straddled over 2 different tiles */
@@ -362,41 +338,6 @@ public class StratoGame {
         // Check if our new tile would be placed over 2 different tiles
         return (!(pieceIDArray[index0.getX()][index0.getY()] == pieceIDArray[index1.getX()][index1.getY()] &&
                   pieceIDArray[index1.getX()][index1.getY()] == pieceIDArray[index2.getX()][index2.getY()]));
-    }
-
-    /**
-     *  Return the position of a specific cell of a Tile on the board.
-     *  The 'A' orientation of a L-shaped tile based on 'index' is represented as:
-     *     [0]  [1]
-     *     [2]
-     */
-    private static Position cellPosition (Tile tile, int index) {
-        // Return the position of the origin cell if zero index is requested
-        if (index == 0) return tile.getPosition();
-
-        /* We retrieve the X and Y character coordinates of
-           the origin index - i.e. at index = 0. */
-        int originX = tile.getPosition().getX();
-        int originY = tile.getPosition().getY();
-
-        //Here, we check the Orientation of our tile and return the relevant Positions
-        switch (tile.getOrientation()) {
-            case A:
-                if (index == 1) return new Position((char)(originX+1+'A'), (char)(originY+'A'));
-                if (index == 2) return new Position((char)(originX+'A'), (char)(originY+1+'A'));
-            case B:
-                if (index == 1) return new Position((char)(originX+'A'), (char)(originY+1+'A'));
-                if (index == 2) return new Position((char)(originX-1+'A'), (char)(originY+'A'));
-            case C:
-                if (index == 1) return new Position((char)(originX-1+'A'), (char)(originY+'A'));
-                if (index == 2) return new Position((char)(originX+'A'), (char)(originY-1+'A'));
-            case D:
-                if (index == 1) return new Position((char)(originX+'A'), (char)(originY-1+'A'));
-                if (index == 2) return new Position((char)(originX+1+'A'), (char)(originY+'A'));
-            default:
-                // Something went wrong...
-                return new Position('#','#'); // need more appropriate return
-        }
     }
 
     /**

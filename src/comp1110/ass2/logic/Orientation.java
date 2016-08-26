@@ -20,7 +20,18 @@ public enum Orientation {
             case 'B': return Orientation.B;
             case 'C': return Orientation.C;
             case 'D': return Orientation.D;
-            default : return NULL; // need to fix
+            default : return NULL;
+        }
+    }
+
+    /* Return a character given an Orientation input */
+    public static char toChar(Orientation orientation) {
+        switch (orientation) {
+            case A : return 'A';
+            case B : return 'B';
+            case C : return 'C';
+            case D : return 'D';
+            default : return '\0';
         }
     }
 }

@@ -99,4 +99,32 @@ public enum Shape {
             default : return NULL;
         }
     }
+
+    /* Return a character given a Shape input */
+    public static char toChar(Shape shape) {
+        switch (shape) {
+            case A : return 'A';
+            case B : return 'B';
+            case C : return 'C';
+            case D : return 'D';
+            case E : return 'E';
+            case F : return 'F';
+            case G : return 'G';
+            case H : return 'H';
+            case I : return 'I';
+            case J : return 'J';
+            case K : return 'K';
+            case L : return 'L';
+            case M : return 'M';
+            case N : return 'N';
+            case O : return 'O';
+            case P : return 'P';
+            case Q : return 'Q';
+            case R : return 'R';
+            case S : return 'S';
+            case T : return 'T';
+            case U : return 'U';
+            default : return '\0';
+        }
+    }
 }
