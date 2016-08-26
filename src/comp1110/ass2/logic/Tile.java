@@ -28,7 +28,7 @@ public class Tile {
      *     [0]  [1]
      *     [2]
      */
-    public Position positionAtIndex (int index) {
+    public Position positionAtIndex(int index) {
         // Return the position of the origin cell if zero index is requested
         if (index == 0) return position;
 
@@ -54,6 +54,16 @@ public class Tile {
             default:
                 return null; // Something went wrong...
         }
+    }
+
+    // Get the x-coordinate at a specific index of a tile
+    public int getX(int index) {
+        return positionAtIndex(index).getX();
+    }
+
+    // Get the y-coordinate at a specific index of a tile
+    public int getY(int index) {
+        return positionAtIndex(index).getY();
     }
 
     /* Checks that no part of the tile extends beyond the board */
