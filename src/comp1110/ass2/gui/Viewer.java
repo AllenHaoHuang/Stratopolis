@@ -35,14 +35,12 @@ import java.util.Arrays;
  * placements.
  */
 public class Viewer extends Application {
-
     /* board layout */
     private static final int VIEWER_WIDTH = 750;
     private static final int VIEWER_HEIGHT = 700;
     private static final int GRID_SIZE = 26;
     private static final int TILE_PLACEMENT_LENGTH = 4;
 
-    private static final String URI_BASE = "assets/";
     private final Group root = new Group();
     private final Group controls = new Group();
     private TextField textField;
@@ -60,7 +58,7 @@ public class Viewer extends Application {
         defaultGrid();
         setInitialPiece();
 
-        // Clear the height array and set 'MMUA' height
+        // Clear the height array and set height for initial piece 'MMUA'
         for(int i = 0; i < GRID_SIZE; i++ )
             Arrays.fill(heightArray[i], 0);
         heightArray[12][12]++;
@@ -71,7 +69,7 @@ public class Viewer extends Application {
 
         // Loop through the rest of the placement string
         for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
-            // We get the X and Y coordinate, and create a Shape and Orientation object
+            // We get the X and Y coordinate of the origin, and create a Shape and Orientation object
             char originX = placement.charAt(i);
             char originY = placement.charAt(i + 1);
             Shape shapeID = Shape.fromChar(placement.charAt(i + 2));
@@ -136,23 +134,23 @@ public class Viewer extends Application {
         switch(orientation) {
             case A:
                 heightArray[x][y]++;
-                heightArray[x + 1][y]++;
-                heightArray[x][y + 1]++;
+                heightArray[x+1][y]++;
+                heightArray[x][y+1]++;
                 return;
             case B:
                 heightArray[x][y]++;
-                heightArray[x][y + 1]++;
-                heightArray[x - 1][y]++;
+                heightArray[x][y+1]++;
+                heightArray[x-1][y]++;
                 return;
             case C:
                 heightArray[x][y]++;
-                heightArray[x - 1][y]++;
-                heightArray[x][y - 1]++;
+                heightArray[x-1][y]++;
+                heightArray[x][y-1]++;
                 return;
             case D:
                 heightArray[x][y]++;
-                heightArray[x][y - 1]++;
-                heightArray[x + 1][y]++;
+                heightArray[x][y-1]++;
+                heightArray[x+1][y]++;
                 return;
             case NULL:
         }
