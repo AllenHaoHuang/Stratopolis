@@ -17,7 +17,6 @@ import javafx.stage.Stage;
 import comp1110.ass2.logic.*;
 import comp1110.ass2.bots.*;
 
-import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -36,11 +35,11 @@ public class Board extends Application {
 
     /* Variables for JavaFX */
     private final Group root = new Group();
-    private final Group greenTiles = new Group();
-    private final Group redTiles =new Group();
+    private final Group greenCurrentTile = new Group();
+    private final Group redCurrentTile =new Group();
 
-    private final Group greenLeft = new Group();
-    private final Group redLeft = new Group();
+    private Label greenPiecesLeft = new Label();
+    private Label redPiecesLeft = new Label();
 
     /** INITIAL DESIGN FOR ROOT INDEXES
      *  - 0 to 675 for grid and cells
@@ -57,6 +56,12 @@ public class Board extends Application {
         redPlayer.setTranslateX(BOARD_WIDTH - 95);
         redPlayer.setTranslateY(25);
         root.getChildren().addAll(greenPlayer, redPlayer);
+        // Add labels for pieces left
+        greenPiecesLeft.setTranslateX(30);
+        greenPiecesLeft.setTranslateY(105);
+        redPiecesLeft.setTranslateX(BOARD_WIDTH - 110);
+        redPiecesLeft.setTranslateY(105);
+        root.getChildren().addAll(greenPiecesLeft, redPiecesLeft);
         // Initialise the 'deck' of tiles for the players and shuffle them
         for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
             playerRed.add(i);
@@ -82,16 +87,16 @@ public class Board extends Application {
 
         // The green player is first to run out of pieces, so red does too
         if (isGreen && playerGreen.size() == 0) {
-            root.getChildren().remove(greenTiles);
+            root.getChildren().remove(greenCurrentTile);
             isGreen = !isGreen;
             return;
         } else if (playerRed.size() == 0) {
-            root.getChildren().remove(redTiles);
+            root.getChildren().remove(redCurrentTile);
             return;
         } else if (isGreen) {
             // Remove existing shape preview for green player
-            root.getChildren().remove(greenTiles);
-            greenTiles.getChildren().clear();
+            root.getChildren().remove(greenCurrentTile);
+            greenCurrentTile.getChildren().clear();
             nextTile = playerGreen.removeFirst();
             zero = new Cell(nextTile.colourAtIndex(0));
             one = new Cell(nextTile.colourAtIndex(1));
@@ -99,8 +104,8 @@ public class Board extends Application {
             zero.setTranslateX(50);
         } else {
             // Remove existing shape preview for red player
-            root.getChildren().remove(redTiles);
-            redTiles.getChildren().clear();
+            root.getChildren().remove(redCurrentTile);
+            redCurrentTile.getChildren().clear();
             nextTile = playerRed.removeFirst();
             zero = new Cell(nextTile.colourAtIndex(0));
             one = new Cell(nextTile.colourAtIndex(1));
@@ -117,12 +122,12 @@ public class Board extends Application {
 
         // Add the cells to the relevant groups
         if (isGreen) {
-            greenTiles.getChildren().addAll(zero, one, two);
-            root.getChildren().add(greenTiles);
+            greenCurrentTile.getChildren().addAll(zero, one, two);
+            root.getChildren().add(greenCurrentTile);
         } else {
             // Add the cells to the relevant groups
-            redTiles.getChildren().addAll(zero, one, two);
-            root.getChildren().add(redTiles);
+            redCurrentTile.getChildren().addAll(zero, one, two);
+            root.getChildren().add(redCurrentTile);
         }
 
         // We invert whose turn it is
@@ -130,25 +135,11 @@ public class Board extends Application {
     }
 
     private void piecesLeft() {
-        if (isGreen) {
-            int size = playerGreen.size();
-            root.getChildren().remove(greenLeft);
-            greenLeft.getChildren().clear();
-            Label temp = new Label(size + " pieces left.");
-            temp.setTranslateX(30);
-            temp.setTranslateY(105);
-            greenLeft.getChildren().add(temp);
-            root.getChildren().add(greenLeft);
-        } else {
-            int size = playerRed.size();
-            root.getChildren().remove(redLeft);
-            redLeft.getChildren().clear();
-            Label temp = new Label(size + " pieces left.");
-            temp.setTranslateX(BOARD_WIDTH - 110);
-            temp.setTranslateY(105);
-            redLeft.getChildren().add(temp);
-            root.getChildren().add(redLeft);
-        }
+        // Update how many pieces a player has left after they have played a move
+        if (isGreen)
+            greenPiecesLeft.setText(playerGreen.size() + " pieces left.");
+        else
+            redPiecesLeft.setText(playerRed.size() + " pieces left.");
     }
 
     private void makeControls() {
