@@ -1,9 +1,12 @@
 package comp1110.ass2.gui;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -14,6 +17,7 @@ import javafx.stage.Stage;
 import comp1110.ass2.logic.*;
 import comp1110.ass2.bots.*;
 
+import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -32,10 +36,27 @@ public class Board extends Application {
 
     /* Variables for JavaFX */
     private final Group root = new Group();
+    private final Group greenTiles = new Group();
+    private final Group redTiles =new Group();
 
+    private final Group greenLeft = new Group();
+    private final Group redLeft = new Group();
+
+    /** INITIAL DESIGN FOR ROOT INDEXES
+     *  - 0 to 675 for grid and cells
+     *  - 676 and on for other stuff
+     */
 
     /* Prepare everything accordingly for play */
     private void setupGame() {
+        // Place labels to identify players
+        Label greenPlayer = new Label("Player Green:");
+        Label redPlayer = new Label("Player Red:");
+        greenPlayer.setTranslateX(35);
+        greenPlayer.setTranslateY(25);
+        redPlayer.setTranslateX(BOARD_WIDTH - 95);
+        redPlayer.setTranslateY(25);
+        root.getChildren().addAll(greenPlayer, redPlayer);
         // Initialise the 'deck' of tiles for the players and shuffle them
         for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
             playerRed.add(i);
@@ -49,22 +70,100 @@ public class Board extends Application {
         Collections.shuffle(playerRed);
         // We wait for the green player's turn
         isGreen = true;
-        // DISABLE RED TILE DECK
+        showNextTile();
+        showNextTile();
     }
 
     private void showNextTile() {
-        // The tile has been removed off the top of the deck by the player
-        if (isGreen) {
-            playerGreen.removeFirst();
-            // CODE FOR SHOWING TILE; PROBABLY DRAW ON CONSTANT STACKPANE
-            // DISABLE RED TILE DECK
+        /* FIXME: Extremely ugly code */
+        piecesLeft();
+        Shape nextTile;
+        Cell zero, one, two;
+
+        // The green player is first to run out of pieces, so red does too
+        if (isGreen && playerGreen.size() == 0) {
+            root.getChildren().remove(greenTiles);
+            isGreen = !isGreen;
+            return;
+        } else if (playerRed.size() == 0) {
+            root.getChildren().remove(redTiles);
+            return;
+        } else if (isGreen) {
+            // Remove existing shape preview for green player
+            root.getChildren().remove(greenTiles);
+            greenTiles.getChildren().clear();
+            nextTile = playerGreen.removeFirst();
+            zero = new Cell(nextTile.colourAtIndex(0));
+            one = new Cell(nextTile.colourAtIndex(1));
+            two = new Cell(nextTile.colourAtIndex(2));
+            zero.setTranslateX(50);
         } else {
-            playerRed.removeFirst();
-            // CODE FOR SHOWING TILE; PROBABLY DRAW ON CONSTANT STACKPANE
-            // DISABLE GREEN TILE DECK
+            // Remove existing shape preview for red player
+            root.getChildren().remove(redTiles);
+            redTiles.getChildren().clear();
+            nextTile = playerRed.removeFirst();
+            zero = new Cell(nextTile.colourAtIndex(0));
+            one = new Cell(nextTile.colourAtIndex(1));
+            two = new Cell(nextTile.colourAtIndex(2));
+            zero.setTranslateX(BOARD_WIDTH - 80);
         }
+
+        // Set position of cells on scene
+        zero.setTranslateY(50);
+        one.setTranslateX(zero.getTranslateX() + 24);
+        one.setTranslateY(zero.getTranslateY());
+        two.setTranslateX(zero.getTranslateX());
+        two.setTranslateY(zero.getTranslateY() + 24);
+
+        // Add the cells to the relevant groups
+        if (isGreen) {
+            greenTiles.getChildren().addAll(zero, one, two);
+            root.getChildren().add(greenTiles);
+        } else {
+            // Add the cells to the relevant groups
+            redTiles.getChildren().addAll(zero, one, two);
+            root.getChildren().add(redTiles);
+        }
+
         // We invert whose turn it is
         isGreen = !isGreen;
+    }
+
+    private void piecesLeft() {
+        if (isGreen) {
+            int size = playerGreen.size();
+            root.getChildren().remove(greenLeft);
+            greenLeft.getChildren().clear();
+            Label temp = new Label(size + " pieces left.");
+            temp.setTranslateX(30);
+            temp.setTranslateY(105);
+            greenLeft.getChildren().add(temp);
+            root.getChildren().add(greenLeft);
+        } else {
+            int size = playerRed.size();
+            root.getChildren().remove(redLeft);
+            redLeft.getChildren().clear();
+            Label temp = new Label(size + " pieces left.");
+            temp.setTranslateX(BOARD_WIDTH - 110);
+            temp.setTranslateY(105);
+            redLeft.getChildren().add(temp);
+            root.getChildren().add(redLeft);
+        }
+    }
+
+    private void makeControls() {
+        Button button = new Button("Refresh");
+        // Handle click of `Refresh` button
+        button.setOnAction(new EventHandler<javafx.event.ActionEvent>() {
+            @Override
+            public void handle(javafx.event.ActionEvent event) {
+                showNextTile();
+
+            }
+        });
+        button.setTranslateX(10);
+        button.setTranslateY(500);
+        root.getChildren().add(button);
     }
 
     private void addTile() {
@@ -103,8 +202,10 @@ public class Board extends Application {
         // Set the initial 'MMUA' piece
         Cell c1 = new Cell(Colour.Red);
         Cell c2 = new Cell(Colour.Green);
-        c1.setTranslateX(442); c1.setTranslateY(308);
-        c2.setTranslateX(442); c2.setTranslateY(332);
+        c1.setTranslateX(442);
+        c1.setTranslateY(308);
+        c2.setTranslateX(442);
+        c2.setTranslateY(332);
         root.getChildren().set(324, c1);
         root.getChildren().set(350, c2);
     }
@@ -123,13 +224,14 @@ public class Board extends Application {
             // Combine the square and the text
             getChildren().addAll(border, text);
         }
+
         private Cell(Colour colour) {
             // Create the cell and fill it with the relevant colour
             Rectangle cell = new Rectangle(24, 24);
             cell.setStroke(Color.rgb(54, 54, 54));
             cell.setStrokeType(StrokeType.INSIDE);
             cell.setStrokeWidth(2);
-            switch(colour) {
+            switch (colour) {
                 case Black:
                     cell.setFill(Color.rgb(0, 0, 0));
                     break;
@@ -139,20 +241,22 @@ public class Board extends Application {
                 case Green:
                     cell.setFill(Color.rgb(0, 127, 0));
                     break;
-                case NULL :
+                case NULL:
                     cell.setFill(null);
             }
             getChildren().add(cell);
         }
     }
 
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("StratoGame");
         Scene scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT);
 
-        setupGame();
         newGrid();
+        setupGame();
+        makeControls();
 
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
