@@ -92,6 +92,7 @@ public class Board extends Application {
         Cell zero, one, two;
         
         // Set text in label for whose turn it is
+        playerTurn.setTextFill(Color.BLACK);
         if (!isGreen) {
             playerTurn.setText("Green Player's Turn");
         } else {
@@ -180,6 +181,7 @@ public class Board extends Application {
                 cell.setOnMouseExited(event -> {
                     root.getChildren().remove(hoverTile);
                     hoverTile.getChildren().clear();
+                    alreadyHovered = false;
                 });
 
                 root.getChildren().add(cell);
@@ -197,6 +199,8 @@ public class Board extends Application {
     }
 
     private void addTile(char x, char y, boolean hoverOnly) {
+        // Don't show hover when we're on right hand side or bottom
+        if (x == 'Z' || y == 'Z') return;
         // Create a new tile
         Position position = new Position(x, y);
         Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
@@ -206,12 +210,15 @@ public class Board extends Application {
         if (boardState.isTileValid(tile) && !hoverOnly) {
             boardState.addTile(new Tile(position, shape, orientation));
         } else if (!boardState.isTileValid(tile) && !hoverOnly){
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid tile placement my friend :D");
-            alert.showAndWait();
+            playerTurn.setTextFill(Color.RED);
+            if (playerTurn.getText().contains("Invalid Tile Placement"))
+                playerTurn.setText("!" + playerTurn.getText() + "!");
+            else playerTurn.setText("!Invalid Tile Placement!");
             return;
         }
 
         // SHOW TILE ON GRID, DO CALCULATIONS AND UPDATE IN ROOT
+        // PROBABLY NEED TO OUTSOURCE CELL TO ANOThER CLASS
         Cell zero = new Cell(tile.getShape().colourAtIndex(0));
         Cell one = new Cell(tile.getShape().colourAtIndex(1));
         Cell two = new Cell(tile.getShape().colourAtIndex(2));
@@ -225,6 +232,8 @@ public class Board extends Application {
         two.setTranslateX(translateX(x));
         two.setTranslateY(translateY((char) (y + 1)));
 
+        // NEED TO ACCOUNT FOR TILE STACKING
+
         // update cells in root
         if (!hoverOnly) {
             root.getChildren().set(getIndex(x, y), zero);
@@ -234,12 +243,16 @@ public class Board extends Application {
             else playerRed.removeFirst();
             showNextTile();
         } else {
-            //zero.setOpacity(0.8);
-            //one.setOpacity(0.8);
-            //two.setOpacity(0.8);
+            zero.setOpacity(0.5);
+            one.setOpacity(0.5);
+            two.setOpacity(0.5);
+            zero.toFront();
+            one.toFront();
+            two.toFront();
 
             hoverTile.getChildren().addAll(zero, one, two);
             hoverTile.toFront();
+            hoverTile.setMouseTransparent(true);
             root.getChildren().add(hoverTile);
             alreadyHovered = true;
         }
