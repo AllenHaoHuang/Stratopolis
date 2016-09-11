@@ -14,7 +14,6 @@ public class StratoGame {
     
     private static final int TILE_PLACEMENT_LENGTH = 4;
     private static final int MAX_TILE_PLACEMENTS = 41;
-    private static final int BOARD_SIZE = 26;
 
     /**
      * Determine whether a tile placement is well-formed according to the following:
@@ -165,10 +164,19 @@ public class StratoGame {
      */
     static int getScoreForPlacement(String placement, boolean green) {
         // FIXME Task 7: determine the score for a player given a placement
-        if (green)
-            return Score.getScore(placement, Colour.Green);
-        else
-            return Score.getScore(placement, Colour.Red);
+        if (!isPlacementValid(placement)) return -1;
+
+        BoardState board = new BoardState();
+        for (int i = 4; i < placement.length(); i += 4) {
+            // Create a new tile from the placement string
+            Tile substringTile = new Tile(new Position(placement.charAt(i), placement.charAt(i+1)),
+                                            Shape.fromChar(placement.charAt(i+2)),
+                                            Orientation.fromChar(placement.charAt(i+3)));
+            board.addTile(substringTile); // update the board state
+        }
+
+        return Score.getScore(board, green);
+        // FIXME Marvin please implement the scoring system in the Score class
     }
 
     /**
