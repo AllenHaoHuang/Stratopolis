@@ -34,6 +34,7 @@ public class Board extends Application {
     private LinkedList<Shape> playerGreen = new LinkedList<>();
     private boolean isGreen;
     private boolean alreadyHovered = false;
+    private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
     private final Group root = new Group();
@@ -170,18 +171,33 @@ public class Board extends Application {
                 Cell cell = new Cell(sb.toString());
                 cell.setTranslateX(j * 24 + 154);
                 cell.setTranslateY(i * 24 + 30);
-                /* CODE TO HANDLE MOUSE CLICK ON CELL */
+                /* We place a tile if a  */
                 cell.setOnMouseClicked(event -> {
-                    addTile(x, y, false);
+                    addTile(x, y);
+                    hoverOrientation = Orientation.A;
                 });
                 /* HANDLE HOVER OVER : RIP THIS CODE KILLS */
                 cell.setOnMouseEntered(event -> {
-                    addTile(x, y, true);
+                    hoverTile(x, y);
                 });
                 cell.setOnMouseExited(event -> {
                     root.getChildren().remove(hoverTile);
                     hoverTile.getChildren().clear();
                     alreadyHovered = false;
+                });
+                cell.setOnScroll(event -> {
+                    root.getChildren().remove(hoverTile);
+                    hoverTile.getChildren().clear();
+                    if (hoverOrientation == Orientation.A)
+                        hoverOrientation = Orientation.B;
+                    else if (hoverOrientation == Orientation.B)
+                        hoverOrientation = Orientation.C;
+                    else if (hoverOrientation == Orientation.C)
+                        hoverOrientation = Orientation.D;
+                    else if (hoverOrientation == Orientation.D)
+                        hoverOrientation = Orientation.A;
+                    alreadyHovered = false;
+                    hoverTile(x, y);
                 });
 
                 root.getChildren().add(cell);
@@ -198,18 +214,67 @@ public class Board extends Application {
         root.getChildren().set(350, c2);
     }
 
-    private void addTile(char x, char y, boolean hoverOnly) {
-        // Don't show hover when we're on right hand side or bottom
-        if (x == 'Z' || y == 'Z') return;
+    private void hoverTile(char x, char y) {
+        // Get the tile ID so we can extract the colours
+        Shape tile = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
+
+        // We don't want to show tile if it is out of bounds
+        switch (hoverOrientation) {
+            case A :
+                if (x == 'Z' || y == 'Z') return;
+                // Build the cells into the `hoverTile` Group
+                hoverCell(x, y, tile.colourAtIndex(0));
+                hoverCell((char)(x+1), y, tile.colourAtIndex(1));
+                hoverCell(x, (char)(y+1), tile.colourAtIndex(2));
+                break;
+            case B :
+                if (x == 'A' || y == 'Z') return;
+                // Build the cells into the `hoverTile` Group
+                hoverCell(x, y, tile.colourAtIndex(0));
+                hoverCell(x, (char)(y+1), tile.colourAtIndex(1));
+                hoverCell((char)(x-1), y, tile.colourAtIndex(2));
+                break;
+            case C :
+                if (x == 'A' || y == 'A') return;
+                // Build the cells into the `hoverTile` Group
+                hoverCell(x, y, tile.colourAtIndex(0));
+                hoverCell((char)(x-1), y, tile.colourAtIndex(1));
+                hoverCell(x, (char)(y-1), tile.colourAtIndex(2));
+                break;
+            case D :
+                if (x == 'Z' || y == 'A') return;
+                // Build the cells into the `hoverTile` Group
+                hoverCell(x, y, tile.colourAtIndex(0));
+                hoverCell(x, (char)(y-1), tile.colourAtIndex(1));
+                hoverCell((char)(x+1), y, tile.colourAtIndex(2));
+                break;
+        }
+
+        // Add the tile hover to the root
+        hoverTile.setMouseTransparent(true);
+        root.getChildren().add(hoverTile);
+        alreadyHovered = true;
+    }
+
+    private void hoverCell(char x, char y, Colour colour) {
+        Cell cell = new Cell(colour);
+        cell.setTranslateX(translateX(x));
+        cell.setTranslateY(translateY(y));
+        cell.setOpacity(0.5);
+        cell.toFront();
+        hoverTile.getChildren().add(cell);
+    }
+
+    private void addTile(char x, char y) {
         // Create a new tile
         Position position = new Position(x, y);
         Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
         Orientation orientation = Orientation.fromChar('A'); // TODO: take into account orientation
         Tile tile = new Tile(position, shape, orientation);
         // Add a new tile to our board
-        if (boardState.isTileValid(tile) && !hoverOnly) {
+        if (boardState.isTileValid(tile)) {
             boardState.addTile(new Tile(position, shape, orientation));
-        } else if (!boardState.isTileValid(tile) && !hoverOnly){
+        } else {
             playerTurn.setTextFill(Color.RED);
             if (playerTurn.getText().contains("Invalid Tile Placement"))
                 playerTurn.setText("!" + playerTurn.getText() + "!");
@@ -235,27 +300,12 @@ public class Board extends Application {
         // NEED TO ACCOUNT FOR TILE STACKING
 
         // update cells in root
-        if (!hoverOnly) {
-            root.getChildren().set(getIndex(x, y), zero);
-            root.getChildren().set(getIndex((char) (x + 1), y), one);
-            root.getChildren().set(getIndex(x, (char) (y + 1)), two);
-            if (isGreen) playerGreen.removeFirst();
-            else playerRed.removeFirst();
-            showNextTile();
-        } else {
-            zero.setOpacity(0.5);
-            one.setOpacity(0.5);
-            two.setOpacity(0.5);
-            zero.toFront();
-            one.toFront();
-            two.toFront();
-
-            hoverTile.getChildren().addAll(zero, one, two);
-            hoverTile.toFront();
-            hoverTile.setMouseTransparent(true);
-            root.getChildren().add(hoverTile);
-            alreadyHovered = true;
-        }
+        root.getChildren().set(getIndex(x, y), zero);
+        root.getChildren().set(getIndex((char) (x + 1), y), one);
+        root.getChildren().set(getIndex(x, (char) (y + 1)), two);
+        if (isGreen) playerGreen.removeFirst();
+        else playerRed.removeFirst();
+        showNextTile();
     }
 
     // Calculate how many pixels to translate x and y by on window
