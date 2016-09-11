@@ -1,19 +1,10 @@
 package comp1110.ass2.gui;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import comp1110.ass2.logic.*;
 import comp1110.ass2.bots.*;
@@ -209,38 +200,38 @@ public class Board extends Application {
     }
 
     private void hoverTile(char x, char y) {
-        // Get the tile ID so we can extract the colours
-        Shape tile = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
+        // Get the shape so we can extract the colours
+        Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
 
-        // We don't want to show tile if it is out of bounds
+        // We don't want to show shape if it is out of bounds
         switch (hoverOrientation) {
             case A :
                 if (x == 'Z' || y == 'Z') return;
                 // Build the cells into the `hoverTile` Group
-                hoverCell(x, y, tile.colourAtIndex(0));
-                hoverCell((char)(x+1), y, tile.colourAtIndex(1));
-                hoverCell(x, (char)(y+1), tile.colourAtIndex(2));
+                hoverCell(x, y, shape.colourAtIndex(0));
+                hoverCell((char)(x+1), y, shape.colourAtIndex(1));
+                hoverCell(x, (char)(y+1), shape.colourAtIndex(2));
                 break;
             case B :
                 if (x == 'A' || y == 'Z') return;
                 // Build the cells into the `hoverTile` Group
-                hoverCell(x, y, tile.colourAtIndex(0));
-                hoverCell(x, (char)(y+1), tile.colourAtIndex(1));
-                hoverCell((char)(x-1), y, tile.colourAtIndex(2));
+                hoverCell(x, y, shape.colourAtIndex(0));
+                hoverCell(x, (char)(y+1), shape.colourAtIndex(1));
+                hoverCell((char)(x-1), y, shape.colourAtIndex(2));
                 break;
             case C :
                 if (x == 'A' || y == 'A') return;
                 // Build the cells into the `hoverTile` Group
-                hoverCell(x, y, tile.colourAtIndex(0));
-                hoverCell((char)(x-1), y, tile.colourAtIndex(1));
-                hoverCell(x, (char)(y-1), tile.colourAtIndex(2));
+                hoverCell(x, y, shape.colourAtIndex(0));
+                hoverCell((char)(x-1), y, shape.colourAtIndex(1));
+                hoverCell(x, (char)(y-1), shape.colourAtIndex(2));
                 break;
             case D :
                 if (x == 'Z' || y == 'A') return;
                 // Build the cells into the `hoverTile` Group
-                hoverCell(x, y, tile.colourAtIndex(0));
-                hoverCell(x, (char)(y-1), tile.colourAtIndex(1));
-                hoverCell((char)(x+1), y, tile.colourAtIndex(2));
+                hoverCell(x, y, shape.colourAtIndex(0));
+                hoverCell(x, (char)(y-1), shape.colourAtIndex(1));
+                hoverCell((char)(x+1), y, shape.colourAtIndex(2));
                 break;
         }
 
@@ -252,10 +243,10 @@ public class Board extends Application {
 
     private void hoverCell(char x, char y, Colour colour) {
         // Create new cell, change its properties and add to group
-        Cell cell = new Cell(colour);
+        Cell cell = new Cell(colour, isGreen);
         cell.setTranslateX(translateX(x));
         cell.setTranslateY(translateY(y));
-        cell.setOpacity(0.5);
+        cell.setOpacity(0.85);
         hoverTile.getChildren().add(cell);
     }
 
@@ -326,44 +317,6 @@ public class Board extends Application {
     private int getIndex(char x, char y) {
         if (y - 'A' == 0) return x - 'A';
         else return (x - 'A')+(y - 'A')*26;
-    }
-
-    private class Cell extends StackPane {
-        private Cell(String str) {
-            // We create a square with a border
-            Rectangle border = new Rectangle(24, 24);
-            border.setFill(null);
-            border.setStroke(Color.LIGHTGREY);
-            // We create the text to indicate the position
-            Text text = new Text(str);
-            text.setFont(Font.font(12));
-            text.setFill(Color.GRAY);
-            setAlignment(Pos.CENTER);
-            // Combine the square and the text
-            getChildren().addAll(border, text);
-        }
-
-        private Cell(Colour colour) {
-            // Create the cell and fill it with the relevant colour
-            Rectangle cell = new Rectangle(24, 24);
-            cell.setStroke(Color.rgb(54, 54, 54));
-            cell.setStrokeType(StrokeType.INSIDE);
-            cell.setStrokeWidth(2);
-            switch (colour) {
-                case Black:
-                    cell.setFill(Color.rgb(0, 0, 0));
-                    break;
-                case Red:
-                    cell.setFill(Color.rgb(255, 0, 0));
-                    break;
-                case Green:
-                    cell.setFill(Color.rgb(0, 127, 0));
-                    break;
-                case NULL:
-                    cell.setFill(null);
-            }
-            getChildren().add(cell);
-        }
     }
 
 

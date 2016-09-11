@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 /**
  * A very simple viewer for piece placements in the link game.
- *
+ * <p>
  * NOTE: This class is separate from your main game class.  This
  * class does not play a game, it just illustrates various piece
  * placements.
@@ -51,7 +51,7 @@ public class Viewer extends Application {
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
-     * @param placement  A valid placement string
+     * @param placement A valid placement string
      */
     void makePlacement(String placement) {
         // We clear an existing grid and set the initial tile "MMUA"
@@ -59,13 +59,15 @@ public class Viewer extends Application {
         setInitialPiece();
 
         // Clear the height array and set height for initial piece 'MMUA'
-        for(int i = 0; i < GRID_SIZE; i++ )
+        for (int i = 0; i < GRID_SIZE; i++)
             Arrays.fill(heightArray[i], 0);
         heightArray[12][12]++;
         heightArray[12][13]++;
 
         // We know if |placement| = 4, placement = "MMUA" only
-        if (placement.length() == 4) { return; }
+        if (placement.length() == 4) {
+            return;
+        }
 
         // Loop through the rest of the placement string
         for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
@@ -85,26 +87,26 @@ public class Viewer extends Application {
                By using the methods in Colour, we can get the colour of a cell
                within a tile at a given index.
             */
-            switch(orientation) {
-                case A :
+            switch (orientation) {
+                case A:
                     setCell(originX, originY, shapeID.colourAtIndex(0));
-                    setCell((char)(originX+1), originY, shapeID.colourAtIndex(1));
-                    setCell(originX, (char)(originY+1), shapeID.colourAtIndex(2));
+                    setCell((char) (originX + 1), originY, shapeID.colourAtIndex(1));
+                    setCell(originX, (char) (originY + 1), shapeID.colourAtIndex(2));
                     break;
-                case B :
+                case B:
                     setCell(originX, originY, shapeID.colourAtIndex(0));
-                    setCell(originX, (char)(originY+1), shapeID.colourAtIndex(1));
-                    setCell((char)(originX-1), originY, shapeID.colourAtIndex(2));
+                    setCell(originX, (char) (originY + 1), shapeID.colourAtIndex(1));
+                    setCell((char) (originX - 1), originY, shapeID.colourAtIndex(2));
                     break;
-                case C :
+                case C:
                     setCell(originX, originY, shapeID.colourAtIndex(0));
-                    setCell((char)(originX-1), originY, shapeID.colourAtIndex(1));
-                    setCell(originX, (char)(originY-1), shapeID.colourAtIndex(2));
+                    setCell((char) (originX - 1), originY, shapeID.colourAtIndex(1));
+                    setCell(originX, (char) (originY - 1), shapeID.colourAtIndex(2));
                     break;
-                case D :
+                case D:
                     setCell(originX, originY, shapeID.colourAtIndex(0));
-                    setCell(originX, (char)(originY-1), shapeID.colourAtIndex(1));
-                    setCell((char)(originX+1), originY, shapeID.colourAtIndex(2));
+                    setCell(originX, (char) (originY - 1), shapeID.colourAtIndex(1));
+                    setCell((char) (originX + 1), originY, shapeID.colourAtIndex(2));
                     break;
                 case NULL:
                     break;
@@ -131,26 +133,26 @@ public class Viewer extends Application {
     private void updateHeightArray(char c1, char c2, Orientation orientation) {
         int x = c1 - 'A';
         int y = c2 - 'A';
-        switch(orientation) {
+        switch (orientation) {
             case A:
                 heightArray[x][y]++;
-                heightArray[x+1][y]++;
-                heightArray[x][y+1]++;
+                heightArray[x + 1][y]++;
+                heightArray[x][y + 1]++;
                 return;
             case B:
                 heightArray[x][y]++;
-                heightArray[x][y+1]++;
-                heightArray[x-1][y]++;
+                heightArray[x][y + 1]++;
+                heightArray[x - 1][y]++;
                 return;
             case C:
                 heightArray[x][y]++;
-                heightArray[x-1][y]++;
-                heightArray[x][y-1]++;
+                heightArray[x - 1][y]++;
+                heightArray[x][y - 1]++;
                 return;
             case D:
                 heightArray[x][y]++;
-                heightArray[x][y-1]++;
-                heightArray[x+1][y]++;
+                heightArray[x][y - 1]++;
+                heightArray[x + 1][y]++;
                 return;
             case NULL:
         }
@@ -159,19 +161,26 @@ public class Viewer extends Application {
     /* We get the index in the Scene `root`, of the position given */
     private int getIndex(char x, char y) {
         if (y - 'A' == 0) return x - 'A';
-        else return (x - 'A')+(y - 'A')*26;
+        else return (x - 'A') + (y - 'A') * 26;
     }
 
     // Calculate how many pixels to translate x and y by on window
-    private int translateX(char x) { return (x - 'A')*24 + 63; }
-    private int translateY(char y) { return (y - 'A')*24 + 10; }
+    private int translateX(char x) {
+        return (x - 'A') * 24 + 63;
+    }
+
+    private int translateY(char y) {
+        return (y - 'A') * 24 + 10;
+    }
 
     // Set the initial "MMUA" for ease
     private void setInitialPiece() {
         Cell c1 = new Cell(Colour.Red);
         Cell c2 = new Cell(Colour.Green);
-        c1.setTranslateX(351); c1.setTranslateY(298);
-        c2.setTranslateX(351); c2.setTranslateY(322);
+        c1.setTranslateX(351);
+        c1.setTranslateY(298);
+        c2.setTranslateX(351);
+        c2.setTranslateY(322);
         root.getChildren().set(324, c1);
         root.getChildren().set(350, c2);
     }
@@ -183,86 +192,16 @@ public class Viewer extends Application {
         // Create grid with cell identifiers
         for (int i = 0; i < GRID_SIZE; i++) { // columns
             for (int j = 0; j < GRID_SIZE; j++) { // rows
-                char x = (char)(j+'A');
-                char y = (char)(i+'A');
+                char x = (char) (j + 'A');
+                char y = (char) (i + 'A');
                 StringBuilder sb = new StringBuilder().append(x).append(y);
                 Cell cell = new Cell(sb.toString());
-                cell.setTranslateX(j*24 + 63);
-                cell.setTranslateY(i*24 + 10);
+                cell.setTranslateX(j * 24 + 63);
+                cell.setTranslateY(i * 24 + 10);
                 root.getChildren().add(cell);
             }
         }
         root.getChildren().add(controls);
-    }
-
-    /** We represent the grid as a collection of Cells.
-     *  Each Cell is initially initalised with their respective coordinate positions.
-     *  Cells with colours can be created to fill in a cell
-     */
-    private class Cell extends StackPane {
-        private Cell(String str) {
-            // We create a square with a border
-            Rectangle border = new Rectangle(24, 24);
-            border.setFill(null);
-            border.setStroke(Color.LIGHTGREY);
-            // We create the text to indicate the position
-            Text text = new Text(str);
-            text.setFont(Font.font(12));
-            text.setFill(Color.GRAY);
-            setAlignment(Pos.CENTER);
-            // Combine the square and the text
-            getChildren().addAll(border, text);
-        }
-
-        private Cell(Colour colour) {
-            // Create the cell and fill it with the relevant colour
-            Rectangle cell = new Rectangle(24, 24);
-            cell.setStroke(Color.rgb(54, 54, 54));
-            cell.setStrokeType(StrokeType.INSIDE);
-            cell.setStrokeWidth(2);
-            switch(colour) {
-                case Black:
-                    cell.setFill(Color.rgb(0, 0, 0));
-                    break;
-                case Red:
-                    cell.setFill(Color.rgb(255, 0, 0));
-                    break;
-                case Green:
-                    cell.setFill(Color.rgb(0, 127, 0));
-                    break;
-                case NULL :
-                    cell.setFill(null);
-            }
-            getChildren().add(cell);
-        }
-
-        private Cell(Colour colour, int height) {
-            // Create the cell and fill it with the relevant colour
-            Rectangle cell = new Rectangle(24, 24);
-            cell.setStroke(Color.rgb(54, 54, 54));
-            cell.setStrokeType(StrokeType.INSIDE);
-            cell.setStrokeWidth(2);
-            switch(colour) {
-                case Black:
-                    cell.setFill(Color.rgb(0, 0, 0));
-                    break;
-                case Red:
-                    cell.setFill(Color.rgb(255, 0, 0));
-                    break;
-                case Green:
-                    cell.setFill(Color.rgb(0, 127, 0));
-                    break;
-                case NULL :
-                    cell.setFill(null);
-            }
-            // We create the text to indicate the position
-            Text text = new Text(String.valueOf(height));
-            text.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-            text.setFill(Color.WHITE);
-            setAlignment(Pos.CENTER);
-            // Add the cell with height text
-            getChildren().addAll(cell, text);
-        }
     }
 
     /**
@@ -270,22 +209,16 @@ public class Viewer extends Application {
      */
     private void makeControls() {
         Label label1 = new Label("Placement:");
-        textField = new TextField ();
+        textField = new TextField();
         textField.setPrefWidth(300);
         Button button = new Button("Refresh");
         // Handle <ENTER> key pressed on TextField
-        textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                if(event.getCode().equals(KeyCode.ENTER)) handleRefresh();
-            }
+        textField.setOnKeyPressed(event -> {
+            if (event.getCode().equals(KeyCode.ENTER)) handleRefresh();
         });
         // Handle click of `Refresh` button
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                handleRefresh();
-            }
+        button.setOnAction(event -> {
+            handleRefresh();
         });
         HBox hb = new HBox();
         hb.getChildren().addAll(label1, textField, button);
@@ -297,7 +230,7 @@ public class Viewer extends Application {
 
     // Checks if the placement string is valid. If not, show popup dialog
     private void handleRefresh() {
-        if(StratoGame.isPlacementValid(textField.getText())) {
+        if (StratoGame.isPlacementValid(textField.getText())) {
             makePlacement(textField.getText());
             textField.clear();
         } else {
