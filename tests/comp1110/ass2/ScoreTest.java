@@ -1,6 +1,5 @@
 package comp1110.ass2;
 
-import comp1110.ass2.logic.*;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -8,7 +7,18 @@ import static org.junit.Assert.*;
 public class ScoreTest {
 
     @Test
-    public void getScore() throws Exception {
+    public void testEmpty() {
+        boolean isGreen = true;
+        assertTrue("Null placement string expected score of 0, but got " +
+                    StratoGame.getScoreForPlacement(null, isGreen),
+                    StratoGame.getScoreForPlacement(null, isGreen) == 0);
+        assertTrue("Empty placement string expected score of 0, but got " +
+                    StratoGame.getScoreForPlacement("", isGreen),
+                    StratoGame.getScoreForPlacement("", isGreen) == 0);
+    }
+
+    @Test
+    public void testGood() {
         String placement = "MMUANLOBLNBCONSCKLDAPOTCMLEBPLMBKNJDOLNBMLDANPLDNNBAONMCLOFAPQTC";
         int greenScore = 8;
         int redScore = 33;

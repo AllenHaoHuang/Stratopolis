@@ -164,7 +164,7 @@ public class StratoGame {
      */
     static int getScoreForPlacement(String placement, boolean green) {
         // FIXME Task 7: determine the score for a player given a placement
-        if (!isPlacementValid(placement)) return -1;
+        if (!isPlacementValid(placement)) return 0;
 
         BoardState board = new BoardState();
         for (int i = 4; i < placement.length(); i += 4) {
