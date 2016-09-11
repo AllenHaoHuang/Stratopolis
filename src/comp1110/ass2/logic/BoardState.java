@@ -26,6 +26,7 @@ public class BoardState {
         pieceIDArray[12][13] = pieceID++;
     }
 
+    // A tile must obey all the rules for it to be valid
     public boolean isTileValid(Tile tile) {
         return (tile.isOnBoard() &&
                 isAdjacent(tile) &&
@@ -34,6 +35,7 @@ public class BoardState {
                 isOverTwoTiles(tile));
     }
 
+    // Check that the tile is adjacent to another tile by checking the height neighbouring cells
     private boolean isAdjacent(Tile tile) {
         int x = tile.getX(0);
         int y = tile.getY(0);
@@ -75,6 +77,7 @@ public class BoardState {
         }
     }
 
+    // We check if the tile follows the colour rules
     private boolean areColoursValid(Tile tile) {
         Colour colour0 = tile.getShape().colourAtIndex(0);
         Colour colour1 = tile.getShape().colourAtIndex(1);
@@ -84,6 +87,7 @@ public class BoardState {
                 isColourValidOnTile(tile.getX(2), tile.getY(2), colour2));
     }
 
+    // Helper function for `areColoursValid`
     private boolean isColourValidOnTile(int x, int y, Colour colour) {
         switch (colour) {
             case Black:
@@ -97,11 +101,13 @@ public class BoardState {
         }
     }
 
+    // The heights must be equal for a tile placement to be valid
     private boolean areHeightsValid(Tile tile) {
         return (heightArray[tile.getX(0)][tile.getY(0)] == heightArray[tile.getX(1)][tile.getY(1)] &&
                 heightArray[tile.getX(0)][tile.getY(0)] == heightArray[tile.getX(2)][tile.getY(2)]);
     }
 
+    // If a tile is placed over others, it must straddle at least two tiles
     private boolean isOverTwoTiles(Tile tile) {
         return (heightArray[tile.getX(0)][tile.getY(0)] == 0 ||
                 !(pieceIDArray[tile.getX(0)][tile.getY(0)] == pieceIDArray[tile.getX(1)][tile.getY(1)] &&
@@ -124,5 +130,12 @@ public class BoardState {
         pieceIDArray[tile.getX(2)][tile.getY(2)] = pieceID++;
     }
 
+    // Get the height at a certain cell on our board
+    public int getHeight(char x, char y) {
+        return heightArray[x - 'A'][y - 'A'];
+    }
+
+    // Get the score of a player at the current board status
+    public int getScore(boolean isGreen) { return Score.getScore(this, isGreen); }
 
 }

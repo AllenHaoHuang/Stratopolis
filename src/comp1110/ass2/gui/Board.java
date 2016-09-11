@@ -24,23 +24,19 @@ public class Board extends Application {
     private LinkedList<Shape> playerRed = new LinkedList<>();
     private LinkedList<Shape> playerGreen = new LinkedList<>();
     private boolean isGreen;
-    private boolean alreadyHovered = false;
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
     private final Group root = new Group();
     private final Group greenCurrentTile = new Group();
-    private final Group redCurrentTile =new Group();
-    private final Group hoverTile = new Group();
+    private final Group greenNextTile = new Group();
+    private final Group redCurrentTile = new Group();
+    private final Group redNextTile = new Group();
+    private final Group hoverCurrentTile = new Group();
 
     private Label greenPiecesLeft = new Label();
     private Label redPiecesLeft = new Label();
     private Label playerTurn = new Label();
-
-    /** INITIAL DESIGN FOR ROOT INDEXES
-     *  - 0 to 675 for grid and cells
-     *  - 676 and on for other stuff
-     */
 
     /* Prepare everything accordingly for play */
     private void setupGame() {
@@ -56,9 +52,9 @@ public class Board extends Application {
         playerTurn.setTranslateX(BOARD_WIDTH/2 - 70);
         playerTurn.setTranslateY(5);
         greenPiecesLeft.setTranslateX(30);
-        greenPiecesLeft.setTranslateY(105);
+        greenPiecesLeft.setTranslateY(180);
         redPiecesLeft.setTranslateX(BOARD_WIDTH - 110);
-        redPiecesLeft.setTranslateY(105);
+        redPiecesLeft.setTranslateY(180);
         root.getChildren().addAll(playerTurn, greenPiecesLeft, redPiecesLeft);
         // Initialise the 'deck' of tiles for the players and shuffle them
         for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
@@ -71,18 +67,21 @@ public class Board extends Application {
         }
         Collections.shuffle(playerGreen);
         Collections.shuffle(playerRed);
-        // We wait for the green player's turn
+        // We wait for the green player's turn and display the top pieces
         isGreen = true;
-        showNextTile();
-        showNextTile();
+        showCurrentTile();
+        showCurrentTile();
     }
 
-    private void showNextTile() {
-        /* FIXME: Extremely ugly code */
-        piecesLeft();
+    private void showCurrentTile() {
+        /* Show how many pieces are left and initalise variables */
+        // Update how many pieces a player has left after they have played a move
+        if (isGreen) greenPiecesLeft.setText(playerGreen.size() + " piece(s) left.");
+        else redPiecesLeft.setText(playerRed.size() + " piece(s) left.");
+
         Shape nextTile;
         Cell zero, one, two;
-        
+
         // Set text in label for whose turn it is
         if (!isGreen) {
             playerTurn.setTextFill(Color.GREEN);
@@ -96,10 +95,17 @@ public class Board extends Application {
         if (isGreen && playerGreen.size() == 0) {
             root.getChildren().remove(greenCurrentTile);
             isGreen = !isGreen;
+            greenPiecesLeft.setVisible(false);
             return;
         } else if (playerRed.size() == 0) {
+            redPiecesLeft.setVisible(false);
+            playerTurn.setTextFill(Color.DEEPPINK);
             playerTurn.setText("Game finished.");
             root.getChildren().remove(redCurrentTile);
+            // Disable grid at end of game
+            for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                root.getChildren().get(i).setDisable(true);
+            }
             return;
         } else if (isGreen) {
             // Remove existing shape preview for green player
@@ -138,16 +144,56 @@ public class Board extends Application {
             root.getChildren().add(redCurrentTile);
         }
 
+        // Add next tile to preview
+        if (playerGreen.size() == 1 && isGreen) {
+            root.getChildren().remove(greenNextTile);
+            greenPiecesLeft.setTranslateY(110);
+        } else if (playerRed.size() == 1) {
+            root.getChildren().remove(redNextTile);
+            redPiecesLeft.setTranslateY(110);
+        } else {
+            Shape temp = (isGreen) ? playerGreen.get(1) : playerRed.get(1);
+            showNextTile(temp);
+        }
+
         // We invert whose turn it is
         isGreen = !isGreen;
     }
 
-    private void piecesLeft() {
-        // Update how many pieces a player has left after they have played a move
-        if (isGreen)
-            greenPiecesLeft.setText(playerGreen.size() + " pieces left.");
-        else
-            redPiecesLeft.setText(playerRed.size() + " pieces left.");
+    private void showNextTile(Shape shape) {
+        Cell zero = new Cell(shape.colourAtIndex(0));
+        Cell one = new Cell(shape.colourAtIndex(1));
+        Cell two = new Cell(shape.colourAtIndex(2));
+
+        if (isGreen) {
+            root.getChildren().remove(greenNextTile);
+            greenNextTile.getChildren().clear();
+
+            zero.setTranslateX(50);
+            zero.setTranslateY(115);
+            one.setTranslateX(zero.getTranslateX() + 24);
+            one.setTranslateY(zero.getTranslateY());
+            two.setTranslateX(zero.getTranslateX());
+            two.setTranslateY(zero.getTranslateY() + 24);
+
+            greenNextTile.getChildren().addAll(zero, one, two);
+            greenNextTile.setOpacity(0.55);
+            root.getChildren().add(greenNextTile);
+        } else {
+            root.getChildren().remove(redNextTile);
+            redNextTile.getChildren().clear();
+
+            zero.setTranslateX(BOARD_WIDTH - 80);
+            zero.setTranslateY(115);
+            one.setTranslateX(zero.getTranslateX() + 24);
+            one.setTranslateY(zero.getTranslateY());
+            two.setTranslateX(zero.getTranslateX());
+            two.setTranslateY(zero.getTranslateY() + 24);
+
+            redNextTile.getChildren().addAll(zero, one, two);
+            redNextTile.setOpacity(0.55);
+            root.getChildren().add(redNextTile);
+        }
     }
 
     // We create the default grid
@@ -157,52 +203,46 @@ public class Board extends Application {
         // Create grid with cell identifiers
         for (int i = 0; i < GRID_SIZE; i++) { // columns
             for (int j = 0; j < GRID_SIZE; j++) { // rows
+                // Build a new cell with the identifiers
                 char x = (char) (j + 'A');
                 char y = (char) (i + 'A');
                 StringBuilder sb = new StringBuilder().append(x).append(y);
                 Cell cell = new Cell(sb.toString());
                 cell.setTranslateX(j * 24 + 154);
                 cell.setTranslateY(i * 24 + 30);
-                /* We place a tile if a  */
+                /* Add a tile to the board state and GUI grid */
                 cell.setOnMouseClicked(event -> {
                     addTile(x, y);
                 });
-                /* HANDLE HOVER OVER : RIP THIS CODE KILLS */
+                /* Show a slightly transparent tile on the GUI grid */
                 cell.setOnMouseEntered(event -> {
                     hoverTile(x, y);
                 });
+                /* Remove the preview tile on the GUI grid */
                 cell.setOnMouseExited(event -> {
-                    root.getChildren().remove(hoverTile);
-                    hoverTile.getChildren().clear();
-                    alreadyHovered = false;
+                    root.getChildren().remove(hoverCurrentTile);
+                    hoverCurrentTile.getChildren().clear();
                 });
+                /* Change the orientation of a preview tile on the GUI grid */
                 cell.setOnScroll(event -> {
                     // Remove the current tile preview and draw another one
-                    root.getChildren().remove(hoverTile);
-                    hoverTile.getChildren().clear();
+                    root.getChildren().remove(hoverCurrentTile);
+                    hoverCurrentTile.getChildren().clear();
                     hoverOrientation = Orientation.next(hoverOrientation);
-                    alreadyHovered = false;
                     hoverTile(x, y);
                 });
-
+                // Add the cell to the root group
                 root.getChildren().add(cell);
             }
         }
         // Set the initial 'MMUA' piece
-        Cell c1 = new Cell(Colour.Red);
-        Cell c2 = new Cell(Colour.Green);
-        c1.setTranslateX(442);
-        c1.setTranslateY(318);
-        c2.setTranslateX(442);
-        c2.setTranslateY(342);
-        root.getChildren().set(324, c1);
-        root.getChildren().set(350, c2);
+        addCell('M', 'M', Colour.Red);
+        addCell('M', 'N', Colour.Green);
     }
 
     private void hoverTile(char x, char y) {
         // Get the shape so we can extract the colours
         Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
-
         // We don't want to show shape if it is out of bounds
         switch (hoverOrientation) {
             case A :
@@ -234,31 +274,28 @@ public class Board extends Application {
                 hoverCell((char)(x+1), y, shape.colourAtIndex(2));
                 break;
         }
-
-        // Add the tile hover to the root
-        hoverTile.setMouseTransparent(true);
-        root.getChildren().add(hoverTile);
-        alreadyHovered = true;
+        // Add the tile hover to the root node
+        hoverCurrentTile.setMouseTransparent(true);
+        root.getChildren().add(hoverCurrentTile);
     }
 
     private void hoverCell(char x, char y, Colour colour) {
         // Create new cell, change its properties and add to group
-        Cell cell = new Cell(colour, isGreen);
+        Cell cell;
+        cell = new Cell(colour, isGreen);
         cell.setTranslateX(translateX(x));
         cell.setTranslateY(translateY(y));
         cell.setOpacity(0.85);
-        hoverTile.getChildren().add(cell);
+        hoverCurrentTile.getChildren().add(cell);
     }
 
     private void addTile(char x, char y) {
         // Create a new tile
-        Position position = new Position(x, y);
         Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
-        Orientation orientation = hoverOrientation;
-        Tile tile = new Tile(position, shape, orientation);
+        Tile tile = new Tile(new Position(x, y), shape, hoverOrientation);
         // Add a new tile to our board if it is valid
         if (boardState.isTileValid(tile)) {
-            boardState.addTile(new Tile(position, shape, orientation));
+            boardState.addTile(tile);
         } else {
             // When tile placement is not valid, we show an error message
             playerTurn.setTextFill(Color.RED);
@@ -269,7 +306,7 @@ public class Board extends Application {
         }
 
         // Add cells onto the board based on the tile orientation
-        switch (orientation) {
+        switch (hoverOrientation) {
             case A :
                 addCell(x, y, shape.colourAtIndex(0));
                 addCell((char)(x+1), y, shape.colourAtIndex(1));
@@ -295,18 +332,40 @@ public class Board extends Application {
         // Remove the piece from the player's pieces and show their next piece
         if (isGreen) playerGreen.removeFirst();
         else playerRed.removeFirst();
-        showNextTile();
-        // Reset the orientation for hovering
-        hoverOrientation = Orientation.A;
+        showCurrentTile();
     }
 
     private void addCell(char x, char y, Colour colour) {
         // Create new cell, change its properties and add to root
-        Cell cell = new Cell(colour);
+        Cell cell;
+        if (boardState.getHeight(x, y) > 1)
+            cell = new Cell(colour, boardState.getHeight(x, y));
+        else
+            cell = new Cell(colour);
         cell.setTranslateX(translateX(x));
         cell.setTranslateY(translateY(y));
         root.getChildren().set(getIndex(x, y), cell);
-        // NEED TO HANDLE EVENTS - i.e. Stacking of tiles
+        /* Add a tile to the board state and GUI grid */
+        cell.setOnMouseClicked(event -> {
+            addTile(x, y);
+        });
+        /* Show a slightly transparent tile on the GUI grid */
+        cell.setOnMouseEntered(event -> {
+            hoverTile(x, y);
+        });
+        /* Remove the preview tile on the GUI grid */
+        cell.setOnMouseExited(event -> {
+            root.getChildren().remove(hoverCurrentTile);
+            hoverCurrentTile.getChildren().clear();
+        });
+        /* Change the orientation of a preview tile on the GUI grid */
+        cell.setOnScroll(event -> {
+            // Remove the current tile preview and draw another one
+            root.getChildren().remove(hoverCurrentTile);
+            hoverCurrentTile.getChildren().clear();
+            hoverOrientation = Orientation.next(hoverOrientation);
+            hoverTile(x, y);
+        });
     }
 
     // Calculate how many pixels to translate x and y by on window
@@ -342,7 +401,7 @@ public class Board extends Application {
 
     // FIXME Task 9: Implement scoring
     private int scoring(Colour player) {
-        return Score.getScore("board", player);
+        return Score.getScore(boardState, isGreen);
     }
 
     // FIXME Task 11: Implement a game that can play valid moves (even if they are weak moves)

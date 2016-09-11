@@ -118,7 +118,7 @@ public class Viewer extends Application {
     private void setCell(char x, char y, Colour colour) {
         // Create a new Cell based on the given colour
         Cell cell;
-        if (heightArray[x - 'A'][y - 'A'] > 1 && !(colour.equals(Colour.Black)))
+        if (heightArray[x - 'A'][y - 'A'] > 1)
             cell = new Cell(colour, heightArray[x - 'A'][y - 'A']);
         else
             cell = new Cell(colour);

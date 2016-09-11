@@ -48,10 +48,11 @@ class Cell extends StackPane {
         getChildren().add(cell);
     }
 
-    Cell(Colour colour, boolean bool) {
+    Cell(Colour colour, boolean isGreen) {
         // Create the hover cell and fill it with the relevant colour
         Rectangle cell = new Rectangle(24, 24);
-        if (bool) cell.setStroke(Color.LIGHTGREEN);
+        // Change border colours to recognise each player
+        if (isGreen) cell.setStroke(Color.LIGHTGREEN);
         else cell.setStroke(Color.LIGHTPINK);
         cell.setStrokeType(StrokeType.INSIDE);
         cell.setStrokeWidth(2);
