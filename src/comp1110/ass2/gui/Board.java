@@ -93,10 +93,11 @@ public class Board extends Application {
         Cell zero, one, two;
         
         // Set text in label for whose turn it is
-        playerTurn.setTextFill(Color.BLACK);
         if (!isGreen) {
+            playerTurn.setTextFill(Color.GREEN);
             playerTurn.setText("Green Player's Turn");
         } else {
+            playerTurn.setTextFill(Color.RED);
             playerTurn.setText("Red Player's Turn");
         }
 
@@ -174,7 +175,6 @@ public class Board extends Application {
                 /* We place a tile if a  */
                 cell.setOnMouseClicked(event -> {
                     addTile(x, y);
-                    hoverOrientation = Orientation.A;
                 });
                 /* HANDLE HOVER OVER : RIP THIS CODE KILLS */
                 cell.setOnMouseEntered(event -> {
@@ -186,16 +186,10 @@ public class Board extends Application {
                     alreadyHovered = false;
                 });
                 cell.setOnScroll(event -> {
+                    // Remove the current tile preview and draw another one
                     root.getChildren().remove(hoverTile);
                     hoverTile.getChildren().clear();
-                    if (hoverOrientation == Orientation.A)
-                        hoverOrientation = Orientation.B;
-                    else if (hoverOrientation == Orientation.B)
-                        hoverOrientation = Orientation.C;
-                    else if (hoverOrientation == Orientation.C)
-                        hoverOrientation = Orientation.D;
-                    else if (hoverOrientation == Orientation.D)
-                        hoverOrientation = Orientation.A;
+                    hoverOrientation = Orientation.next(hoverOrientation);
                     alreadyHovered = false;
                     hoverTile(x, y);
                 });
@@ -257,11 +251,11 @@ public class Board extends Application {
     }
 
     private void hoverCell(char x, char y, Colour colour) {
+        // Create new cell, change its properties and add to group
         Cell cell = new Cell(colour);
         cell.setTranslateX(translateX(x));
         cell.setTranslateY(translateY(y));
         cell.setOpacity(0.5);
-        cell.toFront();
         hoverTile.getChildren().add(cell);
     }
 
@@ -269,12 +263,13 @@ public class Board extends Application {
         // Create a new tile
         Position position = new Position(x, y);
         Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
-        Orientation orientation = Orientation.fromChar('A'); // TODO: take into account orientation
+        Orientation orientation = hoverOrientation;
         Tile tile = new Tile(position, shape, orientation);
-        // Add a new tile to our board
+        // Add a new tile to our board if it is valid
         if (boardState.isTileValid(tile)) {
             boardState.addTile(new Tile(position, shape, orientation));
         } else {
+            // When tile placement is not valid, we show an error message
             playerTurn.setTextFill(Color.RED);
             if (playerTurn.getText().contains("Invalid Tile Placement"))
                 playerTurn.setText("!" + playerTurn.getText() + "!");
@@ -282,30 +277,45 @@ public class Board extends Application {
             return;
         }
 
-        // SHOW TILE ON GRID, DO CALCULATIONS AND UPDATE IN ROOT
-        // PROBABLY NEED TO OUTSOURCE CELL TO ANOThER CLASS
-        Cell zero = new Cell(tile.getShape().colourAtIndex(0));
-        Cell one = new Cell(tile.getShape().colourAtIndex(1));
-        Cell two = new Cell(tile.getShape().colourAtIndex(2));
+        // Add cells onto the board based on the tile orientation
+        switch (orientation) {
+            case A :
+                addCell(x, y, shape.colourAtIndex(0));
+                addCell((char)(x+1), y, shape.colourAtIndex(1));
+                addCell(x, (char)(y+1), shape.colourAtIndex(2));
+                break;
+            case B :
+                addCell(x, y, shape.colourAtIndex(0));
+                addCell(x, (char)(y+1), shape.colourAtIndex(1));
+                addCell((char)(x-1), y, shape.colourAtIndex(2));
+                break;
+            case C :
+                addCell(x, y, shape.colourAtIndex(0));
+                addCell((char)(x-1), y, shape.colourAtIndex(1));
+                addCell(x, (char)(y-1), shape.colourAtIndex(2));
+                break;
+            case D :
+                addCell(x, y, shape.colourAtIndex(0));
+                addCell(x, (char)(y-1), shape.colourAtIndex(1));
+                addCell((char)(x+1), y, shape.colourAtIndex(2));
+                break;
+        }
 
-        zero.setTranslateX(translateX(x));
-        zero.setTranslateY(translateY(y));
-
-        one.setTranslateX(translateX((char) (x + 1)));
-        one.setTranslateY(translateY(y));
-
-        two.setTranslateX(translateX(x));
-        two.setTranslateY(translateY((char) (y + 1)));
-
-        // NEED TO ACCOUNT FOR TILE STACKING
-
-        // update cells in root
-        root.getChildren().set(getIndex(x, y), zero);
-        root.getChildren().set(getIndex((char) (x + 1), y), one);
-        root.getChildren().set(getIndex(x, (char) (y + 1)), two);
+        // Remove the piece from the player's pieces and show their next piece
         if (isGreen) playerGreen.removeFirst();
         else playerRed.removeFirst();
         showNextTile();
+        // Reset the orientation for hovering
+        hoverOrientation = Orientation.A;
+    }
+
+    private void addCell(char x, char y, Colour colour) {
+        // Create new cell, change its properties and add to root
+        Cell cell = new Cell(colour);
+        cell.setTranslateX(translateX(x));
+        cell.setTranslateY(translateY(y));
+        root.getChildren().set(getIndex(x, y), cell);
+        // NEED TO HANDLE EVENTS - i.e. Stacking of tiles
     }
 
     // Calculate how many pixels to translate x and y by on window

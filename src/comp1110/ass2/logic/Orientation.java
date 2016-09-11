@@ -34,4 +34,15 @@ public enum Orientation {
             default : return '\0';
         }
     }
+
+    /* Return the next Orientation enum for scrolling on the board */
+    public static Orientation next(Orientation orientation) {
+        switch (orientation) {
+            case A : return B;
+            case B : return C;
+            case C : return D;
+            case D : return A;
+            default : return NULL;
+        }
+    }
 }
