@@ -3,6 +3,8 @@ package comp1110.ass2;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static comp1110.ass2.TestUtility.INVALID_PLACEMENTS;
+
 
 public class ScoreTest {
 
@@ -23,13 +25,23 @@ public class ScoreTest {
         int greenScore = 8;
         int redScore = 33;
         boolean isGreen = true;
-        System.out.println("Test Placement String: " + placement);
-        assertTrue("Expected score for green player = " + greenScore + ", but got " +
+        assertTrue("Placement Test String: " + placement +
+                        "\nExpected score for green player = " + greenScore + ", but got " +
                         StratoGame.getScoreForPlacement(placement, isGreen),
                         StratoGame.getScoreForPlacement(placement, isGreen) == greenScore);
-        assertTrue("Expected score for red player = " + redScore + ", but got " +
+        assertTrue("Placement Test String: " + placement +
+                        "\nExpected score for green player = " + greenScore + ", but got " +
                         StratoGame.getScoreForPlacement(placement, !isGreen),
                         StratoGame.getScoreForPlacement(placement, !isGreen) == redScore);
     }
 
+    @Test
+    public void testBad() {
+        for (int i = 0; i < INVALID_PLACEMENTS.length; i++) {
+            String p = INVALID_PLACEMENTS[i];
+            assertTrue("Placement '" + p + "' is invalid, but gave score " +
+                        StratoGame.getScoreForPlacement(p, true) + " instead of 0",
+                        StratoGame.getScoreForPlacement(p, true) == 0);
+        }
+    }
 }
