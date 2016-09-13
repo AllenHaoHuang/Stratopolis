@@ -18,6 +18,7 @@ public class Score {
 
     // Calculates Score for given player
     public static int getScore(BoardState board, boolean isGreen) {
+        // FIXME: Task 7 Marvin please do this
         return getLargestArea(board, isGreen) * maximumHeight(board, isGreen);
     }
 

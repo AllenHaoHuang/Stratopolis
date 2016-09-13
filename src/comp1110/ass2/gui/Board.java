@@ -3,6 +3,7 @@ package comp1110.ass2.gui;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -56,31 +57,33 @@ public class Board extends Application {
         redPiecesLeft.setTranslateX(BOARD_WIDTH - 110);
         redPiecesLeft.setTranslateY(180);
         root.getChildren().addAll(playerTurn, greenPiecesLeft, redPiecesLeft);
+        // Initialise the 'deck' of tiles for the players and display them
+        setupPlayerTiles();
+        // We wait for the green player's turn and display the top pieces
+        isGreen = true;
+    }
+
+    private void setupPlayerTiles() {
         // Initialise the 'deck' of tiles for the players and shuffle them
         for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
             playerRed.add(i);
-            playerRed.add(i);
+            //playerRed.add(i);
         }
         for (Shape i : EnumSet.range(Shape.K, Shape.T)) {
             playerGreen.add(i);
-            playerGreen.add(i);
+            //playerGreen.add(i);
         }
         Collections.shuffle(playerGreen);
         Collections.shuffle(playerRed);
-        // We wait for the green player's turn and display the top pieces
-        isGreen = true;
-        showCurrentTile();
-        showCurrentTile();
+        // Show the tile previews
+        previewTiles();
+        previewTiles();
     }
 
-    private void showCurrentTile() {
-        /* Show how many pieces are left and initalise variables */
-        // Update how many pieces a player has left after they have played a move
+    private void previewTiles() {
+        // Show how many pieces a player has left
         if (isGreen) greenPiecesLeft.setText(playerGreen.size() + " piece(s) left.");
         else redPiecesLeft.setText(playerRed.size() + " piece(s) left.");
-
-        Shape nextTile;
-        Cell zero, one, two;
 
         // Set text in label for whose turn it is
         if (!isGreen) {
@@ -91,60 +94,27 @@ public class Board extends Application {
             playerTurn.setText("Red Player's Turn");
         }
 
-        // The green player is first to run out of pieces, so red does too
+        // Check if we are approaching the end game state
         if (isGreen && playerGreen.size() == 0) {
+            // Green runs out of pieces
             root.getChildren().remove(greenCurrentTile);
-            isGreen = !isGreen;
             greenPiecesLeft.setVisible(false);
+            isGreen = !isGreen;
             return;
         } else if (playerRed.size() == 0) {
+            // Red runs out of pieces, end of game
+            root.getChildren().remove(redCurrentTile);
             redPiecesLeft.setVisible(false);
-            playerTurn.setTextFill(Color.DEEPPINK);
-            playerTurn.setText("Game finished.");
-            root.getChildren().remove(redCurrentTile);
-            // Disable grid at end of game
-            for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-                root.getChildren().get(i).setDisable(true);
-            }
+            // Prepare board for endgame state
+            endGame();
             return;
-        } else if (isGreen) {
-            // Remove existing shape preview for green player
-            root.getChildren().remove(greenCurrentTile);
-            greenCurrentTile.getChildren().clear();
-            nextTile = playerGreen.getFirst();
-            zero = new Cell(nextTile.colourAtIndex(0));
-            one = new Cell(nextTile.colourAtIndex(1));
-            two = new Cell(nextTile.colourAtIndex(2));
-            zero.setTranslateX(50);
-        } else {
-            // Remove existing shape preview for red player
-            root.getChildren().remove(redCurrentTile);
-            redCurrentTile.getChildren().clear();
-            nextTile = playerRed.getFirst();
-            zero = new Cell(nextTile.colourAtIndex(0));
-            one = new Cell(nextTile.colourAtIndex(1));
-            two = new Cell(nextTile.colourAtIndex(2));
-            zero.setTranslateX(BOARD_WIDTH - 80);
         }
 
-        // Set position of cells on scene
-        zero.setTranslateY(50);
-        one.setTranslateX(zero.getTranslateX() + 24);
-        one.setTranslateY(zero.getTranslateY());
-        two.setTranslateX(zero.getTranslateX());
-        two.setTranslateY(zero.getTranslateY() + 24);
+        // We create a new preview cell based on whose turn it is
+        if (isGreen) showCurrentTile(playerGreen.getFirst());
+        else showCurrentTile(playerRed.getFirst());
 
-        // Add the cells to the relevant groups
-        if (isGreen) {
-            greenCurrentTile.getChildren().addAll(zero, one, two);
-            root.getChildren().add(greenCurrentTile);
-        } else {
-            // Add the cells to the relevant groups
-            redCurrentTile.getChildren().addAll(zero, one, two);
-            root.getChildren().add(redCurrentTile);
-        }
-
-        // Add next tile to preview
+        // Add next tile to preview or move the `Pieces Left` label
         if (playerGreen.size() == 1 && isGreen) {
             root.getChildren().remove(greenNextTile);
             greenPiecesLeft.setTranslateY(110);
@@ -152,6 +122,7 @@ public class Board extends Application {
             root.getChildren().remove(redNextTile);
             redPiecesLeft.setTranslateY(110);
         } else {
+            // Get the next shape after the current one - i.e. player has picked up current shape
             Shape temp = (isGreen) ? playerGreen.get(1) : playerRed.get(1);
             showNextTile(temp);
         }
@@ -160,40 +131,98 @@ public class Board extends Application {
         isGreen = !isGreen;
     }
 
-    private void showNextTile(Shape shape) {
+    private void showCurrentTile(Shape shape) {
+        // Create new cells
         Cell zero = new Cell(shape.colourAtIndex(0));
         Cell one = new Cell(shape.colourAtIndex(1));
         Cell two = new Cell(shape.colourAtIndex(2));
 
+        // Remove existing tile and add new one to root
+        if (isGreen) {
+            root.getChildren().remove(greenCurrentTile);
+            greenCurrentTile.getChildren().clear();
+            // Set up position of cells on screen
+            zero.setTranslateX(50); zero.setTranslateY(50);
+            one.setTranslateX(74); one.setTranslateY(50);
+            two.setTranslateX(50); two.setTranslateY(74);
+            greenCurrentTile.getChildren().addAll(zero, one, two);
+            root.getChildren().add(greenCurrentTile);
+        } else {
+            root.getChildren().remove(redCurrentTile);
+            redCurrentTile.getChildren().clear();
+            // Set up position of cells on screen
+            zero.setTranslateX(BOARD_WIDTH - 80); zero.setTranslateY(50);
+            one.setTranslateX(zero.getTranslateX() + 24); one.setTranslateY(50);
+            two.setTranslateX(zero.getTranslateX()); two.setTranslateY(74);
+            redCurrentTile.getChildren().addAll(zero, one, two);
+            root.getChildren().add(redCurrentTile);
+        }
+    }
+
+    private void showNextTile(Shape shape) {
+        // Create new cells
+        Cell zero = new Cell(shape.colourAtIndex(0));
+        Cell one = new Cell(shape.colourAtIndex(1));
+        Cell two = new Cell(shape.colourAtIndex(2));
+
+        // Removing existing tile and add new one to root
         if (isGreen) {
             root.getChildren().remove(greenNextTile);
             greenNextTile.getChildren().clear();
-
-            zero.setTranslateX(50);
-            zero.setTranslateY(115);
-            one.setTranslateX(zero.getTranslateX() + 24);
-            one.setTranslateY(zero.getTranslateY());
-            two.setTranslateX(zero.getTranslateX());
-            two.setTranslateY(zero.getTranslateY() + 24);
-
+            // Set up position of cells on screen
+            zero.setTranslateX(50); zero.setTranslateY(115);
+            one.setTranslateX(74); one.setTranslateY(115);
+            two.setTranslateX(50); two.setTranslateY(139);
             greenNextTile.getChildren().addAll(zero, one, two);
             greenNextTile.setOpacity(0.55);
             root.getChildren().add(greenNextTile);
         } else {
             root.getChildren().remove(redNextTile);
             redNextTile.getChildren().clear();
-
-            zero.setTranslateX(BOARD_WIDTH - 80);
-            zero.setTranslateY(115);
-            one.setTranslateX(zero.getTranslateX() + 24);
-            one.setTranslateY(zero.getTranslateY());
-            two.setTranslateX(zero.getTranslateX());
-            two.setTranslateY(zero.getTranslateY() + 24);
-
+            // Set up position of cells on screen
+            zero.setTranslateX(BOARD_WIDTH - 80); zero.setTranslateY(115);
+            one.setTranslateX(zero.getTranslateX() + 24); one.setTranslateY(115);
+            two.setTranslateX(zero.getTranslateX()); two.setTranslateY(139);
             redNextTile.getChildren().addAll(zero, one, two);
             redNextTile.setOpacity(0.55);
             root.getChildren().add(redNextTile);
         }
+    }
+
+    private void endGame() {
+        // Update label text
+        playerTurn.setTextFill(Color.DEEPPINK);
+        playerTurn.setText("Game finished.");
+        // Disable the grid at end of game to prevent clicks or hovering
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+            root.getChildren().get(i).setDisable(true);
+        }
+
+        // Show who has won the game
+        int greenScore = Score.getScore(boardState, true);
+        int redScore = Score.getScore(boardState, false);
+        Alert test = new Alert(Alert.AlertType.INFORMATION);
+        if (greenScore > redScore) {
+            test.setTitle("Player Green wins!");
+            test.setHeaderText("Player Green wins!");
+            test.setContentText("Player Green wins with a score of "
+                    + greenScore + ", while Player Red scored " + redScore);
+            test.showAndWait();
+        } else if (redScore > greenScore) {
+            test.setTitle("Player Red wins!");
+            test.setHeaderText("Player Red wins!");
+            test.setContentText("Player Red wins with a score of "
+                    + redScore + ", while Player Green scored " + greenScore);
+            test.showAndWait();
+        } else {
+            test.setTitle("Tie!");
+            test.setHeaderText("Both players tie!");
+            test.setContentText("Player Green and Red tie at " +
+                    greenScore + " points each");
+            test.showAndWait();
+        }
+
+        /* Controls to set up new game if necessary */
     }
 
     // We create the default grid
@@ -203,36 +232,10 @@ public class Board extends Application {
         // Create grid with cell identifiers
         for (int i = 0; i < GRID_SIZE; i++) { // columns
             for (int j = 0; j < GRID_SIZE; j++) { // rows
-                // Build a new cell with the identifiers
+                // Build a new cell with the identifiers and add to root
                 char x = (char) (j + 'A');
                 char y = (char) (i + 'A');
-                StringBuilder sb = new StringBuilder().append(x).append(y);
-                Cell cell = new Cell(sb.toString());
-                cell.setTranslateX(j * 24 + 154);
-                cell.setTranslateY(i * 24 + 30);
-                /* Add a tile to the board state and GUI grid */
-                cell.setOnMouseClicked(event -> {
-                    addTile(x, y);
-                });
-                /* Show a slightly transparent tile on the GUI grid */
-                cell.setOnMouseEntered(event -> {
-                    hoverTile(x, y);
-                });
-                /* Remove the preview tile on the GUI grid */
-                cell.setOnMouseExited(event -> {
-                    root.getChildren().remove(hoverCurrentTile);
-                    hoverCurrentTile.getChildren().clear();
-                });
-                /* Change the orientation of a preview tile on the GUI grid */
-                cell.setOnScroll(event -> {
-                    // Remove the current tile preview and draw another one
-                    root.getChildren().remove(hoverCurrentTile);
-                    hoverCurrentTile.getChildren().clear();
-                    hoverOrientation = Orientation.next(hoverOrientation);
-                    hoverTile(x, y);
-                });
-                // Add the cell to the root group
-                root.getChildren().add(cell);
+                addCell(x, y, Colour.NULL);
             }
         }
         // Set the initial 'MMUA' piece
@@ -332,19 +335,29 @@ public class Board extends Application {
         // Remove the piece from the player's pieces and show their next piece
         if (isGreen) playerGreen.removeFirst();
         else playerRed.removeFirst();
-        showCurrentTile();
+        previewTiles();
     }
 
     private void addCell(char x, char y, Colour colour) {
-        // Create new cell, change its properties and add to root
+        // Creating a new cell
         Cell cell;
-        if (boardState.getHeight(x, y) > 1)
-            cell = new Cell(colour, boardState.getHeight(x, y));
-        else
-            cell = new Cell(colour);
-        cell.setTranslateX(translateX(x));
-        cell.setTranslateY(translateY(y));
-        root.getChildren().set(getIndex(x, y), cell);
+        // Handling grid identifier cells
+        if (colour == Colour.NULL) {
+            cell = new Cell("" + x + y);
+            cell.setTranslateX((x - 'A') * 24 + 154);
+            cell.setTranslateY((y - 'A') * 24 + 30);
+            root.getChildren().add(cell);
+        } else {
+            // Create new cell, change its properties and add to root
+            if (boardState.getHeight(x, y) > 1)
+                cell = new Cell(colour, boardState.getHeight(x, y));
+            else
+                cell = new Cell(colour);
+            cell.setTranslateX(translateX(x));
+            cell.setTranslateY(translateY(y));
+            root.getChildren().set(getIndex(x, y), cell);
+        }
+
         /* Add a tile to the board state and GUI grid */
         cell.setOnMouseClicked(event -> {
             addTile(x, y);
@@ -378,30 +391,16 @@ public class Board extends Application {
         else return (x - 'A')+(y - 'A')*26;
     }
 
-
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // Create the game
         primaryStage.setTitle("StratoGame");
         Scene scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT);
-
         newGrid();
         setupGame();
-
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
-    }
-
-
-    // FIXME Task 8: Implement a basic playable Strato Game in JavaFX that only allows pieces to be placed in valid places
-    private void playGame() {
-        // We create this tile for the UML diagram
-        Tile temp = new Tile(null, Shape.A, Orientation.A);
-    }
-
-    // FIXME Task 9: Implement scoring
-    private int scoring(Colour player) {
-        return Score.getScore(boardState, isGreen);
     }
 
     // FIXME Task 11: Implement a game that can play valid moves (even if they are weak moves)
