@@ -22,8 +22,8 @@ public class Board extends Application {
 
     /* Class variables to store the board, and decks for the players */
     private BoardState boardState = new BoardState();
-    private LinkedList<Shape> playerRed = new LinkedList<>();
     private LinkedList<Shape> playerGreen = new LinkedList<>();
+    private LinkedList<Shape> playerRed = new LinkedList<>();
     private boolean isGreen;
     private Orientation hoverOrientation = Orientation.A;
 
@@ -67,11 +67,11 @@ public class Board extends Application {
         // Initialise the 'deck' of tiles for the players and shuffle them
         for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
             playerRed.add(i);
-            //playerRed.add(i);
+            playerRed.add(i);
         }
         for (Shape i : EnumSet.range(Shape.K, Shape.T)) {
             playerGreen.add(i);
-            //playerGreen.add(i);
+            playerGreen.add(i);
         }
         Collections.shuffle(playerGreen);
         Collections.shuffle(playerRed);
@@ -198,9 +198,9 @@ public class Board extends Application {
             root.getChildren().get(i).setDisable(true);
         }
 
-        // Show who has won the game
-        int greenScore = Score.getScore(boardState, true);
-        int redScore = Score.getScore(boardState, false);
+        // Show who has won the game and display scores
+        int greenScore = boardState.getScore(true);
+        int redScore = boardState.getScore(false);
         Alert test = new Alert(Alert.AlertType.INFORMATION);
         if (greenScore > redScore) {
             test.setTitle("Player Green wins!");
@@ -405,14 +405,14 @@ public class Board extends Application {
 
     // FIXME Task 11: Implement a game that can play valid moves (even if they are weak moves)
     private void easyGame() {
-        EasyBot easyBot = new EasyBot("board");
-        String easyMove = easyBot.getMove();
+        EasyBot easyBot = new EasyBot(playerGreen, playerRed, true);
+        Tile easyMove = easyBot.getMove();
     }
 
     // FIXME Task 12: Implement a game that can play good moves
     private void hardGame() {
-        HardBot hardBot = new HardBot("Board");
-        String hardMove = hardBot.getMove();
+        HardBot hardBot = new HardBot(playerGreen, playerRed, true);
+        Tile hardMove = hardBot.getMove();
     }
 
 }
