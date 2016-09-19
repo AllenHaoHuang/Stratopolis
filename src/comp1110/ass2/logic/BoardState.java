@@ -9,6 +9,12 @@ public class BoardState {
     // Object fields
     private int[][] heightArray = new int[BOARD_SIZE][BOARD_SIZE];
     private Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
+    public int[][] getHeightArray() {
+        return heightArray;
+    }
+    public Colour[][] getColourArray() {
+        return colourArray;
+    }
     private int[][] pieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
     private int pieceID = 1;
 
