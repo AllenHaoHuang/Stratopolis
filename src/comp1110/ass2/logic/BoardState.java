@@ -35,12 +35,20 @@ public class BoardState {
                 isOverTwoTiles(tile));
     }
 
-    // Returning the height and colour array for scoring
+    // Returning a copy of the height and colour array for scoring
     public int[][] getHeightArray() {
-        return heightArray;
+        int[][] newHeightArray = new int[BOARD_SIZE][BOARD_SIZE];
+        for (int i = 0; i < BOARD_SIZE; i++)
+            for (int j = 0; j < BOARD_SIZE; j++)
+                newHeightArray[i][j] = heightArray[i][j];
+        return newHeightArray;
     }
     public Colour[][] getColourArray() {
-        return colourArray;
+        Colour[][] newColourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
+        for(int i = 0; i < BOARD_SIZE; i++)
+            for(int j = 0; j < BOARD_SIZE; j++)
+                newColourArray[i][j]=colourArray[i][j];
+        return newColourArray;
     }
 
     // Check that the tile is adjacent to another tile by checking the height neighbouring cells
