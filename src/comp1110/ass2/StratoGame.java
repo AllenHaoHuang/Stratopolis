@@ -175,7 +175,7 @@ public class StratoGame {
             board.addTile(substringTile); // update the board state
         }
 
-        return Score.getScore(board, green);
+        return board.getScore(green);
         // FIXME Marvin please implement the scoring system in the Score class
     }
 
