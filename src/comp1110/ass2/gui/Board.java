@@ -67,11 +67,11 @@ public class Board extends Application {
         // Initialise the 'deck' of tiles for the players and shuffle them
         for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
             playerRed.add(i);
-            playerRed.add(i);
+           // playerRed.add(i);
         }
         for (Shape i : EnumSet.range(Shape.K, Shape.T)) {
             playerGreen.add(i);
-            playerGreen.add(i);
+           // playerGreen.add(i);
         }
         Collections.shuffle(playerGreen);
         Collections.shuffle(playerRed);
@@ -338,6 +338,8 @@ public class Board extends Application {
         if (isGreen) playerGreen.removeFirst();
         else playerRed.removeFirst();
         previewTiles();
+        // Reset preview orientation
+        hoverOrientation = Orientation.A;
     }
 
     private void addCell(char x, char y, Colour colour) {
@@ -378,7 +380,10 @@ public class Board extends Application {
             // Remove the current tile preview and draw another one
             root.getChildren().remove(hoverCurrentTile);
             hoverCurrentTile.getChildren().clear();
-            hoverOrientation = Orientation.next(hoverOrientation);
+            if (event.getDeltaY() < 0)
+                hoverOrientation = Orientation.next(hoverOrientation);
+            else
+                hoverOrientation = Orientation.previous(hoverOrientation);
             hoverTile(x, y);
         });
     }

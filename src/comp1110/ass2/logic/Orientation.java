@@ -45,4 +45,15 @@ public enum Orientation {
             default : return NULL;
         }
     }
+
+    /* Return the previous Orientation enum for scrolling on the board */
+    public static Orientation previous(Orientation orientation) {
+        switch (orientation) {
+            case A : return D;
+            case B : return A;
+            case C : return B;
+            case D : return C;
+            default : return NULL;
+        }
+    }
 }
