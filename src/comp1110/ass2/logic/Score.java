@@ -7,102 +7,67 @@ package comp1110.ass2.logic;
  */
 
 public class Score {
-    static Colour[][] greencolor=new Colour[26][26];
-    static int[][]greenheight=new int[26][26];
-    static int maxgreeenheight=0;
+    // Helper variables to calculate score
+    private static final int GRID_SIZE = 26;
+    private static Colour[][] colourArray = new Colour[GRID_SIZE][GRID_SIZE];
+    private static int[][] heightArray = new int[GRID_SIZE][GRID_SIZE];
+    private static int exploreHeight = 0;
+    private static Colour searchColour;
 
-    static Colour[][] redcolor=new Colour[26][26];
-    static int[][]redheight=new int[26][26];
-    static int maxredheight=0;
 
-    // Calculates Score for given player
-    public static  int GreenScore(BoardState board) {
+    public static int getScore(BoardState board, boolean isGreen) {
+        // Initialise the arrays and variables
+        colourArray = board.getColourArray();
+        heightArray = board.getHeightArray();
 
-        greencolor=board.getColourArray().clone();
-        greenheight=board.getHeightArray().clone();
-        int maxarea=0;
-        int height=0;
-        for(int i=0;i<26;i++){
-            for(int j=0;j<26;j++){
-                if(greencolor[i][j]==Colour.Green){
-                    int area= explore_from_green(i,j);
-                    if(area>maxarea){
-                        maxarea=area;
-                        height=maxgreeenheight;
+        int maxArea = 0;
+        int maxHeight = 0;
+
+        if (isGreen) searchColour = Colour.Green;
+        else searchColour = Colour.Red;
+
+        // Loop through the board, only search on cells that correspond to the player
+        for (int i = 0; i < GRID_SIZE; i++){
+            for (int j = 0; j < GRID_SIZE; j++){
+                if (colourArray[i][j] == searchColour) {
+                    int exploreArea = explore_board(i, j);
+                    // Update max area and max height if there is a bigger region
+                    if (exploreArea > maxArea) {
+                        maxArea = exploreArea;
+                        maxHeight = exploreHeight;
+                    } else if (exploreArea == maxArea) {
+                        // If region of equal size get the bigger height
+                        if (exploreHeight > maxHeight) maxHeight = exploreHeight;
                     }
-                    maxgreeenheight=0;
+                    // Reset the height for the next cell search
+                    exploreHeight = 0;
                 }
             }
         }
-        return maxarea*height;
 
+        return maxArea * maxHeight;
     }
-    private static int explore_from_green(int i, int j) {
-        int area=1;
-        greencolor[i][j]=Colour.Black;
-        if(greenheight[i][j]>maxgreeenheight){
-            maxgreeenheight=greenheight[i][j];
-        }
-        if(i>0&&greencolor[i-1][j]==Colour.Green){
-            area+=explore_from_green(i-1,j);
-        }else if(i<25&&greencolor[i+1][j]==Colour.Green){
-            area+=explore_from_green(i+1,j);
-        }else if(j>0&&greencolor[i][j-1]==Colour.Green){
-            area+=explore_from_green(i,j-1);
-        }else if(j<25&&greencolor[i][j+1]==Colour.Green){
-            area+=explore_from_green(i,j+1);
-        }
+
+    /* This function relies on recursion to explore the surrounding cells */
+    private static int explore_board(int x, int y) {
+        // Once we read a cell set it to black so it cannot be read again
+        int area = 1;
+        colourArray[x][y] = Colour.Black;
+
+        // Finding the maximum height of a connected region
+        if (heightArray[x][y] > exploreHeight)
+            exploreHeight = heightArray[x][y];
+
+        // Search and explore the cells surrounding our current one
+        if (x > 0 && colourArray[x-1][y] == searchColour)
+            area += explore_board(x-1, y);
+        if (x < 25 && colourArray[x+1][y] == searchColour)
+            area += explore_board(x+1, y);
+        if (y > 0 && colourArray[x][y-1] == searchColour)
+            area += explore_board(x, y-1);
+        if (y < 25 && colourArray[x][y+1] == searchColour)
+            area += explore_board(x, y+1);
         return area;
-
     }
-
-    private static int explore_from_red(int i, int j) {
-        int area=1;
-        redcolor[i][j]=Colour.Black;
-        if(redheight[i][j]>maxredheight){
-            maxredheight=redheight[i][j];
-        }
-        if(i>0&&redcolor[i-1][j]==Colour.Red){
-            area+=explore_from_red(i-1,j);
-        }else if(i<25&&redcolor[i+1][j]==Colour.Red){
-            area+=explore_from_red(i+1,j);
-        }else if(j>0&&redcolor[i][j-1]==Colour.Red){
-            area+=explore_from_red(i,j-1);
-        }else if(j<25&&redcolor[i][j+1]==Colour.Red){
-            area+=explore_from_red(i,j+1);
-        }
-        return area;
-
-    }
-
-    public static int RedScore(BoardState board){
-        redcolor=board.getColourArray().clone();
-        redheight=board.getHeightArray().clone();
-        int maxarea=0;
-        int height=0;
-        for(int i=0;i<26;i++){
-            for(int j=0;j<26;j++){
-                if(redcolor[i][j]==Colour.Red){
-                    maxredheight=0;
-                    int area= explore_from_red(i,j);
-                    if(area>maxarea){
-                        maxarea=area;
-                        height=maxredheight;
-                    }
-                }
-            }
-        }
-        return maxarea*height;
-    }
-
-    public static int getScore(BoardState board, boolean color) {
-
-        if(color){
-            return GreenScore(board);
-        }
-        return RedScore(board);
-    }
-
-
 }
 

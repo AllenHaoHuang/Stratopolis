@@ -67,11 +67,11 @@ public class Board extends Application {
         // Initialise the 'deck' of tiles for the players and shuffle them
         for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
             playerRed.add(i);
-            playerRed.add(i);
+            //playerRed.add(i);
         }
         for (Shape i : EnumSet.range(Shape.K, Shape.T)) {
             playerGreen.add(i);
-            playerGreen.add(i);
+            //playerGreen.add(i);
         }
         Collections.shuffle(playerGreen);
         Collections.shuffle(playerRed);

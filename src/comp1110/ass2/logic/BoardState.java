@@ -9,12 +9,6 @@ public class BoardState {
     // Object fields
     private int[][] heightArray = new int[BOARD_SIZE][BOARD_SIZE];
     private Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
-    public int[][] getHeightArray() {
-        return heightArray;
-    }
-    public Colour[][] getColourArray() {
-        return colourArray;
-    }
     private int[][] pieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
     private int pieceID = 1;
 
@@ -39,6 +33,14 @@ public class BoardState {
                 areColoursValid(tile) &&
                 areHeightsValid(tile) &&
                 isOverTwoTiles(tile));
+    }
+
+    // Returning the height and colour array for scoring
+    public int[][] getHeightArray() {
+        return heightArray;
+    }
+    public Colour[][] getColourArray() {
+        return colourArray;
     }
 
     // Check that the tile is adjacent to another tile by checking the height neighbouring cells
