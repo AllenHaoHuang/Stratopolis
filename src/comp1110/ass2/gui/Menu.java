@@ -56,7 +56,10 @@ public class Menu extends Application {
         howToPlay.setTooltip(new Tooltip("How to Play StratoGame"));
         howToPlay.setLayoutX(primaryStage.getWidth() - 200);
         howToPlay.setOnAction(event -> {
-           // Open form with instructions on how to play 
+            // Open form with instructions on how to play
+            root.setDisable(true);
+            new Instructions(primaryStage);
+            root.setDisable(false);
         });
 
         Button help = new Button("?");
