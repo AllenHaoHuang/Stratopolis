@@ -6,7 +6,7 @@
     -fx-text-fill: white;
 }
 
-#round-btn {
+#round-btn-magenta {
     -fx-font-weight: bolder;
     -fx-font-size: 16px;
     -fx-text-fill: white;
@@ -18,8 +18,20 @@
     -fx-background-color: #E8115F;
 }
 
-#round-btn:hover {
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+#round-btn-magenta:hover, #round-btn-teal:hover {
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6), 5, 0.0, 0, 1);
+}
+
+#round-btn-teal {
+    -fx-font-weight: bolder;
+    -fx-font-size: 18px;
+    -fx-text-fill: white;
+    -fx-background-radius: 5em;
+    -fx-min-width: 35px;
+    -fx-min-height: 35px;
+    -fx-max-width: 35px;
+    -fx-max-height: 35px;
+    -fx-background-color: #009688;
 }
 
 #player-btn-green {
@@ -35,6 +47,7 @@
 
 #player-btn-green:hover {
     -fx-background-color: #38dc7b;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 5, 0.0, 0, 1);
 }
 
 #player-btn-red {
@@ -49,6 +62,7 @@
 
 #player-btn-red:hover {
     -fx-background-color: #ff5953;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6), 5, 0.0, 0, 1);
 }
 
 #control-btn {

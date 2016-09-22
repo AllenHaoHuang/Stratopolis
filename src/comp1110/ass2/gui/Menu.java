@@ -2,7 +2,6 @@ package comp1110.ass2.gui;
 
 import comp1110.ass2.bots.Player;
 import comp1110.ass2.gui.scenes.Board;
-import comp1110.ass2.gui.scenes.Viewer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -74,18 +73,39 @@ public class Menu extends Application {
         root.getChildren().addAll(title, hb, info);
     }
 
-    private void viewerButton() {
-        Button viewer = new Button("V");
-        viewer.setId("round-btn");
-        viewer.setTooltip(new Tooltip("Open Viewer"));
-        viewer.setLayoutX(primaryStage.getWidth() - 100);
-        viewer.setLayoutY(20);
-        root.getChildren().add(viewer);
-
-        viewer.setOnAction(event -> {
-            Scene viewScene = new Viewer(new Group(), scene, primaryStage);
-            this.primaryStage.setScene(viewScene);
+    private void topButtons() {
+        Button help = new Button("?");
+        help.setId("round-btn-teal");
+        help.setTooltip(new Tooltip("Help"));
+        help.setLayoutX(primaryStage.getWidth() - 150);
+        help.setLayoutY(20);
+        help.setOnAction(event -> {
+            Alert message = new Alert(Alert.AlertType.INFORMATION);
+            message.setTitle("StratoGame - Help");
+            message.setHeaderText("Main Menu Help");
+            message.setContentText("Please select which player you desire to be, and/or place against "
+                    + "by clicking the red and green buttons"
+                    + " There are 3 kinds of players - Human, Easy Bot, and Hard Bot. Once you have "
+                    + "selected the players, press 'Start Game'.\n\nTo open the viewer, click on the 'V'"
+                    + "at the top right corner of the window.");
+            message.showAndWait();
         });
+
+
+        Button viewBtn = new Button("V");
+        viewBtn.setId("round-btn-magenta");
+        viewBtn.setTooltip(new Tooltip("Open Viewer"));
+        viewBtn.setLayoutX(primaryStage.getWidth() - 100);
+        viewBtn.setLayoutY(20);
+        viewBtn.setOnAction(event -> {
+            /* Only allow one instance of Viewer open at a moment
+               Viewer is displayed using Show and Wait */
+            viewBtn.setDisable(true);
+            new Viewer();
+            viewBtn.setDisable(false);
+        });
+
+        root.getChildren().addAll(help, viewBtn);
     }
 
     private void playerButtons() {
@@ -115,9 +135,8 @@ public class Menu extends Application {
     }
 
     private void controlButtons() {
-        Button help = new Button("Help");
-        help.setId("control-btn");
-        help.setPrefWidth(80);
+        Button options = new Button("Options");
+        options.setId("control-btn");
 
         Button startGame = new Button("Start Game");
         startGame.setId("control-btn");
@@ -132,7 +151,7 @@ public class Menu extends Application {
         hb.setAlignment(Pos.CENTER);
         hb.setLayoutX(65);
         hb.setLayoutY(HEIGHT - 90);
-        hb.getChildren().addAll(startGame, help, exit);
+        hb.getChildren().addAll(startGame, options, exit);
 
         root.getChildren().add(hb);
 
@@ -155,15 +174,8 @@ public class Menu extends Application {
         });
 
         // Show help message
-        help.setOnAction(event -> {
-            Alert message = new Alert(Alert.AlertType.INFORMATION);
-            message.setTitle("StratoGame - Help");
-            message.setHeaderText("Main Menu Help");
-            message.setContentText("Please select which player you desire to be, and/or place against."
-                + " There are 3 kinds of players - Human, Easy Bot, and Hard Bot. Once you have "
-                + "selected the players, press 'Start Game'.\n To open the viewer, click on the 'V'"
-                + "at the top right corner of the window.");
-            message.showAndWait();
+        options.setOnAction(event -> {
+            System.out.println("hi");
         });
     }
 
@@ -172,8 +184,6 @@ public class Menu extends Application {
         this.primaryStage = primaryStage;
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/R.png")));
         primaryStage.setTitle("StratoGame - Main Menu");
-        primaryStage.setMinHeight(HEIGHT);
-        primaryStage.setMinWidth(WIDTH);
         scene = new Scene(root, WIDTH, HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
@@ -184,7 +194,7 @@ public class Menu extends Application {
 
         addPanels();
         addLabels();
-        viewerButton();
+        topButtons();
         playerButtons();
         controlButtons();
 

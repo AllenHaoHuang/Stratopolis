@@ -1,4 +1,4 @@
-package comp1110.ass2.gui.scenes;
+package comp1110.ass2.gui;
 
 import comp1110.ass2.gui.Cell;
 import comp1110.ass2.gui.Menu;
@@ -15,6 +15,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
@@ -26,6 +27,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import comp1110.ass2.StratoGame;
+import javafx.stage.StageStyle;
 
 import java.util.Arrays;
 
@@ -36,10 +38,10 @@ import java.util.Arrays;
  * class does not play a game, it just illustrates various piece
  * placements.
  */
-public class Viewer extends Scene {
+public class Viewer extends Stage {
     /* board layout */
-    private static final int VIEWER_WIDTH = 680;
-    private static final int VIEWER_HEIGHT = 720;
+    private static final int VIEWER_WIDTH = 675;
+    private static final int VIEWER_HEIGHT = 710;
     private static final int GRID_SIZE = 26;
     private static final int CELL_SIZE = 25;
     private static final int TILE_PLACEMENT_LENGTH = 4;
@@ -49,9 +51,8 @@ public class Viewer extends Scene {
 
     private final Group root = new Group();
     private final Group controls = new Group();
+    private final Stage primaryStage = new Stage();
 
-    private Stage parentStage;
-    private Scene parentScene;
     private TextField textField;
 
     // Array to store heights
@@ -211,10 +212,10 @@ public class Viewer extends Scene {
      * Create a basic text field for input and a refresh button.
      */
     private void makeControls() {
-        Button menu = new Button("Main Menu");
+        Button menu = new Button("Close");
         menu.setId("control-btn");
         menu.setOnAction(event -> {
-            parentStage.setScene(parentScene);
+            primaryStage.close();
         });
 
         Label label1 = new Label("Placement:");
@@ -235,7 +236,7 @@ public class Viewer extends Scene {
         hb.setSpacing(10);
         hb.setPrefWidth(VIEWER_WIDTH);
         hb.setAlignment(Pos.CENTER);
-        hb.setLayoutY(VIEWER_HEIGHT - 45);
+        hb.setLayoutY(VIEWER_HEIGHT - 32);
         controls.getChildren().add(hb);
         // Focus on text field
         textField.requestFocus();
@@ -254,15 +255,19 @@ public class Viewer extends Scene {
         }
     }
 
-    public Viewer(Group parentRoot, Scene parentScene, Stage parentStage) {
-        super(parentRoot, VIEWER_WIDTH, VIEWER_HEIGHT);
-        parentRoot.getChildren().add(root);
-        this.parentScene = parentScene;
-        this.parentStage = parentStage;
+    public Viewer() {
+        primaryStage.setTitle("Viewer");
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/E.png")));
+        primaryStage.setResizable(false);
+
+        Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
+        primaryStage.setScene(scene);
 
         defaultGrid();
         makeControls();
+        primaryStage.showAndWait();
     }
+
     /*
     @Override
     public void start(Stage primaryStage) throws Exception {
