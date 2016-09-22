@@ -32,6 +32,12 @@ abstract class Bot {
 
     // Generates the possible moves given a particular game state
     Tile[] generatePossibleMoves() {
+        LinkedList<Tile> tileLinkedList = new LinkedList<>();
+
+
+
         return null;
     }
+
+
 }
