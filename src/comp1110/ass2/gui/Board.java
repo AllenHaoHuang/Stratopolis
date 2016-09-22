@@ -1,25 +1,27 @@
-package comp1110.ass2.gui.scenes;
+package comp1110.ass2.gui;
 
 import comp1110.ass2.bots.Player;
-import comp1110.ass2.gui.Cell;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import comp1110.ass2.logic.*;
 import comp1110.ass2.bots.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 
-public class Board extends Scene {
+public class Board extends Stage {
     /* Constants */
     private static final int BOARD_WIDTH = 933;
     private static final int BOARD_HEIGHT = 720;
@@ -45,6 +47,7 @@ public class Board extends Scene {
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
+    private final Stage primaryStage = new Stage();
     private final Group root = new Group();
     private final Group greenCurrentTile = new Group();
     private final Group greenNextTile = new Group();
@@ -55,7 +58,6 @@ public class Board extends Scene {
     private Label greenPiecesLeft = new Label();
     private Label redPiecesLeft = new Label();
     private Label playerTurn = new Label();
-
 
 
     /* Prepare everything accordingly for play */
@@ -152,6 +154,10 @@ public class Board extends Scene {
             redPiecesLeft.setTranslateY(45);
             // Prepare board for endgame state
             endGame();
+
+            // Show new pane with scores and stuff
+            // Close this window for now
+            primaryStage.close();
             return;
         }
 
@@ -391,7 +397,7 @@ public class Board extends Scene {
         // Reset preview orientation
         hoverOrientation = Orientation.A;
 
-        // Disable board according to if player is a bot or not
+        /* Disable board according to if player is a bot or not
         if ((!isGreen && redState == Player.EasyBot) || isGreen && greenState == Player.EasyBot) {
             System.out.println("disable grid");
             //disableGrid();
@@ -408,7 +414,7 @@ public class Board extends Scene {
         } else if (isGreen && (redState == Player.EasyBot || redState == Player.HardBot)) {
             System.out.println("enable grid");
             enableGrid();
-        }
+        } */
     }
 
     private void addCell(char x, char y, Colour colour) {
@@ -483,32 +489,29 @@ public class Board extends Scene {
             redHardBot = new HardBot(playerGreen, playerRed, false);
     }
 
-    public Board(Group parentRoot, Player greenState, Player redState) {
-        super(parentRoot, BOARD_WIDTH, BOARD_HEIGHT);
-        parentRoot.getChildren().add(root);
+    Board(Stage parentStage, Player greenState, Player redState) {
+        // Set player states
         this.greenState = greenState;
         this.redState = redState;
-        System.out.println("width: " + this.getWidth() + ", height : " + this.getHeight());
-        newBots();
-        newGrid();
-        setupGame();
-    }
 
-    /*
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        // Create the game
+        // Prepare and show stage
         primaryStage.setTitle("StratoGame");
-        Scene scene = new Scene(root, BOARD_WIDTH + 1, BOARD_HEIGHT);
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/G.png")));
+        primaryStage.setResizable(false);
+        Scene scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT);
+        primaryStage.setScene(scene);
+
+        // Open as blocking dialog, so only one instance at a time
+        primaryStage.initModality(Modality.WINDOW_MODAL);
+        primaryStage.initOwner(parentStage);
+
+        //newBots();
         newGrid();
         setupGame();
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
 
-        System.out.println("width:" + scene.getWidth() + ", height: " + scene.getHeight());
+        primaryStage.showAndWait();
+        System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
     }
-    */
 
     // FIXME Task 11: Implement a game that can play valid moves (even if they are weak moves)
     private void easyGame() {
