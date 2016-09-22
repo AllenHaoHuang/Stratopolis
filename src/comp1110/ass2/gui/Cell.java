@@ -10,11 +10,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-class Cell extends StackPane {
+public class Cell extends StackPane {
+    private static final int CELL_SIZE = 26;
 
-    Cell(String str) {
+    public Cell(String str) {
         // We create a square with a border
-        Rectangle border = new Rectangle(24, 24);
+        Rectangle border = new Rectangle(CELL_SIZE, CELL_SIZE);
         border.setFill(null);
         border.setStroke(Color.LIGHTGREY);
         // We create the text to indicate the position
@@ -26,9 +27,9 @@ class Cell extends StackPane {
         getChildren().addAll(border, text);
     }
 
-    Cell(Colour colour) {
+    public Cell(Colour colour) {
         // Create the cell and fill it with the relevant colour
-        Rectangle cell = new Rectangle(24, 24);
+        Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE);
         cell.setStroke(Color.rgb(54, 54, 54));
         cell.setStrokeType(StrokeType.INSIDE);
         cell.setStrokeWidth(2);
@@ -48,9 +49,9 @@ class Cell extends StackPane {
         getChildren().add(cell);
     }
 
-    Cell(Colour colour, boolean isGreen) {
+    public Cell(Colour colour, boolean isGreen) {
         // Create the hover cell and fill it with the relevant colour
-        Rectangle cell = new Rectangle(24, 24);
+        Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE);
         // Change border colours to recognise each player
         if (isGreen) cell.setStroke(Color.LIGHTGREEN);
         else cell.setStroke(Color.LIGHTPINK);
@@ -72,9 +73,9 @@ class Cell extends StackPane {
         getChildren().add(cell);
     }
 
-    Cell(Colour colour, int height) {
+    public Cell(Colour colour, int height) {
         // Create the cell and fill it with the relevant colour
-        Rectangle cell = new Rectangle(24, 24);
+        Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE);
         cell.setStroke(Color.rgb(54, 54, 54));
         cell.setStrokeType(StrokeType.INSIDE);
         cell.setStrokeWidth(2);

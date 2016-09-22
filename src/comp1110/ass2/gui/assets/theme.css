@@ -1,0 +1,64 @@
+/* Some button styling from http://docs.oracle.com/javafx/2/get_started/css.htm */
+
+#title-txt {
+    -fx-font-size: 25px;
+    -fx-font-weight : bold;
+    -fx-text-fill: white;
+}
+
+#round-btn {
+    -fx-font-weight: bolder;
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-background-radius: 5em;
+    -fx-min-width: 35px;
+    -fx-min-height: 35px;
+    -fx-max-width: 35px;
+    -fx-max-height: 35px;
+    -fx-background-color: #E8115F;
+}
+
+#round-btn:hover {
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+#player-btn-green {
+    -fx-padding: 4px;
+    -fx-background-color: #34C669;
+    -fx-pref-height: 105px;
+    -fx-pref-width: 105px;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-radius: 3px;
+}
+
+#player-btn-green:hover {
+    -fx-background-color: #38dc7b;
+}
+
+#player-btn-red {
+    -fx-background-color: #e45350;
+    -fx-pref-height: 105px;
+    -fx-pref-width: 105px;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-radius: 3px;
+}
+
+#player-btn-red:hover {
+    -fx-background-color: #ff5953;
+}
+
+#control-btn {
+    -fx-border-color: darkgrey;
+    -fx-background-color: "#E9E9ED";
+    -fx-font-size: 18px;
+    -fx-background-radius: 3px;
+}
+
+#control-btn:hover {
+    -fx-background-color: -fx-outer-border, -fx-inner-border,
+            -fx-shadow-highlight-color, -fx-body-color;
+}

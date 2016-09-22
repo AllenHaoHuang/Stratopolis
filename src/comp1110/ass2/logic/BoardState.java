@@ -11,6 +11,7 @@ public class BoardState {
     private Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
     private int[][] pieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
     private int pieceID = 1;
+    private String placementString = "MMUA";
 
     /* Constructor for BoardState, we create a board with 'MMUA' initially */
     public BoardState() {
@@ -36,14 +37,14 @@ public class BoardState {
     }
 
     // Returning a copy of the height and colour array for scoring
-    public int[][] getHeightArray() {
+    int[][] getHeightArray() {
         int[][] newHeightArray = new int[BOARD_SIZE][BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++)
             for (int j = 0; j < BOARD_SIZE; j++)
                 newHeightArray[i][j] = heightArray[i][j];
         return newHeightArray;
     }
-    public Colour[][] getColourArray() {
+    Colour[][] getColourArray() {
         Colour[][] newColourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
         for(int i = 0; i < BOARD_SIZE; i++)
             for(int j = 0; j < BOARD_SIZE; j++)
@@ -144,6 +145,8 @@ public class BoardState {
         pieceIDArray[tile.getX(0)][tile.getY(0)] = pieceID;
         pieceIDArray[tile.getX(1)][tile.getY(1)] = pieceID;
         pieceIDArray[tile.getX(2)][tile.getY(2)] = pieceID++;
+        // Update placement string
+        placementString += tile.toString();
     }
 
     // Get the height at a certain cell on our board
@@ -154,4 +157,6 @@ public class BoardState {
     // Get the score of a player at the current board status
     public int getScore(boolean isGreen) { return Score.getScore(this, isGreen); }
 
+    // Get the placement string
+    public String getPlacementString() { return placementString; }
 }

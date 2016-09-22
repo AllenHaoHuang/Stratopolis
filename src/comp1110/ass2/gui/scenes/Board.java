@@ -1,12 +1,17 @@
-package comp1110.ass2.gui;
+package comp1110.ass2.gui.scenes;
 
-import javafx.application.Application;
+import comp1110.ass2.bots.Player;
+import comp1110.ass2.gui.Cell;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import comp1110.ass2.logic.*;
 import comp1110.ass2.bots.*;
 
@@ -14,16 +19,28 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 
-public class Board extends Application {
+public class Board extends Scene {
     /* Constants */
     private static final int BOARD_WIDTH = 933;
-    private static final int BOARD_HEIGHT = 700;
+    private static final int BOARD_HEIGHT = 720;
     private static final int GRID_SIZE = 26;
+    // In pixels
+    private static final int CELL_SIZE = 26;
+    private static final int X_OFFSET = 135;
+    private static final int Y_OFFSET = 45;
 
-    /* Class variables to store the board, and decks for the players */
+    /* Bot States, left uninitialised for now */
+    private EasyBot greenEasyBot;
+    private EasyBot redEasyBot;
+    private HardBot greenHardBot;
+    private HardBot redHardBot;
+
+    /* Class variables to store the board, and decks for the players, and state */
     private BoardState boardState = new BoardState();
     private LinkedList<Shape> playerGreen = new LinkedList<>();
     private LinkedList<Shape> playerRed = new LinkedList<>();
+    private Player greenState;
+    private Player redState;
     private boolean isGreen;
     private Orientation hoverOrientation = Orientation.A;
 
@@ -39,26 +56,49 @@ public class Board extends Application {
     private Label redPiecesLeft = new Label();
     private Label playerTurn = new Label();
 
+
+
     /* Prepare everything accordingly for play */
     private void setupGame() {
+        // Large box identifiers
+        Rectangle greenPanel = new Rectangle(X_OFFSET, 752);
+        greenPanel.setFill(Color.GREEN);
+        greenPanel.setOpacity(0.3);
+        Rectangle redPanel = new Rectangle(X_OFFSET, 752);
+        redPanel.setFill(Color.RED);
+        redPanel.setOpacity(0.3);
+        redPanel.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
+        Rectangle greyPanelTop = new Rectangle(GRID_SIZE * CELL_SIZE, 45);
+        greyPanelTop.setFill(Color.GREY);
+        greyPanelTop.setOpacity(0.2);
+        greyPanelTop.setTranslateX(X_OFFSET);
+        root.getChildren().addAll(greenPanel, redPanel, greyPanelTop);
         // Place labels to identify players
-        Label greenPlayer = new Label("Player Green:");
-        Label redPlayer = new Label("Player Red:");
-        greenPlayer.setTranslateX(35);
-        greenPlayer.setTranslateY(25);
-        redPlayer.setTranslateX(BOARD_WIDTH - 95);
-        redPlayer.setTranslateY(25);
-        root.getChildren().addAll(greenPlayer, redPlayer);
-        // Add labels for pieces left and whose turn it is
-        playerTurn.setTranslateX(BOARD_WIDTH/2 - 70);
-        playerTurn.setTranslateY(5);
-        greenPiecesLeft.setTranslateX(30);
+        Label greenPlayer = new Label("Player Green");
+        Label redPlayer = new Label("Player Red");
+        greenPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
+        redPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
+        greenPlayer.setTranslateX(13);
+        greenPlayer.setTranslateY(10);
+        redPlayer.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE + 14);
+        redPlayer.setTranslateY(10);
+        // Change position of pieces left
+        greenPiecesLeft.setFont(Font.font(16));
+        redPiecesLeft.setFont(Font.font(16));
+        greenPiecesLeft.setTranslateX(13);
         greenPiecesLeft.setTranslateY(180);
-        redPiecesLeft.setTranslateX(BOARD_WIDTH - 110);
+        redPiecesLeft.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE + 10);
         redPiecesLeft.setTranslateY(180);
-        root.getChildren().addAll(playerTurn, greenPiecesLeft, redPiecesLeft);
+        // Add labels for pieces left and whose turn it is
+        playerTurn.setFont(Font.font("System", FontWeight.BOLD, 18));
+        playerTurn.setPrefWidth(676);
+        playerTurn.setTranslateX(X_OFFSET);
+        playerTurn.setTranslateY(10);
+        playerTurn.setAlignment(Pos.CENTER);
+        root.getChildren().addAll(greenPlayer, redPlayer, greenPiecesLeft, redPiecesLeft, playerTurn);
         // Initialise the 'deck' of tiles for the players and display them
         setupPlayerTiles();
+
         // We wait for the green player's turn and display the top pieces
         isGreen = true;
     }
@@ -67,25 +107,28 @@ public class Board extends Application {
         // Initialise the 'deck' of tiles for the players and shuffle them
         for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
             playerRed.add(i);
-           // playerRed.add(i);
+            playerRed.add(i);
         }
         for (Shape i : EnumSet.range(Shape.K, Shape.T)) {
             playerGreen.add(i);
-           // playerGreen.add(i);
+            playerGreen.add(i);
         }
         Collections.shuffle(playerGreen);
         Collections.shuffle(playerRed);
         // Show the tile previews
         previewTiles();
         previewTiles();
+        // Set player's turn
+        playerTurn.setTextFill(Color.GREEN);
+        playerTurn.setText("Green Player's Turn");
     }
 
     private void previewTiles() {
         // Show how many pieces a player has left
         if (isGreen) greenPiecesLeft.setText(playerGreen.size() + " piece(s) left."
-                + "\n Score = " + boardState.getScore(true));
+                + "\nScore = " + boardState.getScore(true));
         else redPiecesLeft.setText(playerRed.size() + " piece(s) left."
-                + "\n Score = " + boardState.getScore(false));
+                + "\nScore = " + boardState.getScore(false));
 
         // Set text in label for whose turn it is
         if (!isGreen) {
@@ -100,13 +143,13 @@ public class Board extends Application {
         if (isGreen && playerGreen.size() == 0) {
             // Green runs out of pieces
             root.getChildren().remove(greenCurrentTile);
-            greenPiecesLeft.setVisible(false);
+            greenPiecesLeft.setTranslateY(45);
             isGreen = !isGreen;
             return;
         } else if (playerRed.size() == 0) {
             // Red runs out of pieces, end of game
             root.getChildren().remove(redCurrentTile);
-            redPiecesLeft.setVisible(false);
+            redPiecesLeft.setTranslateY(45);
             // Prepare board for endgame state
             endGame();
             return;
@@ -144,17 +187,17 @@ public class Board extends Application {
             root.getChildren().remove(greenCurrentTile);
             greenCurrentTile.getChildren().clear();
             // Set up position of cells on screen
-            zero.setTranslateX(50); zero.setTranslateY(50);
-            one.setTranslateX(74); one.setTranslateY(50);
-            two.setTranslateX(50); two.setTranslateY(74);
+            zero.setTranslateX(40); zero.setTranslateY(50);
+            one.setTranslateX(64); one.setTranslateY(50);
+            two.setTranslateX(40); two.setTranslateY(74);
             greenCurrentTile.getChildren().addAll(zero, one, two);
             root.getChildren().add(greenCurrentTile);
         } else {
             root.getChildren().remove(redCurrentTile);
             redCurrentTile.getChildren().clear();
             // Set up position of cells on screen
-            zero.setTranslateX(BOARD_WIDTH - 80); zero.setTranslateY(50);
-            one.setTranslateX(zero.getTranslateX() + 24); one.setTranslateY(50);
+            zero.setTranslateX(BOARD_WIDTH - 90); zero.setTranslateY(50);
+            one.setTranslateX(zero.getTranslateX() + CELL_SIZE); one.setTranslateY(50);
             two.setTranslateX(zero.getTranslateX()); two.setTranslateY(74);
             redCurrentTile.getChildren().addAll(zero, one, two);
             root.getChildren().add(redCurrentTile);
@@ -172,9 +215,9 @@ public class Board extends Application {
             root.getChildren().remove(greenNextTile);
             greenNextTile.getChildren().clear();
             // Set up position of cells on screen
-            zero.setTranslateX(50); zero.setTranslateY(115);
-            one.setTranslateX(74); one.setTranslateY(115);
-            two.setTranslateX(50); two.setTranslateY(139);
+            zero.setTranslateX(40); zero.setTranslateY(115);
+            one.setTranslateX(64); one.setTranslateY(115);
+            two.setTranslateX(40); two.setTranslateY(139);
             greenNextTile.getChildren().addAll(zero, one, two);
             greenNextTile.setOpacity(0.55);
             root.getChildren().add(greenNextTile);
@@ -182,8 +225,8 @@ public class Board extends Application {
             root.getChildren().remove(redNextTile);
             redNextTile.getChildren().clear();
             // Set up position of cells on screen
-            zero.setTranslateX(BOARD_WIDTH - 80); zero.setTranslateY(115);
-            one.setTranslateX(zero.getTranslateX() + 24); one.setTranslateY(115);
+            zero.setTranslateX(BOARD_WIDTH - 90); zero.setTranslateY(115);
+            one.setTranslateX(zero.getTranslateX() + CELL_SIZE); one.setTranslateY(115);
             two.setTranslateX(zero.getTranslateX()); two.setTranslateY(139);
             redNextTile.getChildren().addAll(zero, one, two);
             redNextTile.setOpacity(0.55);
@@ -192,13 +235,10 @@ public class Board extends Application {
     }
 
     private void endGame() {
-        // Update label text
+        // Update label text and disable grid
         playerTurn.setTextFill(Color.DEEPPINK);
         playerTurn.setText("Game finished.");
-        // Disable the grid at end of game to prevent clicks or hovering
-        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-            root.getChildren().get(i).setDisable(true);
-        }
+        disableGrid();
 
         // Show who has won the game and display scores
         int greenScore = boardState.getScore(true);
@@ -223,7 +263,6 @@ public class Board extends Application {
                     greenScore + " points each");
             test.showAndWait();
         }
-
         /* Controls to set up new game if necessary */
     }
 
@@ -243,6 +282,17 @@ public class Board extends Application {
         // Set the initial 'MMUA' piece
         addCell('M', 'M', Colour.Red);
         addCell('M', 'N', Colour.Green);
+    }
+
+    // Disable the grid at end of game to prevent clicks or hovering, e.g. when bot is playing
+    private void disableGrid() {
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++)
+            root.getChildren().get(i).setDisable(true);
+    }
+    // Enable grid
+    private void enableGrid() {
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++)
+            root.getChildren().get(i).setDisable(false);
     }
 
     private void hoverTile(char x, char y) {
@@ -305,8 +355,8 @@ public class Board extends Application {
             // When tile placement is not valid, we show an error message
             playerTurn.setTextFill(Color.RED);
             if (playerTurn.getText().contains("Invalid Tile Placement"))
-                playerTurn.setText("!" + playerTurn.getText() + "!");
-            else playerTurn.setText("!Invalid Tile Placement!");
+                playerTurn.setText(playerTurn.getText() + "!");
+            else playerTurn.setText("Invalid Tile Placement!");
             return;
         }
 
@@ -340,6 +390,25 @@ public class Board extends Application {
         previewTiles();
         // Reset preview orientation
         hoverOrientation = Orientation.A;
+
+        // Disable board according to if player is a bot or not
+        if ((!isGreen && redState == Player.EasyBot) || isGreen && greenState == Player.EasyBot) {
+            System.out.println("disable grid");
+            //disableGrid();
+            easyGame();
+        } else if ((!isGreen && redState == Player.HardBot) || isGreen && greenState == Player.HardBot) {
+            System.out.println("disable grid");
+            //disableGrid();
+            hardGame();
+        }
+        // Enable board according to if player is a bot or not
+        if (!isGreen && (greenState == Player.EasyBot || greenState == Player.HardBot)) {
+            System.out.println("enable grid");
+            enableGrid();
+        } else if (isGreen && (redState == Player.EasyBot || redState == Player.HardBot)) {
+            System.out.println("enable grid");
+            enableGrid();
+        }
     }
 
     private void addCell(char x, char y, Colour colour) {
@@ -348,8 +417,8 @@ public class Board extends Application {
         // Handling grid identifier cells
         if (colour == Colour.NULL) {
             cell = new Cell("" + x + y);
-            cell.setTranslateX((x - 'A') * 24 + 154);
-            cell.setTranslateY((y - 'A') * 24 + 30);
+            cell.setTranslateX((x - 'A') * CELL_SIZE + X_OFFSET);
+            cell.setTranslateY((y - 'A') * CELL_SIZE + Y_OFFSET);
             root.getChildren().add(cell);
         } else {
             // Create new cell, change its properties and add to root
@@ -361,6 +430,8 @@ public class Board extends Application {
             cell.setTranslateY(translateY(y));
             root.getChildren().set(getIndex(x, y), cell);
         }
+
+        cell.setCursor(Cursor.DISAPPEAR);
 
         /* Add a tile to the board state and GUI grid */
         cell.setOnMouseClicked(event -> {
@@ -389,8 +460,8 @@ public class Board extends Application {
     }
 
     // Calculate how many pixels to translate x and y by on window
-    private int translateX(char x) { return (x - 'A')*24 + 154; }
-    private int translateY(char y) { return (y - 'A')*24 + 30; }
+    private int translateX(char x) { return (x - 'A')* CELL_SIZE + X_OFFSET; }
+    private int translateY(char y) { return (y - 'A')* CELL_SIZE + Y_OFFSET; }
 
     /* We get the index in the Scene `root`, of the position given */
     private int getIndex(char x, char y) {
@@ -398,17 +469,46 @@ public class Board extends Application {
         else return (x - 'A')+(y - 'A')*26;
     }
 
+    // Initialise the bots
+    private void newBots() {
+        // Green bot
+        if (greenState == Player.EasyBot)
+            greenEasyBot = new EasyBot(playerGreen, playerRed, true);
+        else if (redState == Player.HardBot)
+            greenHardBot = new HardBot(playerGreen, playerRed, true);
+        // Red bot
+        if (redState == Player.EasyBot)
+            redEasyBot = new EasyBot(playerGreen, playerRed, false);
+        else if (redState == Player.HardBot)
+            redHardBot = new HardBot(playerGreen, playerRed, false);
+    }
+
+    public Board(Group parentRoot, Player greenState, Player redState) {
+        super(parentRoot, BOARD_WIDTH, BOARD_HEIGHT);
+        parentRoot.getChildren().add(root);
+        this.greenState = greenState;
+        this.redState = redState;
+        System.out.println("width: " + this.getWidth() + ", height : " + this.getHeight());
+        newBots();
+        newGrid();
+        setupGame();
+    }
+
+    /*
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Create the game
         primaryStage.setTitle("StratoGame");
-        Scene scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT);
+        Scene scene = new Scene(root, BOARD_WIDTH + 1, BOARD_HEIGHT);
         newGrid();
         setupGame();
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+
+        System.out.println("width:" + scene.getWidth() + ", height: " + scene.getHeight());
     }
+    */
 
     // FIXME Task 11: Implement a game that can play valid moves (even if they are weak moves)
     private void easyGame() {
@@ -421,5 +521,4 @@ public class Board extends Application {
         HardBot hardBot = new HardBot(playerGreen, playerRed, true);
         Tile hardMove = hardBot.getMove();
     }
-
 }

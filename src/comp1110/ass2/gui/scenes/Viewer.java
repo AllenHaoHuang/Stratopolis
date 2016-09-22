@@ -1,5 +1,7 @@
-package comp1110.ass2.gui;
+package comp1110.ass2.gui.scenes;
 
+import comp1110.ass2.gui.Cell;
+import comp1110.ass2.gui.Menu;
 import comp1110.ass2.logic.Colour;
 import comp1110.ass2.logic.Orientation;
 import comp1110.ass2.logic.Shape;
@@ -34,15 +36,22 @@ import java.util.Arrays;
  * class does not play a game, it just illustrates various piece
  * placements.
  */
-public class Viewer extends Application {
+public class Viewer extends Scene {
     /* board layout */
-    private static final int VIEWER_WIDTH = 750;
-    private static final int VIEWER_HEIGHT = 700;
+    private static final int VIEWER_WIDTH = 680;
+    private static final int VIEWER_HEIGHT = 720;
     private static final int GRID_SIZE = 26;
+    private static final int CELL_SIZE = 25;
     private static final int TILE_PLACEMENT_LENGTH = 4;
+
+    private static final int X_OFFSET = 15;
+    private static final int Y_OFFSET = 10;
 
     private final Group root = new Group();
     private final Group controls = new Group();
+
+    private Stage parentStage;
+    private Scene parentScene;
     private TextField textField;
 
     // Array to store heights
@@ -53,7 +62,7 @@ public class Viewer extends Application {
      *
      * @param placement A valid placement string
      */
-    void makePlacement(String placement) {
+    private void makePlacement(String placement) {
         // We clear an existing grid and set the initial tile "MMUA"
         defaultGrid();
         setInitialPiece();
@@ -65,9 +74,7 @@ public class Viewer extends Application {
         heightArray[12][13]++;
 
         // We know if |placement| = 4, placement = "MMUA" only
-        if (placement.length() == 4) {
-            return;
-        }
+        if (placement.length() == 4) return;
 
         // Loop through the rest of the placement string
         for (int i = 4; i < placement.length(); i += TILE_PLACEMENT_LENGTH) {
@@ -159,30 +166,26 @@ public class Viewer extends Application {
     }
 
     /* We get the index in the Scene `root`, of the position given */
+    /* We get the index in the Scene `root`, of the position given */
     private int getIndex(char x, char y) {
         if (y - 'A' == 0) return x - 'A';
-        else return (x - 'A') + (y - 'A') * 26;
+        else return (x - 'A')+(y - 'A')*GRID_SIZE;
     }
 
     // Calculate how many pixels to translate x and y by on window
-    private int translateX(char x) {
-        return (x - 'A') * 24 + 63;
-    }
-
-    private int translateY(char y) {
-        return (y - 'A') * 24 + 10;
-    }
+    private int translateX(char x) { return (x - 'A')* CELL_SIZE + X_OFFSET; }
+    private int translateY(char y) { return (y - 'A')* CELL_SIZE + Y_OFFSET; }
 
     // Set the initial "MMUA" for ease
     private void setInitialPiece() {
         Cell c1 = new Cell(Colour.Red);
         Cell c2 = new Cell(Colour.Green);
-        c1.setTranslateX(351);
-        c1.setTranslateY(298);
-        c2.setTranslateX(351);
-        c2.setTranslateY(322);
-        root.getChildren().set(324, c1);
-        root.getChildren().set(350, c2);
+        c1.setTranslateX(translateX('M'));
+        c1.setTranslateY(translateY('M'));
+        c2.setTranslateX(translateX('M'));
+        c2.setTranslateY(translateY('N'));
+        root.getChildren().set(getIndex('M', 'M'), c1);
+        root.getChildren().set(getIndex('M', 'N'), c2);
     }
 
     // We create the default grid
@@ -196,8 +199,8 @@ public class Viewer extends Application {
                 char y = (char) (i + 'A');
                 StringBuilder sb = new StringBuilder().append(x).append(y);
                 Cell cell = new Cell(sb.toString());
-                cell.setTranslateX(j * 24 + 63);
-                cell.setTranslateY(i * 24 + 10);
+                cell.setTranslateX(j * CELL_SIZE + X_OFFSET);
+                cell.setTranslateY(i * CELL_SIZE + Y_OFFSET);
                 root.getChildren().add(cell);
             }
         }
@@ -208,24 +211,34 @@ public class Viewer extends Application {
      * Create a basic text field for input and a refresh button.
      */
     private void makeControls() {
+        Button menu = new Button("Main Menu");
+        menu.setId("control-btn");
+        menu.setOnAction(event -> {
+            parentStage.setScene(parentScene);
+        });
+
         Label label1 = new Label("Placement:");
+
         textField = new TextField();
         textField.setPrefWidth(300);
-        Button button = new Button("Refresh");
-        // Handle <ENTER> key pressed on TextField
         textField.setOnKeyPressed(event -> {
             if (event.getCode().equals(KeyCode.ENTER)) handleRefresh();
         });
-        // Handle click of `Refresh` button
-        button.setOnAction(event -> {
+
+        Button refresh = new Button("Refresh");
+        refresh.setOnAction(event -> {
             handleRefresh();
         });
+        // Add to HBox, layout and view
         HBox hb = new HBox();
-        hb.getChildren().addAll(label1, textField, button);
+        hb.getChildren().addAll(menu, label1, textField, refresh);
         hb.setSpacing(10);
-        hb.setLayoutX(130);
-        hb.setLayoutY(VIEWER_HEIGHT - 50);
+        hb.setPrefWidth(VIEWER_WIDTH);
+        hb.setAlignment(Pos.CENTER);
+        hb.setLayoutY(VIEWER_HEIGHT - 45);
         controls.getChildren().add(hb);
+        // Focus on text field
+        textField.requestFocus();
     }
 
     // Checks if the placement string is valid. If not, show popup dialog
@@ -241,6 +254,16 @@ public class Viewer extends Application {
         }
     }
 
+    public Viewer(Group parentRoot, Scene parentScene, Stage parentStage) {
+        super(parentRoot, VIEWER_WIDTH, VIEWER_HEIGHT);
+        parentRoot.getChildren().add(root);
+        this.parentScene = parentScene;
+        this.parentStage = parentStage;
+
+        defaultGrid();
+        makeControls();
+    }
+    /*
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("StratoGame Viewer");
@@ -254,4 +277,5 @@ public class Viewer extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
     }
+    */
 }

@@ -1,8 +1,5 @@
 package comp1110.ass2.logic;
 
-
-import java.util.Arrays;
-
 /**
  * Created by Allen Huang on 15/08/2016.
  * Edited by Marvin and William on 15/08/2016.
@@ -17,7 +14,6 @@ public class Score {
     private static Colour searchColour;
 
     public static int getScore(BoardState board, boolean isGreen) {
-        resetValues();
         // Initialise the arrays and variables
         colourArray = board.getColourArray();
         heightArray = board.getHeightArray();
@@ -48,14 +44,6 @@ public class Score {
         }
 
         return maxArea * maxHeight;
-    }
-
-    private static void resetValues() {
-        exploreHeight = 0;
-        for (Colour[] row : colourArray)
-            Arrays.fill(row, Colour.Black);
-        for (int[] row : heightArray)
-            Arrays.fill(row, 0);
     }
 
     /* This function relies on recursion to explore the surrounding cells */
