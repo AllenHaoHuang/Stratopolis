@@ -5,18 +5,29 @@ import java.util.Arrays;
 public class BoardState {
     // Constants
     private static final int BOARD_SIZE = 26;
+    private static final int TOTAL_PLAYABLE_TILES = 40;
 
     // Object fields
     private int[][] heightArray = new int[BOARD_SIZE][BOARD_SIZE];
     private Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
     private int[][] pieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
     private boolean[][] possiblePosArray = new boolean[BOARD_SIZE][BOARD_SIZE];
+    private Shape[] playableShapes = new Shape[TOTAL_PLAYABLE_TILES];
 
     private int pieceID = 1;
     private String placementString = "MMUA";
 
     /* Constructor for BoardState, we create a board with 'MMUA' initially */
     public BoardState() {
+        // Fill up shapes array
+        int position = 0;
+        for (Shape s : Shape.values()) {
+            if (s != Shape.NULL && s !=Shape.U) {
+                playableShapes[position] = s;
+                playableShapes[position+1] = s;
+                position+=2;
+            }
+        }
         // Fill the colour array with all black
         for (Colour[] row : colourArray)
             Arrays.fill(row, Colour.Black);
@@ -64,6 +75,7 @@ public class BoardState {
     public boolean[][] getPossiblePosArray() {
         return possiblePosArray;
     }
+    public Shape[] getPlayableShapes() {return playableShapes;}
 
     // Check that the tile is adjacent to another tile by checking the height neighbouring cells
     private boolean isAdjacent(Tile tile) {
@@ -160,6 +172,15 @@ public class BoardState {
         pieceIDArray[tile.getX(2)][tile.getY(2)] = pieceID++;
         // Update placement string
         placementString += tile.toString();
+        // Removes shape from playable shapes array
+        for (Shape s : playableShapes) {
+            if (s == tile.getShape()) {
+                s = Shape.NULL;
+            }
+            break;
+        }
+        // Update positions to check
+        updatePositionsToCheck();
     }
 
     // Get the height at a certain cell on our board
