@@ -31,7 +31,8 @@ abstract class Bot {
     // Opponent placed a tile, add it to the bot's BoardState
     public void addTile(Tile tile) { game.addTile(tile); }
 
-    // Generates the possible moves given a particular game state, basic bot shouldn't use this
+    // Generates the possible moves given a particular game state, basic bot shouldn't use this, it should
+    // break once it finds first valid move
     LinkedList<Tile> generateAllPossibleMoves() {
         LinkedList<Tile> tileLinkedList = new LinkedList<>();
         boolean[][] positionsToCheck = game.getPossiblePosArray();
