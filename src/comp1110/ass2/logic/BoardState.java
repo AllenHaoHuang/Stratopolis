@@ -5,16 +5,29 @@ import java.util.Arrays;
 public class BoardState {
     // Constants
     private static final int BOARD_SIZE = 26;
+    private static final int TOTAL_PLAYABLE_TILES = 40;
 
     // Object fields
     private int[][] heightArray = new int[BOARD_SIZE][BOARD_SIZE];
     private Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
     private int[][] pieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
+    private boolean[][] possiblePosArray = new boolean[BOARD_SIZE][BOARD_SIZE];
+    private Shape[] playableShapes = new Shape[TOTAL_PLAYABLE_TILES];
+
     private int pieceID = 1;
     private String placementString = "MMUA";
 
     /* Constructor for BoardState, we create a board with 'MMUA' initially */
     public BoardState() {
+        // Fill up shapes array
+        int position = 0;
+        for (Shape s : Shape.values()) {
+            if (s != Shape.NULL && s !=Shape.U) {
+                playableShapes[position] = s;
+                playableShapes[position+1] = s;
+                position+=2;
+            }
+        }
         // Fill the colour array with all black
         for (Colour[] row : colourArray)
             Arrays.fill(row, Colour.Black);
@@ -25,6 +38,8 @@ public class BoardState {
         colourArray[12][13] = Colour.Green;
         pieceIDArray[12][12] = pieceID;
         pieceIDArray[12][13] = pieceID++;
+
+        updatePositionsToCheck();
     }
 
     // A tile must obey all the rules for it to be valid
@@ -37,20 +52,30 @@ public class BoardState {
     }
 
     // Returning a copy of the height and colour array for scoring
-    int[][] getHeightArray() {
+    public int[][] getHeightArray() {
+        return heightArray;
+        /* Why all these unnecessary steps
         int[][] newHeightArray = new int[BOARD_SIZE][BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++)
             for (int j = 0; j < BOARD_SIZE; j++)
                 newHeightArray[i][j] = heightArray[i][j];
-        return newHeightArray;
+        return newHeightArray;*/
     }
-    Colour[][] getColourArray() {
+    public Colour[][] getColourArray() {
+        return colourArray;
+        /* Why all these unnecessary steps
         Colour[][] newColourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
         for(int i = 0; i < BOARD_SIZE; i++)
             for(int j = 0; j < BOARD_SIZE; j++)
                 newColourArray[i][j]=colourArray[i][j];
-        return newColourArray;
+        return newColourArray;*/
     }
+
+    // Returns arrays on which positions to check
+    public boolean[][] getPossiblePosArray() {
+        return possiblePosArray;
+    }
+    public Shape[] getPlayableShapes() {return playableShapes;}
 
     // Check that the tile is adjacent to another tile by checking the height neighbouring cells
     private boolean isAdjacent(Tile tile) {
@@ -147,6 +172,15 @@ public class BoardState {
         pieceIDArray[tile.getX(2)][tile.getY(2)] = pieceID++;
         // Update placement string
         placementString += tile.toString();
+        // Removes shape from playable shapes array
+        for (Shape s : playableShapes) {
+            if (s == tile.getShape()) {
+                s = Shape.NULL;
+            }
+            break;
+        }
+        // Update positions to check
+        updatePositionsToCheck();
     }
 
     // Get the height at a certain cell on our board
@@ -159,4 +193,29 @@ public class BoardState {
 
     // Get the placement string
     public String getPlacementString() { return placementString; }
+
+    // Positions to check
+    public void updatePositionsToCheck() {
+        // Firstly makes a 2-D boolean array that is true for a position if that positions height
+        // is larger than 0 or is adjacent to a position of height larger than 0
+        for (int i=0; i<BOARD_SIZE; i++) {
+            for (int j=0; j<BOARD_SIZE; j++) {
+                if (heightArray[i][j] > 0) {
+                    possiblePosArray[i][j] = true;
+                    if (i%BOARD_SIZE != 0) {
+                        possiblePosArray[i-1][j] = true;
+                    }
+                    if (i%BOARD_SIZE != BOARD_SIZE-1) {
+                        possiblePosArray[i+1][j] = true;
+                    }
+                    if (j%BOARD_SIZE != 0) {
+                        possiblePosArray[i-1][j] = true;
+                    }
+                    if (j%BOARD_SIZE != BOARD_SIZE-1) {
+                        possiblePosArray[i+1][j] = true;
+                    }
+                }
+            }
+        }
+    }
 }

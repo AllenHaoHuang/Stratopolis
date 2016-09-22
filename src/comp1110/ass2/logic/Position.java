@@ -15,6 +15,12 @@ public class Position {
         this.y = y;
     }
 
+    // variation of constructor that takes in ints
+    public Position (int x, int y) {
+        this.x = (char)(x + (int)'A') ;
+        this.y = (char)(y + (int)'A');
+    }
+
     // Return the fields of a Position object in int index form
     public int getX() { return x - 'A'; }
     public int getY() { return y - 'A'; }
