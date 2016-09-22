@@ -15,9 +15,13 @@ public class Position {
         this.y = y;
     }
 
-    // Return the fields of a Position object
+    // Return the fields of a Position object in int index form
     public int getX() { return x - 'A'; }
     public int getY() { return y - 'A'; }
+
+    // Return the fields of a Position object in char form
+    public char getCharX() { return x; }
+    public char getCharY() { return y; }
 
     @Override
     public String toString() {
