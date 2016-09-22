@@ -25,6 +25,7 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import comp1110.ass2.StratoGame;
 import javafx.stage.StageStyle;
@@ -255,10 +256,14 @@ public class Viewer extends Stage {
         }
     }
 
-    public Viewer() {
+    Viewer(Stage parentStage) {
         primaryStage.setTitle("Viewer");
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/E.png")));
         primaryStage.setResizable(false);
+
+        // Open as blocking dialog, so only one instance
+        primaryStage.initModality(Modality.WINDOW_MODAL);
+        primaryStage.initOwner(parentStage);
 
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
         primaryStage.setScene(scene);
@@ -266,21 +271,7 @@ public class Viewer extends Stage {
         defaultGrid();
         makeControls();
         primaryStage.showAndWait();
+
+        System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
     }
-
-    /*
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("StratoGame Viewer");
-        Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
-
-        // First create grid with cell identifiers then enable controls
-        defaultGrid();
-        makeControls();
-
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
-    }
-    */
 }

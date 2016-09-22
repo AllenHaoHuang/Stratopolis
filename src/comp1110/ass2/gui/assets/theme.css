@@ -1,16 +1,18 @@
 /* Some button styling from http://docs.oracle.com/javafx/2/get_started/css.htm */
 
 #title-txt {
-    -fx-font-size: 25px;
+    -fx-font-size: 30px;
     -fx-font-weight : bold;
     -fx-text-fill: white;
 }
 
 #round-btn-magenta {
     -fx-font-weight: bolder;
-    -fx-font-size: 16px;
+    -fx-font-size: 16.5px;
+    -fx-text-alignment: center;
     -fx-text-fill: white;
     -fx-background-radius: 5em;
+    -fx-translate-y: 25px;
     -fx-min-width: 35px;
     -fx-min-height: 35px;
     -fx-max-width: 35px;
@@ -18,15 +20,13 @@
     -fx-background-color: #E8115F;
 }
 
-#round-btn-magenta:hover, #round-btn-teal:hover {
-    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6), 5, 0.0, 0, 1);
-}
-
 #round-btn-teal {
     -fx-font-weight: bolder;
     -fx-font-size: 18px;
+    -fx-text-alignment: center;
     -fx-text-fill: white;
     -fx-background-radius: 5em;
+    -fx-translate-y: 25px;
     -fx-min-width: 35px;
     -fx-min-height: 35px;
     -fx-max-width: 35px;
@@ -34,12 +34,30 @@
     -fx-background-color: #009688;
 }
 
+#round-btn-blue {
+    -fx-font-weight: bolder;
+    -fx-font-size: 16.5px;
+    -fx-text-alignment: center;
+    -fx-text-fill: white;
+    -fx-background-radius: 5em;
+    -fx-translate-y: 25px;
+    -fx-min-width: 35px;
+    -fx-min-height: 35px;
+    -fx-max-width: 35px;
+    -fx-max-height: 35px;
+    -fx-background-color: #2196F3;
+}
+
+#round-btn-magenta:hover, #round-btn-teal:hover, #round-btn-blue:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 1);
+}
+
 #player-btn-green {
     -fx-padding: 4px;
     -fx-background-color: #34C669;
-    -fx-pref-height: 105px;
-    -fx-pref-width: 105px;
-    -fx-font-size: 18px;
+    -fx-pref-height: 120px;
+    -fx-pref-width: 120px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
     -fx-background-radius: 3px;
@@ -52,9 +70,9 @@
 
 #player-btn-red {
     -fx-background-color: #e45350;
-    -fx-pref-height: 105px;
-    -fx-pref-width: 105px;
-    -fx-font-size: 18px;
+    -fx-pref-height: 120px;
+    -fx-pref-width: 120px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
     -fx-background-radius: 3px;

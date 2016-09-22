@@ -1,14 +1,16 @@
 package comp1110.ass2.gui;
 
 import comp1110.ass2.bots.Player;
-import comp1110.ass2.gui.scenes.Board;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -19,66 +21,51 @@ import java.util.Optional;
 
 /* Fancy yet ugly material design based main menu */
 public class Menu extends Application {
-    private static final int WIDTH = 518;
-    private static final int HEIGHT = 352;
+    private static final int WIDTH = 500;
+    private static final int HEIGHT = 455;
 
     // So we can return to menu
     private Stage primaryStage;
     private Group root = new Group();
-    private Scene scene;
 
-    private Player greenState = Player.Human;
-    private Player redState = Player.Human;
+    private Button greenBtn = new Button("Human");
+    private Button redBtn = new Button ("Human");
+
+    private Player greenPlayer = Player.Human;
+    private Player redPlayer = Player.Human;
 
     private void addPanels() {
+        // Create panels and add to root
         Rectangle mainPanel = new Rectangle(primaryStage.getWidth(), primaryStage.getHeight());
         mainPanel.setFill(Color.web("#E9E9ED"));
 
-        Rectangle topPanel = new Rectangle(primaryStage.getWidth(), 120);
+        Rectangle topPanel = new Rectangle(primaryStage.getWidth(), 130);
         topPanel.setFill(Color.web("#3E50B5"));
 
-        Rectangle middlePanel = new Rectangle(primaryStage.getWidth() - 130, primaryStage.getHeight() - 100);
+        Rectangle middlePanel = new Rectangle(primaryStage.getWidth() - 130, HEIGHT - 125);
         middlePanel.setLayoutX(65);
-        middlePanel.setLayoutY(75);
-        middlePanel.setFill(Color.web("#FEFEFE"));
+        middlePanel.setLayoutY(85);
+        middlePanel.setFill(Color.web("#FFFFFF"));
 
         root.getChildren().addAll(mainPanel, topPanel, middlePanel);
     }
 
-    private void addLabels() {
-        Label title = new Label ("StratoGame");
-        title.setId("title-txt");
-        title.setLayoutX(65);
-        title.setLayoutY(20);
-
-        Label green = new Label("Player Green");
-        Label red = new Label("Player Red");
-        green.setFont(Font.font(19));
-        red.setFont(Font.font(19));
-
-        Label info = new Label("By William Shen, Allen Huang and Marvin Yang");
-        info.setFont(Font.font(16));
-        info.setTextFill(Color.web("#3E50B5"));
-        info.setPrefWidth(primaryStage.getWidth());
-        info.setAlignment(Pos.CENTER);
-        info.setLayoutY(HEIGHT - 25);
-
-        HBox hb = new HBox();
-        hb.setPrefWidth(primaryStage.getWidth());
-        hb.getChildren().addAll(green, red);
-        hb.setAlignment(Pos.CENTER);
-        hb.setSpacing(90);
-        hb.setLayoutY(90);
-
-        root.getChildren().addAll(title, hb, info);
-    }
-
     private void topButtons() {
+        Button howToPlay = new Button("H");
+        howToPlay.setId("round-btn-blue");
+        howToPlay.setTooltip(new Tooltip("How to Play StratoGame"));
+        howToPlay.setLayoutX(primaryStage.getWidth() - 200);
+        howToPlay.setOnAction(event -> {
+            // Open form with instructions on how to play
+            root.setDisable(true);
+            new Instructions(primaryStage);
+            root.setDisable(false);
+        });
+
         Button help = new Button("?");
         help.setId("round-btn-teal");
         help.setTooltip(new Tooltip("Help"));
         help.setLayoutX(primaryStage.getWidth() - 150);
-        help.setLayoutY(20);
         help.setOnAction(event -> {
             Alert message = new Alert(Alert.AlertType.INFORMATION);
             message.setTitle("StratoGame - Help");
@@ -91,50 +78,73 @@ public class Menu extends Application {
             message.showAndWait();
         });
 
-
         Button viewBtn = new Button("V");
         viewBtn.setId("round-btn-magenta");
         viewBtn.setTooltip(new Tooltip("Open Viewer"));
         viewBtn.setLayoutX(primaryStage.getWidth() - 100);
-        viewBtn.setLayoutY(20);
         viewBtn.setOnAction(event -> {
-            /* Only allow one instance of Viewer open at a moment
-               Viewer is displayed using Show and Wait */
-            viewBtn.setDisable(true);
-            new Viewer();
-            viewBtn.setDisable(false);
+            // Only allow one instance of Viewer
+            root.setDisable(true);
+            new Viewer(primaryStage);
+            root.setDisable(false);
         });
 
-        root.getChildren().addAll(help, viewBtn);
+        root.getChildren().addAll(howToPlay, help, viewBtn);
     }
 
-    private void playerButtons() {
-        Button playerGreen = new Button("Human");
-        playerGreen.setId("player-btn-green");
+    private void addMiddle() {
+        // Set up labels and add css properties and add to root
+        Label title = new Label ("StratoGame");
+        title.setId("title-txt");
+        title.setLayoutX(65);
+        title.setLayoutY(20);
 
-        Button playerRed = new Button ("Human");
-        playerRed.setId("player-btn-red");
+        Label greenLabel = new Label("Player Green");
+        greenLabel.setFont(Font.font(22));
+        greenLabel.setTextFill(Color.GREEN);
+        GridPane.setHalignment(greenLabel, HPos.CENTER);
 
-        HBox hb = new HBox();
-        hb.getChildren().addAll(playerGreen, playerRed);
-        hb.setPrefWidth(primaryStage.getWidth());
-        hb.setAlignment(Pos.CENTER);
-        hb.setSpacing(90);
-        hb.setLayoutY(125);
-        root.getChildren().add(hb);
+        Label redLabel = new Label("Player Red");
+        redLabel.setFont(Font.font(22));
+        redLabel.setTextFill(Color.RED);
+        GridPane.setHalignment(redLabel, HPos.CENTER);
 
-        playerGreen.setOnAction(event -> {
-            greenState = greenState.getNext();
-            playerGreen.setText(greenState.toString());
+        Label info = new Label("By William Shen, Allen Huang and Marvin Yang");
+        info.setFont(Font.font(16));
+        info.setTextFill(Color.web("#3E50B5"));
+        info.setPrefWidth(primaryStage.getWidth());
+        info.setAlignment(Pos.CENTER);
+        info.setLayoutY(HEIGHT - 80);
+
+        greenBtn.setId("player-btn-green");
+        greenBtn.setOnAction(event -> {
+            greenPlayer = greenPlayer.getNext();
+            greenBtn.setText(greenPlayer.toString());
         });
 
-        playerRed.setOnAction(event -> {
-            redState = redState.getNext();
-            playerRed.setText(redState.toString());
+        redBtn.setId("player-btn-red");
+        redBtn.setOnAction(event -> {
+            redPlayer = redPlayer.getNext();
+            redBtn.setText(redPlayer.toString());
         });
+
+        // Add player labels and controls to GridPane
+        GridPane gridpane = new GridPane();
+        gridpane.add(greenLabel, 0, 0);
+        gridpane.add(redLabel, 1, 0);
+        gridpane.add(greenBtn, 0, 1);
+        gridpane.add(redBtn, 1, 1);
+        gridpane.setHgap(60);
+        gridpane.setVgap(10);
+        gridpane.setPrefWidth(primaryStage.getWidth());
+        gridpane.setTranslateY(110);
+        gridpane.setAlignment(Pos.CENTER);
+
+        root.getChildren().addAll(title, gridpane, info);
     }
 
     private void controlButtons() {
+        // Create buttons, add CSS and group into HBox
         Button options = new Button("Options");
         options.setId("control-btn");
 
@@ -150,33 +160,61 @@ public class Menu extends Application {
         hb.setSpacing(25);
         hb.setAlignment(Pos.CENTER);
         hb.setLayoutX(65);
-        hb.setLayoutY(HEIGHT - 90);
+        hb.setLayoutY(HEIGHT - 145);
         hb.getChildren().addAll(startGame, options, exit);
 
         root.getChildren().add(hb);
 
         // Open game board and pass player states
         startGame.setOnAction(event -> {
-            Scene board = new Board(new Group(), greenState, redState);
-            this.primaryStage.setScene(board);
+            root.setDisable(true);
+            new Board(primaryStage, greenPlayer, redPlayer);
+            root.setDisable(false);
+            resetPlayerButtons();
         });
 
         // Close program
         exit.setOnAction(event -> {
             // Make user confirm they want to exit
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                    "Please confirm that you are exiting StratoGame.");
-
+                    "Please confirm that you are exiting StratoGame. All " +
+                    "instance windows will be closed. (e.g. Viewer, Game)");
             // Check response and take action accordingly
             Optional<ButtonType> response = confirm.showAndWait();
-            if (response.isPresent() && ButtonType.OK.equals(response.get()))
-                Platform.exit();
+            if (response.isPresent() && ButtonType.OK.equals(response.get())) Platform.exit();
         });
-
         // Show help message
         options.setOnAction(event -> {
+            // FIXME: Open options menu
             System.out.println("hi");
         });
+    }
+
+    private void imagePanel() {
+        // Set up fancy strip of tiles
+        GridPane gridPane = new GridPane();
+        gridPane.setPrefWidth(primaryStage.getWidth());
+        gridPane.setHgap(3);
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setTranslateY(HEIGHT - 25);
+        gridPane.setOpacity(0.4);
+        // Loop through asset tiles
+        for (char i = 'A'; i <= 'T'; i++) {
+            ImageView imageView = new ImageView();
+            Image tile = new Image(getClass().getResourceAsStream("assets/" + i + ".png"), 22, 22, false, false);
+            imageView.setImage(tile);
+            gridPane.add(imageView, i - 'A', 0);
+        }
+        // Add GridPane to root
+        root.getChildren().add(gridPane);
+    }
+
+    private void resetPlayerButtons() {
+        // Reset both players to human
+        greenPlayer = Player.Human;
+        greenBtn.setText(greenPlayer.toString());
+        redPlayer = Player.Human;
+        redBtn.setText(greenPlayer.toString());
     }
 
     @Override
@@ -184,7 +222,7 @@ public class Menu extends Application {
         this.primaryStage = primaryStage;
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/R.png")));
         primaryStage.setTitle("StratoGame - Main Menu");
-        scene = new Scene(root, WIDTH, HEIGHT);
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -193,10 +231,10 @@ public class Menu extends Application {
         scene.getStylesheets().add(style);
 
         addPanels();
-        addLabels();
         topButtons();
-        playerButtons();
+        addMiddle();
         controlButtons();
+        imagePanel();
 
         System.out.println("width: " + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
         root.requestFocus();
