@@ -1,5 +1,6 @@
 package comp1110.ass2.logic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BoardState {
@@ -75,7 +76,17 @@ public class BoardState {
     public boolean[][] getPossiblePosArray() {
         return possiblePosArray;
     }
-    public Shape[] getPlayableShapes() {return playableShapes;}
+
+    // Modified function to get playable shapes array so there is no repeats
+    public Shape[] getPlayableShapesNoRepeat() {
+        ArrayList<Shape> shapeArrayList = new ArrayList<>();
+        for (Shape s : playableShapes) {
+            if (s!=Shape.NULL && !(shapeArrayList.contains(s))) {
+                shapeArrayList.add(s);
+            }
+        }
+        return (shapeArrayList.toArray(new Shape[shapeArrayList.size()]));
+    }
 
     // Check that the tile is adjacent to another tile by checking the height neighbouring cells
     private boolean isAdjacent(Tile tile) {

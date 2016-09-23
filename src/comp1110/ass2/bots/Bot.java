@@ -40,13 +40,11 @@ abstract class Bot {
         for (int i=0; i<BOARD_SIZE; i++) {
             for (int j=0; j<BOARD_SIZE; j++) {
                 if (positionsToCheck[i][j]==true) {
-                    for (Shape s : game.getPlayableShapes()) {
-                        if (s != Shape.NULL) {
-                            for (Orientation o : Orientation.values()) {
-                                Tile newTile = new Tile(new Position(i,j), s, o);
-                                if (StratoGame.isPlacementValid(game.getPlacementString() + newTile.toString())) {
-                                    tileLinkedList.add(newTile);
-                                }
+                    for (Shape s : game.getPlayableShapesNoRepeat()) {
+                        for (Orientation o : Orientation.values()) {
+                            Tile newTile = new Tile(new Position(i,j), s, o);
+                            if (StratoGame.isPlacementValid(game.getPlacementString() + newTile.toString())) {
+                                tileLinkedList.add(newTile);
                             }
                         }
                     }
