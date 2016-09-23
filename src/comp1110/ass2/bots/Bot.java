@@ -33,7 +33,7 @@ abstract class Bot {
 
     // Generates the possible moves given a particular game state, basic bot shouldn't use this, it should
     // break once it finds first valid move
-    LinkedList<Tile> generateAllPossibleMoves() {
+    Tile[] generatePossibleMoves() {
         LinkedList<Tile> tileLinkedList = new LinkedList<>();
         boolean[][] positionsToCheck = game.getPossiblePosArray();
 
@@ -53,8 +53,6 @@ abstract class Bot {
                 }
             }
         }
-        return tileLinkedList;
+        return (tileLinkedList.toArray(new Tile[tileLinkedList.size()]));
     }
-
-
 }
