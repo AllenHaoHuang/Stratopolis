@@ -14,16 +14,19 @@ abstract class Bot {
     private static final int BOARD_SIZE = 26;
 
     private BoardState game = new BoardState();
+
+    /*
     private LinkedList<Shape> playerGreen;
     private LinkedList<Shape> playerRed;
     private boolean isGreen;
-
+*/
+    /* commenting out for now
     // Used for object initialisation, mainly here for inheritance
     Bot(LinkedList<Shape> playerGreen, LinkedList<Shape> playerRed, boolean isGreen) {
-        this.playerGreen = playerGreen;
-        this.playerRed = playerRed;
-        this.isGreen = isGreen;
-    }
+        game.playerGreen = playerGreen;
+        game.playerRed = playerRed;
+        game.isGreen = isGreen;
+    }*/
 
     // To be implemented by any class that extends
     public abstract Tile getMove();
@@ -37,14 +40,31 @@ abstract class Bot {
         LinkedList<Tile> tileLinkedList = new LinkedList<>();
         boolean[][] positionsToCheck = game.getPossiblePosArray();
 
-        for (int i=0; i<BOARD_SIZE; i++) {
-            for (int j=0; j<BOARD_SIZE; j++) {
-                if (positionsToCheck[i][j]==true) {
-                    for (Shape s : game.getPlayableShapesNoRepeat()) {
-                        for (Orientation o : Orientation.values()) {
-                            Tile newTile = new Tile(new Position(i,j), s, o);
-                            if (StratoGame.isPlacementValid(game.getPlacementString() + newTile.toString())) {
-                                tileLinkedList.add(newTile);
+        if (game.getIsGreen()) {
+            for (int i = 0; i < BOARD_SIZE; i++) {
+                for (int j = 0; j < BOARD_SIZE; j++) {
+                    if (positionsToCheck[i][j] == true) {
+                        for (Shape s : game.getGreenShapeLinkedList()) {
+                            for (Orientation o : Orientation.values()) {
+                                Tile newTile = new Tile(new Position(i, j), s, o);
+                                if (game.isTileValid(newTile)) {
+                                    tileLinkedList.add(newTile);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < BOARD_SIZE; i++) {
+                for (int j = 0; j < BOARD_SIZE; j++) {
+                    if (positionsToCheck[i][j] == true) {
+                        for (Shape s : game.getRedShapeLinkedList()) {
+                            for (Orientation o : Orientation.values()) {
+                                Tile newTile = new Tile(new Position(i, j), s, o);
+                                if (game.isTileValid(newTile)) {
+                                    tileLinkedList.add(newTile);
+                                }
                             }
                         }
                     }

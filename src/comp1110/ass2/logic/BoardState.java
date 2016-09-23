@@ -2,26 +2,31 @@ package comp1110.ass2.logic;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class BoardState {
     // Constants
     private static final int BOARD_SIZE = 26;
-    private static final int TOTAL_PLAYABLE_TILES = 40;
+    private static final int PLAYABLE_TILES = 20;
 
     // Object fields
     private int[][] heightArray = new int[BOARD_SIZE][BOARD_SIZE];
     private Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
     private int[][] pieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
     private boolean[][] possiblePosArray = new boolean[BOARD_SIZE][BOARD_SIZE];
-    private Shape[] playableShapes = new Shape[TOTAL_PLAYABLE_TILES];
+    private LinkedList<Shape> greenShapeLinkedList = new LinkedList<>();
+    private LinkedList<Shape> redShapeLinkedList = new LinkedList<>();
+    private boolean isGreen;
 
     private int pieceID = 1;
     private String placementString = "MMUA";
 
     /* Constructor for BoardState, we create a board with 'MMUA' initially */
     public BoardState() {
-        // Fill up shapes array
+        // Fill up shapes array for red and green
         int position = 0;
+
+        Shape[] playableShapes = new Shape[PLAYABLE_TILES*2];
         for (Shape s : Shape.values()) {
             if (s != Shape.NULL && s !=Shape.U) {
                 playableShapes[position] = s;
@@ -29,6 +34,14 @@ public class BoardState {
                 position+=2;
             }
         }
+
+        for (int i=0; i<PLAYABLE_TILES; i++) {
+            greenShapeLinkedList.add(playableShapes[i]);
+        }
+        for (int i=PLAYABLE_TILES; i<2*PLAYABLE_TILES; i++) {
+            redShapeLinkedList.add(playableShapes[i]);
+        }
+
         // Fill the colour array with all black
         for (Colour[] row : colourArray)
             Arrays.fill(row, Colour.Black);
@@ -52,35 +65,31 @@ public class BoardState {
                 isOverTwoTiles(tile));
     }
 
-    // Returning a copy of the height and colour array for scoring
-    public int[][] getHeightArray() {
-        return heightArray;
-        /* Why all these unnecessary steps
-        int[][] newHeightArray = new int[BOARD_SIZE][BOARD_SIZE];
-        for (int i = 0; i < BOARD_SIZE; i++)
-            for (int j = 0; j < BOARD_SIZE; j++)
-                newHeightArray[i][j] = heightArray[i][j];
-        return newHeightArray;*/
-    }
-    public Colour[][] getColourArray() {
-        return colourArray;
-        /* Why all these unnecessary steps
-        Colour[][] newColourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
-        for(int i = 0; i < BOARD_SIZE; i++)
-            for(int j = 0; j < BOARD_SIZE; j++)
-                newColourArray[i][j]=colourArray[i][j];
-        return newColourArray;*/
-    }
-
-    // Returns arrays on which positions to check
+    // All the get functions for the private variables of boardstate
+    public int[][] getHeightArray() {return heightArray;}
+    public Colour[][] getColourArray() {return colourArray;}
     public boolean[][] getPossiblePosArray() {
         return possiblePosArray;
     }
+    public LinkedList<Shape> getGreenShapeLinkedList() {return greenShapeLinkedList;}
+    public LinkedList<Shape> getRedShapeLinkedList() {return redShapeLinkedList;}
+    public boolean getIsGreen() {return isGreen;}
 
-    // Modified function to get playable shapes array so there is no repeats
-    public Shape[] getPlayableShapesNoRepeat() {
+    // Modified function to get green playable shapes array so there is no repeats
+    public Shape[] getPlayableGreenShapes() {
         ArrayList<Shape> shapeArrayList = new ArrayList<>();
-        for (Shape s : playableShapes) {
+        for (Shape s : greenShapeLinkedList) {
+            if (s!=Shape.NULL && !(shapeArrayList.contains(s))) {
+                shapeArrayList.add(s);
+            }
+        }
+        return (shapeArrayList.toArray(new Shape[shapeArrayList.size()]));
+    }
+
+    // Modified function to get red playable shapes array so there is no repeats
+    public Shape[] getPlayableRedShapes() {
+        ArrayList<Shape> shapeArrayList = new ArrayList<>();
+        for (Shape s : redShapeLinkedList) {
             if (s!=Shape.NULL && !(shapeArrayList.contains(s))) {
                 shapeArrayList.add(s);
             }
@@ -183,12 +192,27 @@ public class BoardState {
         pieceIDArray[tile.getX(2)][tile.getY(2)] = pieceID++;
         // Update placement string
         placementString += tile.toString();
-        // Removes shape from playable shapes array
-        for (Shape s : playableShapes) {
-            if (s == tile.getShape()) {
-                s = Shape.NULL;
+        // If green, remove tile from green linked list
+        if (isGreen) {
+            for (Shape s : greenShapeLinkedList) {
+                if (s == tile.getShape()) {
+                    greenShapeLinkedList.removeFirstOccurrence(s);
+                    break;
+                }
             }
-            break;
+        } else {
+            for (Shape s : redShapeLinkedList) {
+                if (s == tile.getShape()) {
+                    redShapeLinkedList.removeFirstOccurrence(s);
+                    break;
+                }
+            }
+        }
+        // changes the boolean identifying the player's turn
+        if (isGreen) {
+            isGreen = false;
+        } else {
+            isGreen = true;
         }
         // Update positions to check
         updatePositionsToCheck();
