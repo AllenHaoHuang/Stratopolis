@@ -49,6 +49,7 @@ abstract class Bot {
     // Opponent placed a tile, add it to the bot's BoardState
     public void addTile(Tile tile) {
         game.addTile(tile);
+        isGreen = !isGreen;
     }
 
     // Generates the possible moves given a particular game state, basic bot shouldn't use this, it should

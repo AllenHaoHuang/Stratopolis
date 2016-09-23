@@ -35,7 +35,7 @@ public class HardBot extends Bot {
             HardBot copy = new HardBot(this.playerGreen, this.playerRed, this.isGreen, difficulty);
             copy.addTile(tile);
 
-            int tileScore = minimax(copy, lookahead, true);
+            int tileScore = minimax(copy, 2, true);
             System.out.print(tile + ", "+ tileScore + " | ");
             if (tileScore > maxScore) {
                 bestMove = tile;
@@ -59,17 +59,18 @@ public class HardBot extends Bot {
         // if game is finished, return the boardScore
         if ((minimaxBot.isGreen && minimaxBot.playerGreen.isEmpty()) || ((!minimaxBot.isGreen) && minimaxBot.playerRed.isEmpty())) {
             BoardState board = minimaxBot.game;
-            return board.getScore(isGreen);
+            return board.getScore(minimaxBot.isGreen);
         }
 
         if (maximising) {
             // initially best score is a very low number
             int bestScore = -1000;
             for (Tile t : possibleMoves) {
-                minimaxBot.addTile(t);
+                HardBot copy = new HardBot(minimaxBot.playerGreen, minimaxBot.playerRed, minimaxBot.isGreen, difficulty);
+                copy.addTile(t);
                 // find the currentscore for a board, if its higher than the best score, it is the new best score
                 // for maximising
-                int currentScore = minimax(minimaxBot, depth-1, false);
+                int currentScore = minimax(copy, depth-1, false);
                 if (currentScore > bestScore) {
                     bestScore = currentScore;
                 }
@@ -79,11 +80,11 @@ public class HardBot extends Bot {
             // initially best score is a very high number
             int bestScore = 1000;
             for (Tile t : possibleMoves) {
-                // generate a new board and add the tile
-                minimaxBot.addTile(t);
+                HardBot copy = new HardBot(minimaxBot.playerGreen, minimaxBot.playerRed, minimaxBot.isGreen, difficulty);
+                copy.addTile(t);
                 // find the currentscore for a board, if it is lower than the best score, it is the new best score
                 // for minimising
-                int currentScore = minimax(minimaxBot, depth-1, true);
+                int currentScore = minimax(copy, depth-1, true);
                 if (currentScore < bestScore) {
                     bestScore = currentScore;
                 }
