@@ -200,7 +200,19 @@ public class BoardState {
                 if (heightArray[i][j] > 0) {
                     possiblePosArray[i][j] = true;
 
-                    if (i % BOARD_SIZE == 0) {
+                    if (i % BOARD_SIZE == 0 && j % BOARD_SIZE == 0) {
+                        possiblePosArray[i + 1][j] = true;
+                        possiblePosArray[i][j + 1] = true;
+                    } else if (i % BOARD_SIZE == 0 && j % BOARD_SIZE == BOARD_SIZE - 1) {
+                        possiblePosArray[i + 1][j] = true;
+                        possiblePosArray[i - 1][j] = true;
+                    } else if (i % BOARD_SIZE == BOARD_SIZE - 1 && j % BOARD_SIZE == 0) {
+                        possiblePosArray[i - 1][j] = true;
+                        possiblePosArray[i + 1][j] = true;
+                    } else if (i % BOARD_SIZE == BOARD_SIZE - 1 && j % BOARD_SIZE == BOARD_SIZE - 1) {
+                        possiblePosArray[i - 1][j] = true;
+                        possiblePosArray[i - 1][j] = true;
+                    } else if (i % BOARD_SIZE == 0) {
                         possiblePosArray[i + 1][j] = true;
                         possiblePosArray[i][j + 1] = true;
                         possiblePosArray[i][j - 1] = true;
