@@ -12,10 +12,12 @@ import java.util.LinkedList;
 
 public class HardBot extends Bot {
     private int lookahead;
+    private double difficulty;
 
     public HardBot(LinkedList<Shape> playerGreen, LinkedList<Shape> playerRed, boolean isGreen, double difficulty) {
         super(playerGreen, playerRed, isGreen);
         lookahead = (int)(difficulty * 2) + 1;
+        this.difficulty = difficulty;
         System.out.println("Lookahead: " + lookahead);
     }
 
@@ -30,7 +32,7 @@ public class HardBot extends Bot {
         else System.out.println("===============\nRed Bot   Thinking...");
 
         for (Tile tile : possibleMoves) {
-            Bot copy = this;
+            HardBot copy = new HardBot(this.playerGreen, this.playerRed, this.isGreen, difficulty);
             copy.addTile(tile);
 
             int tileScore = minimax(copy, lookahead, true);
