@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -27,12 +28,16 @@ public class Menu extends Application {
     // So we can return to menu
     private Stage primaryStage;
     private Group root = new Group();
+    private Group middleComponents = new Group();
 
     private Button greenBtn = new Button("Human");
     private Button redBtn = new Button ("Human");
 
     private Player greenPlayer = Player.Human;
     private Player redPlayer = Player.Human;
+
+    private double redDifficulty = 3;
+    private double greenDifficulty = 3;
 
     private void addPanels() {
         // Create panels and add to root
@@ -56,10 +61,11 @@ public class Menu extends Application {
         howToPlay.setTooltip(new Tooltip("How to Play StratoGame"));
         howToPlay.setLayoutX(primaryStage.getWidth() - 200);
         howToPlay.setOnAction(event -> {
-            // Open form with instructions on how to play
+            new Alert(Alert.AlertType.ERROR, "Under Construction.").showAndWait();
+            /* Open form with instructions on how to play
             root.setDisable(true);
             new Instructions(primaryStage);
-            root.setDisable(false);
+            root.setDisable(false); */
         });
 
         Button help = new Button("?");
@@ -71,10 +77,10 @@ public class Menu extends Application {
             message.setTitle("StratoGame - Help");
             message.setHeaderText("Main Menu Help");
             message.setContentText("Please select which player you desire to be, and/or place against "
-                    + "by clicking the red and green buttons"
+                    + "by clicking the red and green buttons."
                     + " There are 3 kinds of players - Human, Easy Bot, and Hard Bot. Once you have "
-                    + "selected the players, press 'Start Game'.\n\nTo open the viewer, click on the 'V'"
-                    + "at the top right corner of the window.");
+                    + "selected the players, press 'Start Game'.\n\nTo read how to play StratoGame,"
+                    + " click on the 'H' near the top of the window. To open the viewer, click on the 'V'");
             message.showAndWait();
         });
 
@@ -140,7 +146,8 @@ public class Menu extends Application {
         gridpane.setTranslateY(110);
         gridpane.setAlignment(Pos.CENTER);
 
-        root.getChildren().addAll(title, gridpane, info);
+        middleComponents.getChildren().addAll(gridpane, info);
+        root.getChildren().addAll(title, middleComponents);
     }
 
     private void controlButtons() {
@@ -167,6 +174,12 @@ public class Menu extends Application {
 
         // Open game board and pass player states
         startGame.setOnAction(event -> {
+            if (greenPlayer == Player.HardBot || redPlayer == Player.HardBot) {
+                Alert error = new Alert(Alert.AlertType.ERROR, "Hard Bot is not supported at this time");
+                error.showAndWait();
+                resetPlayerButtons();
+                return;
+            }
             root.setDisable(true);
             new Board(primaryStage, greenPlayer, redPlayer);
             root.setDisable(false);
@@ -177,16 +190,98 @@ public class Menu extends Application {
         exit.setOnAction(event -> {
             // Make user confirm they want to exit
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                    "Please confirm that you are exiting StratoGame. All " +
-                    "instance windows will be closed. (e.g. Viewer, Game)");
+                    "Do you really want to exit StratoGame?", ButtonType.NO, ButtonType.YES);
             // Check response and take action accordingly
             Optional<ButtonType> response = confirm.showAndWait();
-            if (response.isPresent() && ButtonType.OK.equals(response.get())) Platform.exit();
+            if (response.isPresent() && ButtonType.YES.equals(response.get())) Platform.exit();
         });
         // Show help message
         options.setOnAction(event -> {
-            // FIXME: Open options menu
-            System.out.println("hi");
+            hb.setVisible(false);
+            middleComponents.setVisible(false);
+
+            VBox vBox = new VBox();
+            vBox.setAlignment(Pos.CENTER);
+            vBox.setSpacing(15);
+            vBox.setTranslateX(80);
+            vBox.setTranslateY(115);
+
+            Label greenLabel = new Label("Hard Bot Difficulty (for Player Green)");
+            greenLabel.setFont(Font.font(20));
+            greenLabel.setTextFill(Color.GREEN);
+
+            Label redLabel = new Label("Hard Bot Difficulty (for Player Red)");
+            redLabel.setFont(Font.font(20));
+            redLabel.setTextFill(Color.RED);
+
+            Rectangle white = new Rectangle(1, 1);
+            white.setFill(Color.web("#FFFFFF"));
+
+            Slider greenSlider = new Slider(1, 5, greenDifficulty);
+            greenSlider.setId("slider");
+            greenSlider.setShowTickLabels(true);
+            greenSlider.setShowTickMarks(true);
+            greenSlider.setSnapToTicks(true);
+            greenSlider.setPrefWidth(primaryStage.getWidth() - 160);
+
+            Slider redSlider = new Slider(1, 5, redDifficulty);
+            redSlider.setId("slider");
+            redSlider.setShowTickLabels(true);
+            redSlider.setShowTickMarks(true);
+            redSlider.setSnapToTicks(true);
+            redSlider.setPrefWidth(primaryStage.getWidth() - 160);
+
+            vBox.getChildren().addAll(greenLabel, greenSlider, white, redLabel, redSlider);
+            vBox.requestFocus();
+
+            Label instructions = new Label("1 = Easiest\n5 = Hardest");
+            instructions.setTranslateX(-10);
+            instructions.setFont(Font.font(16));
+            instructions.setTextFill(Color.web("#3E50B5"));
+
+            Button save = new Button("Save");
+            save.setId("control-btn");
+
+            Button exitOptions = new Button("Back to Menu");
+            exitOptions.setId("control-btn");
+
+            HBox controls = new HBox();
+            controls.setSpacing(20);
+            controls.setPrefWidth(primaryStage.getWidth());
+            controls.setAlignment(Pos.CENTER);
+            controls.getChildren().addAll(instructions, save, exitOptions);
+            controls.setTranslateY(350);
+
+            root.getChildren().addAll(vBox, controls);
+
+            // Save value
+            save.setOnAction(saveEvent -> {
+                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) return;
+                redDifficulty = redSlider.getValue();
+                greenDifficulty = greenSlider.getValue();
+                Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
+                success.showAndWait();
+            });
+
+            // Close options menu, check if user has saved first
+            exitOptions.setOnAction(exitEvent -> {
+                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) {
+                    root.getChildren().removeAll(vBox, controls);
+                    hb.setVisible(true);
+                    middleComponents.setVisible(true);
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "You have unsaved changes. Do you" +
+                            " want to save the new difficulties?", ButtonType.NO, ButtonType.YES);
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.YES) {
+                        redDifficulty = redSlider.getValue();
+                        greenDifficulty = greenSlider.getValue();
+                    }
+                    root.getChildren().removeAll(vBox, controls);
+                    hb.setVisible(true);
+                    middleComponents.setVisible(true);
+                }
+            });
         });
     }
 
@@ -226,6 +321,10 @@ public class Menu extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(event -> {
+            Platform.exit();
+        });
 
         String style = getClass().getResource("assets/theme.css").toExternalForm();
         scene.getStylesheets().add(style);

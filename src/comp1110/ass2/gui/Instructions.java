@@ -22,7 +22,7 @@ public class Instructions extends Stage {
      */
 
     Instructions(Stage parentStage) {
-        primaryStage.setTitle("Viewer");
+        primaryStage.setTitle("How to Play StratoGame - Instructions");
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/E.png")));
         primaryStage.setResizable(false);
 

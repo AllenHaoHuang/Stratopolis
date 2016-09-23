@@ -493,10 +493,11 @@ public class Board extends Stage {
         // Disable grid to let bot think
         disableGrid();
 
+        // Check if it's green's move and play accordingly
         if (isGreen && greenState == Player.EasyBot) addTile(greenEasyBot.getMove());
         if (isGreen && greenState == Player.HardBot) addTile(greenHardBot.getMove());
 
-        // Temporary workaround
+        // Temporary workaround to prevent unavoidable exceptions
         try {
             if (!isGreen && redState == Player.EasyBot) addTile(redEasyBot.getMove());
             if (!isGreen && redState == Player.HardBot) addTile(redHardBot.getMove());
@@ -507,7 +508,7 @@ public class Board extends Stage {
         enableGrid();
     }
 
-    // Add a played tile to the bot
+    // Add a played tile to the bot - i.e. update their board states
     private void updateBot(Tile tile) {
         // Green bot
         if (greenState == Player.EasyBot)
@@ -556,9 +557,9 @@ public class Board extends Stage {
         newGrid();
         setupGame();
         setupBots();
-
-        primaryStage.show();
         botPlay();
+
+        primaryStage.showAndWait();
 
         System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
     }
