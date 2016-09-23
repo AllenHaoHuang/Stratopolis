@@ -13,8 +13,8 @@ abstract class Bot {
     private static final int BOARD_SIZE = 26;
 
     BoardState game = new BoardState();
-    private LinkedList<Shape> playerGreen;
-    private LinkedList<Shape> playerRed;
+    protected LinkedList<Shape> playerGreen;
+    protected LinkedList<Shape> playerRed;
     boolean isGreen;
 
     // Used for object initialisation, mainly here for inheritance
@@ -88,7 +88,6 @@ abstract class Bot {
                 }
             }
         }
-
         return tileList;
     }
 }
