@@ -170,13 +170,7 @@ public class Menu extends Application {
 
         // Open game board and pass player states
         startGame.setOnAction(event -> {
-            if (greenPlayer == Player.HardBot || redPlayer == Player.HardBot) {
-                Alert error = new Alert(Alert.AlertType.ERROR, "Hard Bot is not supported at this time");
-                error.showAndWait();
-                resetPlayerButtons();
-                return;
-            }
-            new Board(primaryStage, greenPlayer, redPlayer);
+            new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty);
             resetPlayerButtons();
         });
 

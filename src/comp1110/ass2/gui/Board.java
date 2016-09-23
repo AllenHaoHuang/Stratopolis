@@ -524,21 +524,21 @@ public class Board extends Stage {
     }
 
     // Initialise and setup the bots
-    private void setupBots() {
+    private void setupBots(double greenDifficulty, double redDifficulty) {
         // Green bot
         if (greenState == Player.EasyBot)
             greenEasyBot = new EasyBot(playerGreen, playerRed, true);
         if (greenState == Player.HardBot)
-            greenHardBot = new HardBot(playerGreen, playerRed, true);
+            greenHardBot = new HardBot(playerGreen, playerRed, true, greenDifficulty);
 
         // Red Bot
         if (redState == Player.EasyBot)
             redEasyBot = new EasyBot(playerGreen, playerRed, false);
         if (redState == Player.HardBot)
-            redHardBot = new HardBot(playerGreen, playerRed, false);
+            redHardBot = new HardBot(playerGreen, playerRed, false, redDifficulty);
     }
 
-    Board(Stage parentStage, Player greenState, Player redState) {
+    Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty) {
         // Set player states
         this.greenState = greenState;
         this.redState = redState;
@@ -556,7 +556,7 @@ public class Board extends Stage {
 
         newGrid();
         setupGame();
-        setupBots();
+        setupBots(greenDifficulty, redDifficulty);
 
         primaryStage.show();
 

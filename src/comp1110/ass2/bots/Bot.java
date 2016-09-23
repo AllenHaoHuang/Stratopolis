@@ -24,7 +24,7 @@ abstract class Bot {
         this.isGreen = isGreen;
     }
 
-    // Used for object initialisation from valid placement string
+    // Used for object initialisation from valid placement string, task 10
     Bot(String placement, char myPiece, char opponentsPiece) {
         game = new BoardState(placement);
         playerGreen = new LinkedList<>();
