@@ -12,10 +12,10 @@ import java.util.LinkedList;
 abstract class Bot {
     private static final int BOARD_SIZE = 26;
 
-    private BoardState game = new BoardState();
+    BoardState game = new BoardState();
     private LinkedList<Shape> playerGreen;
     private LinkedList<Shape> playerRed;
-    private boolean isGreen;
+    boolean isGreen;
 
     // Used for object initialisation, mainly here for inheritance
     Bot(LinkedList<Shape> playerGreen, LinkedList<Shape> playerRed, boolean isGreen) {

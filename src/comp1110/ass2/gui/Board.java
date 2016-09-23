@@ -387,7 +387,7 @@ public class Board extends Stage {
 
         // Add cells onto the board based on the tile orientation
         handleOrientation(tile, false);
-        System.out.println(", Piece placed successfully.\n");
+        System.out.println(", Piece placed successfully.\n===============");
 
         // Remove the piece from the player's pieces and show their next piece
         if (isGreen) playerGreen.removeFirst();

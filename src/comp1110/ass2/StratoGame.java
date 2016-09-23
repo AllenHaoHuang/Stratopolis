@@ -164,7 +164,7 @@ public class StratoGame {
      *              otherwise the score for the red player should be returned
      * @return the score for the requested player, given the placement
      */
-    static int getScoreForPlacement(String placement, boolean green) {
+     static int getScoreForPlacement(String placement, boolean green) {
         // If the placement is invalid, the score is 0
         if (!isPlacementValid(placement)) return 0;
 
@@ -187,5 +187,4 @@ public class StratoGame {
         EasyBot easyBot = new EasyBot(placement, piece, opponentsPiece);
         return (easyBot.getMove()).toString();
     }
-
 }

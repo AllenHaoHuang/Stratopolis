@@ -15,6 +15,8 @@ public class BoardState {
     private int pieceID = 1;
     private String placementString = "MMUA";
 
+    private BoardState oldState;
+
     /* Constructor for BoardState, we create a board with 'MMUA' initially */
     public BoardState() {
         // Fill the colour array with all black
@@ -44,6 +46,11 @@ public class BoardState {
             this.addTile(substringTile);
         }
         updatePositionsToCheck();
+    }
+
+    /* Constructor for Board State */
+    public BoardState(BoardState oldState) {
+        this(oldState.getPlacementString());
     }
 
     // A tile must obey all the rules for it to be valid
