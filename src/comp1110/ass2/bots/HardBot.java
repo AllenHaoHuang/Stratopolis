@@ -10,16 +10,19 @@ import java.util.LinkedList;
  */
 
 public class HardBot extends Bot {
-    public HardBot(LinkedList<Shape> playerGreen, LinkedList<Shape> playerRed, boolean isGreen) {
+    private int lookahead;
+
+    public HardBot(LinkedList<Shape> playerGreen, LinkedList<Shape> playerRed, boolean isGreen, double difficulty) {
         super(playerGreen, playerRed, isGreen);
+        lookahead = (int)(difficulty * 2) + 1;
+        System.out.println("Lookahead: " + lookahead);
     }
 
     @Override
     public Tile getMove() {
-        // Minimax with Alpha-Beta pruning
-        return null;
+        // Minimax with Alpha-Beta pruning, recursion etc.
+        LinkedList<Tile> possibleMoves = generatePossibleMoves();
+        return possibleMoves.getFirst();
     }
 
-    // Opponent placed a tile, we add it to our board
-    public void addTile(Tile tile) { super.addTile(tile); }
 }
