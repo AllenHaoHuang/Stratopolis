@@ -2,6 +2,7 @@ package comp1110.ass2.bots;
 
 import comp1110.ass2.logic.Shape;
 import comp1110.ass2.logic.Tile;
+import comp1110.ass2.logic.BoardState;
 
 import java.util.LinkedList;
 
@@ -20,21 +21,42 @@ public class HardBot extends Bot {
 
     @Override
     public Tile getMove() {
-        // Minimax with Alpha-Beta pruning, recursion etc.
+        // Copied from easybot for now
         LinkedList<Tile> possibleMoves = generatePossibleMoves();
-        return possibleMoves.getFirst();
+        Tile bestMove = possibleMoves.getFirst();
+        int maxScore = 0;
 
-    public int minimax(BoardState board, int depth, boolean maximising) {
-        // NEEDS POSSIBLE MOVES FUNCTION INSIDE BOARDSTATE, BUT THAT NEEDS THE BOOLEAN ISGREEN IN BOARDSTATE AS WELL
-        LinkedList<Tile> possibleMoves = generatePossibleMoves();
+        if (isGreen) System.out.println("===============\nGreen Bot   Thinking...");
+        else System.out.println("===============\nRed Bot   Thinking...");
+
+        for (Tile tile : possibleMoves) {
+            Bot copy = this;
+            copy.addTile(tile);
+
+            int tileScore = minimax(copy, lookahead, copy.isGreen);
+            System.out.print(tile + ", "+ tileScore + " | ");
+            if (tileScore > maxScore) {
+                bestMove = tile;
+                maxScore = tileScore;
+            }
+        }
+
+        System.out.println("\nMAX SCORE: " + maxScore + ", FINAL CHOICE: " + bestMove);
+        return bestMove;
+    }
+
+    public int minimax(Bot minimaxBot, int depth, boolean maximising) {
+        LinkedList<Tile> possibleMoves = minimaxBot.generatePossibleMoves();
 
         // if depth is 0, return the boardScore
         if (depth == 0) {
-            return board.getScore(isGreen);
+            BoardState board = minimaxBot.game;
+            return board.getScore(minimaxBot.isGreen);
         }
 
         // if game is finished, return the boardScore
-        if ((isGreen && playerGreen.isEmpty()) || ((!isGreen) && playerRed.isEmpty())) {
+        if ((minimaxBot.isGreen && minimaxBot.playerGreen.isEmpty()) || ((!minimaxBot.isGreen) && minimaxBot.playerRed.isEmpty())) {
+            BoardState board = minimaxBot.game;
             return board.getScore(isGreen);
         }
 
@@ -42,12 +64,10 @@ public class HardBot extends Bot {
             // initially best score is a very low number
             int bestScore = -1000;
             for (Tile t : possibleMoves) {
-                // generate a new board and add the tile
-                BoardState newBoard = board;
-                newBoard.addTile(t);
+                minimaxBot.addTile(t);
                 // find the currentscore for a board, if its higher than the best score, it is the new best score
                 // for maximising
-                int currentScore = minimax(newBoard, depth-1, false);
+                int currentScore = minimax(minimaxBot, depth-1, false);
                 if (currentScore > bestScore) {
                     bestScore = currentScore;
                 }
@@ -58,11 +78,10 @@ public class HardBot extends Bot {
             int bestScore = 1000;
             for (Tile t : possibleMoves) {
                 // generate a new board and add the tile
-                BoardState newBoard = board;
-                newBoard.addTile(t);
+                minimaxBot.addTile(t);
                 // find the currentscore for a board, if it is lower than the best score, it is the new best score
                 // for minimising
-                int currentScore = minimax(newBoard, depth-1, true);
+                int currentScore = minimax(minimaxBot, depth-1, true);
                 if (currentScore < bestScore) {
                     bestScore = currentScore;
                 }
