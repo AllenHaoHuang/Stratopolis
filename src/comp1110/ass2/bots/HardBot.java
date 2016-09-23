@@ -33,7 +33,7 @@ public class HardBot extends Bot {
             Bot copy = this;
             copy.addTile(tile);
 
-            int tileScore = minimax(copy, lookahead, copy.isGreen);
+            int tileScore = minimax(copy, lookahead, true);
             System.out.print(tile + ", "+ tileScore + " | ");
             if (tileScore > maxScore) {
                 bestMove = tile;
