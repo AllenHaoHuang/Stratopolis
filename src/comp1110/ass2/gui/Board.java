@@ -152,12 +152,6 @@ public class Board extends Stage {
             // Red runs out of pieces, end of game
             root.getChildren().remove(redCurrentTile);
             redPiecesLeft.setTranslateY(45);
-            // Prepare board for endgame state
-            endGame();
-
-            // Show new pane with scores and stuff
-            // Close this window for now
-            primaryStage.close();
             return;
         }
 
@@ -242,13 +236,15 @@ public class Board extends Stage {
 
     private void endGame() {
         // Update label text and disable grid
-        playerTurn.setTextFill(Color.DEEPPINK);
-        playerTurn.setText("Game finished.");
         disableGrid();
 
         // Show who has won the game and display scores
         int greenScore = boardState.getScore(true);
         int redScore = boardState.getScore(false);
+
+        playerTurn.setTextFill(Color.DEEPPINK);
+        playerTurn.setText("Game finished.");
+
         Alert test = new Alert(Alert.AlertType.INFORMATION);
         if (greenScore > redScore) {
             test.setTitle("Player Green wins!");
@@ -303,6 +299,10 @@ public class Board extends Stage {
 
     private void hoverTile(char x, char y) {
         // Get the shape so we can extract the colours
+        if (playerRed.size() == 0) {
+            endGame();
+            return;
+        }
         Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
         // We don't want to show shape if it is out of bounds
         switch (hoverOrientation) {
@@ -357,6 +357,7 @@ public class Board extends Stage {
         // Add a new tile to our board if it is valid
         if (boardState.isTileValid(tile)) {
             boardState.addTile(tile);
+            updateBot(tile);
         } else {
             // When tile placement is not valid, we show an error message
             playerTurn.setTextFill(Color.RED);
@@ -367,7 +368,45 @@ public class Board extends Stage {
         }
 
         // Add cells onto the board based on the tile orientation
-        switch (hoverOrientation) {
+        handleOrientation(tile, true);
+
+        // Remove the piece from the player's pieces and show their next piece
+        if (isGreen) playerGreen.removeFirst();
+        else playerRed.removeFirst();
+        previewTiles();
+        // Reset preview orientation
+        hoverOrientation = Orientation.A;
+        botPlay();
+    }
+
+    // Add tile to board for bot, assume valid tile input
+    private void addTile(Tile tile) {
+        System.out.print("Valid Placement: " + boardState.isTileValid(tile));
+        boardState.addTile(tile);
+        updateBot(tile);
+
+        // Add cells onto the board based on the tile orientation
+        handleOrientation(tile, false);
+        System.out.println(", Piece placed successfully.\n");
+
+        // Remove the piece from the player's pieces and show their next piece
+        if (isGreen) playerGreen.removeFirst();
+        else playerRed.removeFirst();
+
+        previewTiles();
+        botPlay();
+    }
+
+    private void handleOrientation(Tile tile, boolean useHoverOrientation) {
+        char x = tile.getPosition().getCharX();
+        char y = tile.getPosition().getCharY();
+        Shape shape = tile.getShape();
+        Orientation orientation;
+
+        if (useHoverOrientation) orientation = hoverOrientation;
+        else orientation = tile.getOrientation();
+
+        switch (orientation) {
             case A :
                 addCell(x, y, shape.colourAtIndex(0));
                 addCell((char)(x+1), y, shape.colourAtIndex(1));
@@ -389,32 +428,6 @@ public class Board extends Stage {
                 addCell((char)(x+1), y, shape.colourAtIndex(2));
                 break;
         }
-
-        // Remove the piece from the player's pieces and show their next piece
-        if (isGreen) playerGreen.removeFirst();
-        else playerRed.removeFirst();
-        previewTiles();
-        // Reset preview orientation
-        hoverOrientation = Orientation.A;
-
-        /* Disable board according to if player is a bot or not
-        if ((!isGreen && redState == Player.EasyBot) || isGreen && greenState == Player.EasyBot) {
-            System.out.println("disable grid");
-            //disableGrid();
-            easyGame();
-        } else if ((!isGreen && redState == Player.HardBot) || isGreen && greenState == Player.HardBot) {
-            System.out.println("disable grid");
-            //disableGrid();
-            hardGame();
-        }
-        // Enable board according to if player is a bot or not
-        if (!isGreen && (greenState == Player.EasyBot || greenState == Player.HardBot)) {
-            System.out.println("enable grid");
-            enableGrid();
-        } else if (isGreen && (redState == Player.EasyBot || redState == Player.HardBot)) {
-            System.out.println("enable grid");
-            enableGrid();
-        } */
     }
 
     private void addCell(char x, char y, Colour colour) {
@@ -475,17 +488,52 @@ public class Board extends Stage {
         else return (x - 'A')+(y - 'A')*26;
     }
 
-    // Initialise the bots
-    private void newBots() {
+    // Let the bots play a move if it is their turn
+    private void botPlay() {
+        // Disable grid to let bot think
+        disableGrid();
+
+        if (isGreen && greenState == Player.EasyBot) addTile(greenEasyBot.getMove());
+        if (isGreen && greenState == Player.HardBot) addTile(greenHardBot.getMove());
+
+        // Temporary workaround
+        try {
+            if (!isGreen && redState == Player.EasyBot) addTile(redEasyBot.getMove());
+            if (!isGreen && redState == Player.HardBot) addTile(redHardBot.getMove());
+        } catch (Exception e) {
+            return;
+        }
+
+        enableGrid();
+    }
+
+    // Add a played tile to the bot
+    private void updateBot(Tile tile) {
+        // Green bot
+        if (greenState == Player.EasyBot)
+            greenEasyBot.addTile(tile);
+        if (greenState == Player.HardBot)
+            greenHardBot.addTile(tile);
+
+        // Red Bot
+        if (redState == Player.EasyBot)
+            redEasyBot.addTile(tile);
+        if (redState == Player.HardBot)
+            redHardBot.addTile(tile);
+    }
+
+    // Initialise and setup the bots
+    private void setupBots() {
         // Green bot
         if (greenState == Player.EasyBot)
             greenEasyBot = new EasyBot(playerGreen, playerRed, true);
-        else if (redState == Player.HardBot)
+        if (greenState == Player.HardBot)
             greenHardBot = new HardBot(playerGreen, playerRed, true);
-        // Red bot
+
+        // Red Bot
         if (redState == Player.EasyBot)
             redEasyBot = new EasyBot(playerGreen, playerRed, false);
-        else if (redState == Player.HardBot)
+        if (redState == Player.HardBot)
             redHardBot = new HardBot(playerGreen, playerRed, false);
     }
 
@@ -505,23 +553,13 @@ public class Board extends Stage {
         primaryStage.initModality(Modality.WINDOW_MODAL);
         primaryStage.initOwner(parentStage);
 
-        //newBots();
         newGrid();
         setupGame();
+        setupBots();
 
-        primaryStage.showAndWait();
+        primaryStage.show();
+        botPlay();
+
         System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
-    }
-
-    // FIXME Task 11: Implement a game that can play valid moves (even if they are weak moves)
-    private void easyGame() {
-        EasyBot easyBot = new EasyBot(playerGreen, playerRed, true);
-        Tile easyMove = easyBot.getMove();
-    }
-
-    // FIXME Task 12: Implement a game that can play good moves
-    private void hardGame() {
-        HardBot hardBot = new HardBot(playerGreen, playerRed, true);
-        Tile hardMove = hardBot.getMove();
     }
 }

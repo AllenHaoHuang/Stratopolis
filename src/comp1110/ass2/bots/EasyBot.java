@@ -25,8 +25,15 @@ public class EasyBot extends Bot {
     @Override
     public Tile getMove() {
         // Select a random placement from the array of possible Tile placements
-        System.out.println("move generated: " + generatePossibleMoves().getFirst() + "\n");
-        return generatePossibleMoves().getFirst();
+        Random random = new Random();
+        // Debugging
+        LinkedList<Tile> moves = generatePossibleMoves();
+        int index = random.nextInt(moves.size());
+        System.out.println("Possible Moves: " + moves);
+        System.out.println("Random Index: " + index  + ", Final Move: " + moves.get(index));
+
+        super.addTile(moves.get(index));
+        return moves.get(index);
     }
 
     // Opponent placed a tile, we add it to our board
