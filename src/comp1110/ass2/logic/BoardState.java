@@ -1,12 +1,10 @@
 package comp1110.ass2.logic;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BoardState {
     // Constants
     private static final int BOARD_SIZE = 26;
-    private static final int TOTAL_PLAYABLE_TILES = 40;
 
     // Object fields
     private int[][] heightArray = new int[BOARD_SIZE][BOARD_SIZE];

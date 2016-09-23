@@ -1,9 +1,7 @@
 package comp1110.ass2.bots;
 
-import comp1110.ass2.StratoGame;
 import comp1110.ass2.logic.*;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
