@@ -63,9 +63,7 @@ public class Menu extends Application {
         howToPlay.setOnAction(event -> {
             new Alert(Alert.AlertType.ERROR, "Under Construction.").showAndWait();
             /* Open form with instructions on how to play
-            root.setDisable(true);
-            new Instructions(primaryStage);
-            root.setDisable(false); */
+            new Instructions(primaryStage); */
         });
 
         Button help = new Button("?");
@@ -90,9 +88,7 @@ public class Menu extends Application {
         viewBtn.setLayoutX(primaryStage.getWidth() - 100);
         viewBtn.setOnAction(event -> {
             // Only allow one instance of Viewer
-            root.setDisable(true);
             new Viewer(primaryStage);
-            root.setDisable(false);
         });
 
         root.getChildren().addAll(howToPlay, help, viewBtn);
@@ -180,9 +176,7 @@ public class Menu extends Application {
                 resetPlayerButtons();
                 return;
             }
-            root.setDisable(true);
             new Board(primaryStage, greenPlayer, redPlayer);
-            root.setDisable(false);
             resetPlayerButtons();
         });
 

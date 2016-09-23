@@ -557,9 +557,11 @@ public class Board extends Stage {
         newGrid();
         setupGame();
         setupBots();
+
+        primaryStage.show();
+
         botPlay();
 
-        primaryStage.showAndWait();
 
         System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
     }

@@ -35,7 +35,7 @@ public class Instructions extends Stage {
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         primaryStage.setScene(scene);
-        primaryStage.showAndWait();
+        primaryStage.show();
 
         System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
     }
