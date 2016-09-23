@@ -1,8 +1,10 @@
 package comp1110.ass2.bots;
 
+import comp1110.ass2.logic.BoardState;
 import comp1110.ass2.logic.Shape;
 import comp1110.ass2.logic.Tile;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -15,11 +17,16 @@ public class EasyBot extends Bot {
         super(playerGreen, playerRed, isGreen);
     }
 
+    public EasyBot(String placement, char myPiece, char opponentsPiece) {
+        super(placement, myPiece, opponentsPiece);
+        System.out.println("placement: " + placement + ", mypiece: " + myPiece + ", opppiece: " +opponentsPiece);
+    }
+
     @Override
     public Tile getMove() {
         // Select a random placement from the array of possible Tile placements
-        Tile[] placements = generatePossibleMoves();
-        return placements[new Random().nextInt(placements.length)];
+        System.out.println("move generated: " + generatePossibleMoves().getFirst() + "\n");
+        return generatePossibleMoves().getFirst();
     }
 
     // Opponent placed a tile, we add it to our board

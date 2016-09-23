@@ -13,22 +13,12 @@ public class BoardState {
     private Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
     private int[][] pieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
     private boolean[][] possiblePosArray = new boolean[BOARD_SIZE][BOARD_SIZE];
-    private Shape[] playableShapes = new Shape[TOTAL_PLAYABLE_TILES];
 
     private int pieceID = 1;
     private String placementString = "MMUA";
 
     /* Constructor for BoardState, we create a board with 'MMUA' initially */
     public BoardState() {
-        // Fill up shapes array
-        int position = 0;
-        for (Shape s : Shape.values()) {
-            if (s != Shape.NULL && s !=Shape.U) {
-                playableShapes[position] = s;
-                playableShapes[position+1] = s;
-                position+=2;
-            }
-        }
         // Fill the colour array with all black
         for (Colour[] row : colourArray)
             Arrays.fill(row, Colour.Black);
@@ -43,6 +33,21 @@ public class BoardState {
         updatePositionsToCheck();
     }
 
+    /* Constructor for Board State given a valid placement string */
+    public BoardState(String placement) {
+        // Run constructor above to set up object
+        this();
+        // Loop through placement string excluding "MMUA"
+        for (int i = 4; i < placement.length(); i += 4) {
+            // Create a new tile from the placement string
+            Tile substringTile = new Tile(new Position(placement.charAt(i), placement.charAt(i + 1)),
+                    Shape.fromChar(placement.charAt(i + 2)),
+                    Orientation.fromChar(placement.charAt(i + 3)));
+            this.addTile(substringTile);
+        }
+        updatePositionsToCheck();
+    }
+
     // A tile must obey all the rules for it to be valid
     public boolean isTileValid(Tile tile) {
         return (tile.isOnBoard() &&
@@ -54,38 +59,19 @@ public class BoardState {
 
     // Returning a copy of the height and colour array for scoring
     public int[][] getHeightArray() {
-        return heightArray;
-        /* Why all these unnecessary steps
         int[][] newHeightArray = new int[BOARD_SIZE][BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++)
             for (int j = 0; j < BOARD_SIZE; j++)
                 newHeightArray[i][j] = heightArray[i][j];
-        return newHeightArray;*/
+        return newHeightArray;
     }
+
     public Colour[][] getColourArray() {
-        return colourArray;
-        /* Why all these unnecessary steps
         Colour[][] newColourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
-        for(int i = 0; i < BOARD_SIZE; i++)
-            for(int j = 0; j < BOARD_SIZE; j++)
-                newColourArray[i][j]=colourArray[i][j];
-        return newColourArray;*/
-    }
-
-    // Returns arrays on which positions to check
-    public boolean[][] getPossiblePosArray() {
-        return possiblePosArray;
-    }
-
-    // Modified function to get playable shapes array so there is no repeats
-    public Shape[] getPlayableShapesNoRepeat() {
-        ArrayList<Shape> shapeArrayList = new ArrayList<>();
-        for (Shape s : playableShapes) {
-            if (s!=Shape.NULL && !(shapeArrayList.contains(s))) {
-                shapeArrayList.add(s);
-            }
-        }
-        return (shapeArrayList.toArray(new Shape[shapeArrayList.size()]));
+        for (int i = 0; i < BOARD_SIZE; i++)
+            for (int j = 0; j < BOARD_SIZE; j++)
+                newColourArray[i][j] = colourArray[i][j];
+        return newColourArray;
     }
 
     // Check that the tile is adjacent to another tile by checking the height neighbouring cells
@@ -183,13 +169,6 @@ public class BoardState {
         pieceIDArray[tile.getX(2)][tile.getY(2)] = pieceID++;
         // Update placement string
         placementString += tile.toString();
-        // Removes shape from playable shapes array
-        for (Shape s : playableShapes) {
-            if (s == tile.getShape()) {
-                s = Shape.NULL;
-            }
-            break;
-        }
         // Update positions to check
         updatePositionsToCheck();
     }
@@ -200,41 +179,50 @@ public class BoardState {
     }
 
     // Get the score of a player at the current board status
-    public int getScore(boolean isGreen) { return Score.getScore(this, isGreen); }
+    public int getScore(boolean isGreen) {
+        return Score.getScore(this, isGreen);
+    }
 
     // Get the placement string
-    public String getPlacementString() { return placementString; }
+    public String getPlacementString() {
+        return placementString;
+    }
+
+    // Returns arrays on which positions to check
+    public boolean[][] getPossiblePosArray() {
+        return possiblePosArray;
+    }
 
     // Positions to check
     public void updatePositionsToCheck() {
         // Firstly makes a 2-D boolean array that is true for a position if that positions height
         // is larger than 0 or is adjacent to a position of height larger than 0
-        for (int i=0; i<BOARD_SIZE; i++) {
-            for (int j=0; j<BOARD_SIZE; j++) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
                 if (heightArray[i][j] > 0) {
                     possiblePosArray[i][j] = true;
 
-                    if (i%BOARD_SIZE == 0) {
-                        possiblePosArray[i+1][j] = true;
-                        possiblePosArray[i][j+1] = true;
-                        possiblePosArray[i][j-1] = true;
-                    } else if (i%BOARD_SIZE == BOARD_SIZE-1) {
-                        possiblePosArray[i-1][j] = true;
-                        possiblePosArray[i][j+1] = true;
-                        possiblePosArray[i][j-1] = true;
-                    } else if (j%BOARD_SIZE == 0) {
-                        possiblePosArray[i-1][j] = true;
-                        possiblePosArray[i+1][j] = true;
-                        possiblePosArray[i][j+1] = true;
-                    } else if (j%BOARD_SIZE == BOARD_SIZE-1) {
-                        possiblePosArray[i-1][j] = true;
-                        possiblePosArray[i+1][j] = true;
-                        possiblePosArray[i][j-1] = true;
+                    if (i % BOARD_SIZE == 0) {
+                        possiblePosArray[i + 1][j] = true;
+                        possiblePosArray[i][j + 1] = true;
+                        possiblePosArray[i][j - 1] = true;
+                    } else if (i % BOARD_SIZE == BOARD_SIZE - 1) {
+                        possiblePosArray[i - 1][j] = true;
+                        possiblePosArray[i][j + 1] = true;
+                        possiblePosArray[i][j - 1] = true;
+                    } else if (j % BOARD_SIZE == 0) {
+                        possiblePosArray[i - 1][j] = true;
+                        possiblePosArray[i + 1][j] = true;
+                        possiblePosArray[i][j + 1] = true;
+                    } else if (j % BOARD_SIZE == BOARD_SIZE - 1) {
+                        possiblePosArray[i - 1][j] = true;
+                        possiblePosArray[i + 1][j] = true;
+                        possiblePosArray[i][j - 1] = true;
                     } else {
-                        possiblePosArray[i+1][j] = true;
-                        possiblePosArray[i-1][j] = true;
-                        possiblePosArray[i][j+1] = true;
-                        possiblePosArray[i][j-1] = true;
+                        possiblePosArray[i + 1][j] = true;
+                        possiblePosArray[i - 1][j] = true;
+                        possiblePosArray[i][j + 1] = true;
+                        possiblePosArray[i][j - 1] = true;
                     }
                 }
             }

@@ -1,8 +1,10 @@
 package comp1110.ass2;
 
+import comp1110.ass2.bots.EasyBot;
 import comp1110.ass2.logic.*;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 
 /**
  * This class provides the text interface for the Strato Game
@@ -163,20 +165,12 @@ public class StratoGame {
      * @return the score for the requested player, given the placement
      */
     static int getScoreForPlacement(String placement, boolean green) {
-        // FIXME Task 7: determine the score for a player given a placement
+        // If the placement is invalid, the score is 0
         if (!isPlacementValid(placement)) return 0;
 
-        BoardState board = new BoardState();
-        for (int i = 4; i < placement.length(); i += 4) {
-            // Create a new tile from the placement string
-            Tile substringTile = new Tile(new Position(placement.charAt(i), placement.charAt(i+1)),
-                                            Shape.fromChar(placement.charAt(i+2)),
-                                            Orientation.fromChar(placement.charAt(i+3)));
-            board.addTile(substringTile); // update the board state
-        }
-
+        // Create a new board state and get the score
+        BoardState board = new BoardState(placement);
         return board.getScore(green);
-        // FIXME Marvin please implement the scoring system in the Score class
     }
 
     /**
@@ -190,7 +184,8 @@ public class StratoGame {
      */
     static String generateMove(String placement, char piece, char opponentsPiece) {
         // FIXME Task 10: generate a valid move
-        return null;
+        EasyBot easyBot = new EasyBot(placement, piece, opponentsPiece);
+        return (easyBot.getMove()).toString();
     }
 
 }
