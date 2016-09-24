@@ -11,7 +11,7 @@ class MiniMax {
     static int start(BoardState node, int depth, Colour myPlayer, boolean isMax) {
         // If we've run out of lookahead or game is finished
         if (depth == 0 || node.getRedShapes().isEmpty() || node.getGreenShapes().isEmpty())
-            return node.getScore(myPlayer);
+            return node.getScore(myPlayer) - node.getScore(myPlayer.nextPlayer());
 
         if (isMax) {
             Shape shape = (myPlayer.isGreen()) ? node.getGreenShapes().getFirst()
@@ -56,5 +56,4 @@ class MiniMax {
             return minScore;
         }
     }
-
 }
