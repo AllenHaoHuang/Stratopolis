@@ -36,8 +36,8 @@ public class Menu extends Application {
     private Player greenPlayer = Player.Human;
     private Player redPlayer = Player.Human;
 
-    private double redDifficulty = 3;
-    private double greenDifficulty = 3;
+    private double redDifficulty = 2;
+    private double greenDifficulty = 2;
 
     private void addPanels() {
         // Create panels and add to root

@@ -92,7 +92,6 @@ public class BoardState {
         return playerTurn == Colour.Green;
     }
 
-
     // A tile must obey all the rules for it to be valid
     public boolean isTileValid(Tile tile) {
         return (tile.isOnBoard() &&
@@ -311,5 +310,12 @@ public class BoardState {
             }
         }
         return tileList;
+    }
+
+    public boolean isFinished() {
+        if (getGreenShapes().isEmpty() && getRedShapes().isEmpty()) {
+            return true;
+        }
+        return false;
     }
 }

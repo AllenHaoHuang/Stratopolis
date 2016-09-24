@@ -24,11 +24,9 @@ public class HardBot extends Bot {
         Shape shape;
         if (myPlayer.isGreen()) {
             shape = game.getGreenShapes().getFirst();
-            game.removeGreenShape();
             System.out.println("===== MINIMAX: Green Bot, Depth: " + lookahead + " =====");
         } else {
             shape = game.getRedShapes().getFirst();
-            game.removeRedShape();
             System.out.println("===== MINIMAX: Red Bot, Depth: " + lookahead + " =====");
         }
 

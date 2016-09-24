@@ -8,51 +8,59 @@ import comp1110.ass2.logic.Tile;
 import java.util.LinkedList;
 
 class MiniMax {
+
     static int start(BoardState node, int depth, Colour myPlayer, boolean isMax) {
-        // If we've run out of lookahead or game is finished
-        if (depth == 0 || node.getRedShapes().isEmpty() || node.getGreenShapes().isEmpty())
+        if (depth == 0 || node.isFinished()) {
             return node.getScore(myPlayer) - node.getScore(myPlayer.nextPlayer());
+        }
 
         if (isMax) {
-            Shape shape = (myPlayer.isGreen()) ? node.getGreenShapes().getFirst()
-                    : node.getRedShapes().getFirst();
+            Shape shape;
 
-            if (myPlayer.isGreen()) node.removeGreenShape();
-            else node.removeRedShape();
+            if (myPlayer.isGreen()) {
+                shape = node.getGreenShapes().getFirst();
+                node.removeGreenShape();
+            } else {
+                shape = node.getRedShapes().getFirst();
+                node.removeRedShape();
+            }
 
             LinkedList<Tile> possibleMoves = node.generatePossibleMoves(shape);
             int maxScore = -9999;
 
-            for (Tile tile : possibleMoves) {
+            for (Tile t : possibleMoves) {
                 BoardState child = new BoardState(node);
-                child.addTile(tile);
+                child.addTile(t);
 
-                int tileScore = MiniMax.start(child, depth - 1, myPlayer, false);
-
-                return Math.max(maxScore, tileScore);
+                int tileScore = start(child, depth-1, myPlayer, false);
+                if (tileScore > maxScore) {
+                    maxScore = tileScore;
+                }
             }
-
             return maxScore;
-
         } else {
-            Shape shape = (myPlayer.isGreen()) ? node.getRedShapes().getFirst()
-                    : node.getGreenShapes().getFirst();
+            Shape shape;
 
-            if (myPlayer.isGreen()) node.removeRedShape();
-            else node.removeGreenShape();
+            if (myPlayer.isGreen()) {
+                shape = node.getRedShapes().getFirst();
+                node.removeRedShape();
+            } else {
+                shape = node.getGreenShapes().getFirst();
+                node.removeGreenShape();
+            }
 
             LinkedList<Tile> possibleMoves = node.generatePossibleMoves(shape);
             int minScore = 9999;
 
-            for (Tile tile : possibleMoves) {
+            for (Tile t : possibleMoves) {
                 BoardState child = new BoardState(node);
-                child.addTile(tile);
+                child.addTile(t);
 
-                int tileScore = MiniMax.start(child, depth - 1, myPlayer, true);
-
-                return Math.min(minScore, tileScore);
+                int tileScore = start(child, depth-1, myPlayer, true);
+                if (tileScore < minScore) {
+                    minScore = tileScore;
+                }
             }
-
             return minScore;
         }
     }

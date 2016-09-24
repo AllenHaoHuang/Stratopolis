@@ -522,8 +522,8 @@ public class Board extends Stage {
         // Set player states
         this.greenState = greenState;
         this.redState = redState;
-        this.greenDifficulty = (int)(greenDifficulty * 2.5 + 1.5);
-        this.redDifficulty = (int)(redDifficulty * 2.5 + 1.5);
+        this.greenDifficulty = (int)(greenDifficulty);
+        this.redDifficulty = (int)(redDifficulty);
 
         // Prepare and show stage
         Stage primaryStage = new Stage();
