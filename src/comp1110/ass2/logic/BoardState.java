@@ -1,6 +1,9 @@
 package comp1110.ass2.logic;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.LinkedList;
 
 public class BoardState {
     // Constants
@@ -11,11 +14,13 @@ public class BoardState {
     private Colour[][] colourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
     private int[][] pieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
     private boolean[][] possiblePosArray = new boolean[BOARD_SIZE][BOARD_SIZE];
-
     private int pieceID = 1;
     private String placementString = "MMUA";
 
-    private BoardState oldState;
+    // Holding the pieces
+    private LinkedList<Shape> greenShapes = new LinkedList<>();
+    private LinkedList<Shape> redShapes = new LinkedList<>();
+    private Colour playerTurn = Colour.Green;
 
     /* Constructor for BoardState, we create a board with 'MMUA' initially */
     public BoardState() {
@@ -48,10 +53,45 @@ public class BoardState {
         updatePositionsToCheck();
     }
 
-    /* Constructor for Board State */
+    /* Constructor for Board State given an old state - i.e. makes a copy*/
     public BoardState(BoardState oldState) {
         this(oldState.getPlacementString());
+        // Ignore the warnings, linked lists can be cast (I hope...)
+        this.greenShapes = (LinkedList<Shape>) oldState.getGreenShapes().clone();
+        this.redShapes = (LinkedList<Shape>) oldState.getRedShapes().clone();
+        this.playerTurn = Colour.getValue(playerTurn);
     }
+
+    // Initialise the 'deck' of tiles (shapes) for the players and shuffle them
+    public void createPlayerPieces() {
+        for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
+            redShapes.add(i);
+            redShapes.add(i);
+        }
+        for (Shape i : EnumSet.range(Shape.K, Shape.T)) {
+            greenShapes.add(i);
+            greenShapes.add(i);
+        }
+        Collections.shuffle(greenShapes);
+        Collections.shuffle(redShapes);
+    }
+
+    public LinkedList<Shape> getGreenShapes() { return greenShapes; }
+    public LinkedList<Shape> getRedShapes() { return redShapes; }
+
+    public void removeGreenShape() { greenShapes.removeFirst(); }
+    public void removeRedShape() { redShapes.removeFirst(); }
+
+    // Return whose turn it is in colours
+    public Colour getPlayerTurn() {
+        return playerTurn;
+    }
+
+    // Return if its green player's turn
+    public boolean isGreenTurn() {
+        return playerTurn == Colour.Green;
+    }
+
 
     // A tile must obey all the rules for it to be valid
     public boolean isTileValid(Tile tile) {
@@ -176,6 +216,8 @@ public class BoardState {
         placementString += tile.toString();
         // Update positions to check
         updatePositionsToCheck();
+        // Invert player turn
+        playerTurn = playerTurn.nextPlayer();
     }
 
     // Get the height at a certain cell on our board
@@ -186,6 +228,12 @@ public class BoardState {
     // Get the score of a player at the current board status
     public int getScore(boolean isGreen) {
         return Score.getScore(this, isGreen);
+    }
+
+    // Get the score based off a colour
+    public int getScore(Colour player) {
+        if (player == Colour.Green) return Score.getScore(this, true);
+        else return Score.getScore(this, false);
     }
 
     // Get the placement string
@@ -244,5 +292,24 @@ public class BoardState {
                 }
             }
         }
-    };
+    }
+
+    // Generate possible moves for a given shape and the current board state
+    public LinkedList<Tile> generatePossibleMoves(Shape shape) {
+        LinkedList<Tile> tileList = new LinkedList<>();
+
+        // Loop through board grid
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                // Check if it is possible to place piece
+                if (possiblePosArray[i][j]) {
+                    for (Orientation orientation : Orientation.values()) {
+                        Tile newTile = new Tile(new Position(i,j), shape, orientation);
+                        if (this.isTileValid(newTile)) tileList.add(newTile);
+                    }
+                }
+            }
+        }
+        return tileList;
+    }
 }

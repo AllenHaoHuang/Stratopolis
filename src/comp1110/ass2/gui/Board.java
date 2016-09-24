@@ -1,6 +1,7 @@
 package comp1110.ass2.gui;
 
 import comp1110.ass2.bots.Player;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -17,9 +18,9 @@ import comp1110.ass2.bots.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Board extends Stage {
     /* Constants */
@@ -31,23 +32,15 @@ public class Board extends Stage {
     private static final int X_OFFSET = 135;
     private static final int Y_OFFSET = 45;
 
-    /* Bot States, left uninitialised for now */
-    private EasyBot greenEasyBot;
-    private EasyBot redEasyBot;
-    private HardBot greenHardBot;
-    private HardBot redHardBot;
-
     /* Class variables to store the board, and decks for the players, and state */
     private BoardState boardState = new BoardState();
-    private LinkedList<Shape> playerGreen = new LinkedList<>();
-    private LinkedList<Shape> playerRed = new LinkedList<>();
     private Player greenState;
     private Player redState;
-    private boolean isGreen;
+    private int greenDifficulty;
+    private int redDifficulty;
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
-    private final Stage primaryStage = new Stage();
     private final Group root = new Group();
     private final Group greenCurrentTile = new Group();
     private final Group greenNextTile = new Group();
@@ -100,55 +93,44 @@ public class Board extends Stage {
         root.getChildren().addAll(greenPlayer, redPlayer, greenPiecesLeft, redPiecesLeft, playerTurn);
         // Initialise the 'deck' of tiles for the players and display them
         setupPlayerTiles();
-
-        // We wait for the green player's turn and display the top pieces
-        isGreen = true;
     }
 
     private void setupPlayerTiles() {
-        // Initialise the 'deck' of tiles for the players and shuffle them
-        for (Shape i : EnumSet.range(Shape.A, Shape.J)) {
-            playerRed.add(i);
-            playerRed.add(i);
-        }
-        for (Shape i : EnumSet.range(Shape.K, Shape.T)) {
-            playerGreen.add(i);
-            playerGreen.add(i);
-        }
-        Collections.shuffle(playerGreen);
-        Collections.shuffle(playerRed);
+        // Create the pieces for the players
+        boardState.createPlayerPieces();
         // Show the tile previews
-        previewTiles();
-        previewTiles();
+        previewTiles(true);
+        previewTiles(false);
         // Set player's turn
         playerTurn.setTextFill(Color.GREEN);
         playerTurn.setText("Green Player's Turn");
     }
 
-    private void previewTiles() {
-        // Show how many pieces a player has left
-        if (isGreen) greenPiecesLeft.setText(playerGreen.size() + " piece(s) left."
-                + "\nScore = " + boardState.getScore(true));
-        else redPiecesLeft.setText(playerRed.size() + " piece(s) left."
-                + "\nScore = " + boardState.getScore(false));
+    private void previewTiles(boolean isGreenTurn) {
+        // Set up variables for ease of use
+        LinkedList<Shape> greenShapes = boardState.getGreenShapes();
+        LinkedList<Shape> redShapes = boardState.getRedShapes();
 
-        // Set text in label for whose turn it is
-        if (!isGreen) {
-            playerTurn.setTextFill(Color.GREEN);
-            playerTurn.setText("Green Player's Turn");
-        } else {
+        // Show how many pieces a player has left and the score
+        if (isGreenTurn) {
+            greenPiecesLeft.setText(greenShapes.size() + " piece(s) left."
+                    + "\nScore = " + boardState.getScore(true));
             playerTurn.setTextFill(Color.RED);
             playerTurn.setText("Red Player's Turn");
+        } else {
+            redPiecesLeft.setText(redShapes.size() + " piece(s) left."
+                    + "\nScore = " + boardState.getScore(false));
+            playerTurn.setTextFill(Color.GREEN);
+            playerTurn.setText("Green Player's Turn");
         }
-
+        
         // Check if we are approaching the end game state
-        if (isGreen && playerGreen.size() == 0) {
+        if (isGreenTurn && greenShapes.isEmpty()) {
             // Green runs out of pieces
             root.getChildren().remove(greenCurrentTile);
             greenPiecesLeft.setTranslateY(45);
-            isGreen = !isGreen;
             return;
-        } else if (playerRed.size() == 0) {
+        } else if (redShapes.isEmpty()) {
             // Red runs out of pieces, end of game
             root.getChildren().remove(redCurrentTile);
             redPiecesLeft.setTranslateY(45);
@@ -156,27 +138,24 @@ public class Board extends Stage {
         }
 
         // We create a new preview cell based on whose turn it is
-        if (isGreen) showCurrentTile(playerGreen.getFirst());
-        else showCurrentTile(playerRed.getFirst());
+        if (isGreenTurn) showCurrentTile(greenShapes.getFirst(), true);
+        else showCurrentTile(redShapes.getFirst(), false);
 
         // Add next tile to preview or move the `Pieces Left` label
-        if (playerGreen.size() == 1 && isGreen) {
+        if (greenShapes.size() == 1 && isGreenTurn) {
             root.getChildren().remove(greenNextTile);
             greenPiecesLeft.setTranslateY(110);
-        } else if (playerRed.size() == 1) {
+        } else if (redShapes.size() == 1) {
             root.getChildren().remove(redNextTile);
             redPiecesLeft.setTranslateY(110);
         } else {
             // Get the next shape after the current one - i.e. player has picked up current shape
-            Shape temp = (isGreen) ? playerGreen.get(1) : playerRed.get(1);
-            showNextTile(temp);
+            Shape shape = (isGreenTurn) ? greenShapes.get(1) : redShapes.get(1);
+            showNextTile(shape, isGreenTurn);
         }
-
-        // We invert whose turn it is
-        isGreen = !isGreen;
     }
 
-    private void showCurrentTile(Shape shape) {
+    private void showCurrentTile(Shape shape, boolean isGreen) {
         // Create new cells
         Cell zero = new Cell(shape.colourAtIndex(0));
         Cell one = new Cell(shape.colourAtIndex(1));
@@ -204,7 +183,7 @@ public class Board extends Stage {
         }
     }
 
-    private void showNextTile(Shape shape) {
+    private void showNextTile(Shape shape, boolean isGreen) {
         // Create new cells
         Cell zero = new Cell(shape.colourAtIndex(0));
         Cell one = new Cell(shape.colourAtIndex(1));
@@ -235,6 +214,8 @@ public class Board extends Stage {
     }
 
     private void endGame() {
+        // Game state to terminal
+        System.out.println("Placement String: " + boardState.getPlacementString());
         // Update label text and disable grid
         disableGrid();
 
@@ -247,24 +228,28 @@ public class Board extends Stage {
 
         Alert test = new Alert(Alert.AlertType.INFORMATION);
         if (greenScore > redScore) {
+            System.out.println("Player Green wins! Green = " + greenScore + ", Red = " + redScore);
             test.setTitle("Player Green wins!");
             test.setHeaderText("Player Green wins!");
             test.setContentText("Player Green wins with a score of "
                     + greenScore + ", while Player Red scored " + redScore);
             test.showAndWait();
         } else if (redScore > greenScore) {
+            System.out.println("Player Red Wins! Green = " + greenScore + ", Red = " + redScore);
             test.setTitle("Player Red wins!");
             test.setHeaderText("Player Red wins!");
             test.setContentText("Player Red wins with a score of "
                     + redScore + ", while Player Green scored " + greenScore);
             test.showAndWait();
         } else {
+            System.out.println("Tie! Green = " + greenScore + ", Red = " + redScore);
             test.setTitle("Tie!");
             test.setHeaderText("Both players tie!");
             test.setContentText("Player Green and Red tie at " +
                     greenScore + " points each");
             test.showAndWait();
         }
+
         /* Controls to set up new game if necessary */
     }
 
@@ -298,12 +283,14 @@ public class Board extends Stage {
     }
 
     private void hoverTile(char x, char y) {
-        // Get the shape so we can extract the colours
-        if (playerRed.size() == 0) {
+        if (boardState.getRedShapes().isEmpty()) {
             endGame();
             return;
         }
-        Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
+        // Get the shape to hover
+        Shape shape = (boardState.isGreenTurn()) ? boardState.getGreenShapes().getFirst()
+                : boardState.getRedShapes().getFirst();
+
         // We don't want to show shape if it is out of bounds
         switch (hoverOrientation) {
             case A :
@@ -343,7 +330,7 @@ public class Board extends Stage {
     private void hoverCell(char x, char y, Colour colour) {
         // Create new cell, change its properties and add to group
         Cell cell;
-        cell = new Cell(colour, isGreen);
+        cell = new Cell(colour, boardState.isGreenTurn());
         cell.setTranslateX(translateX(x));
         cell.setTranslateY(translateY(y));
         cell.setOpacity(0.85);
@@ -352,12 +339,12 @@ public class Board extends Stage {
 
     private void addTile(char x, char y) {
         // Create a new tile
-        Shape shape = (isGreen) ? playerGreen.getFirst() : playerRed.getFirst();
+        Shape shape = (boardState.isGreenTurn()) ? boardState.getGreenShapes().getFirst()
+                : boardState.getRedShapes().getFirst();
         Tile tile = new Tile(new Position(x, y), shape, hoverOrientation);
         // Add a new tile to our board if it is valid
         if (boardState.isTileValid(tile)) {
             boardState.addTile(tile);
-            updateBot(tile);
         } else {
             // When tile placement is not valid, we show an error message
             playerTurn.setTextFill(Color.RED);
@@ -368,12 +355,9 @@ public class Board extends Stage {
         }
 
         // Add cells onto the board based on the tile orientation
-        handleOrientation(tile, true);
+        handleOrientation(tile);
 
-        // Remove the piece from the player's pieces and show their next piece
-        if (isGreen) playerGreen.removeFirst();
-        else playerRed.removeFirst();
-        previewTiles();
+        previewTiles(!boardState.isGreenTurn());
         // Reset preview orientation
         hoverOrientation = Orientation.A;
         botPlay();
@@ -381,30 +365,21 @@ public class Board extends Stage {
 
     // Add tile to board for bot, assume valid tile input
     private void addTile(Tile tile) {
-        System.out.print("Valid Placement: " + boardState.isTileValid(tile));
         boardState.addTile(tile);
-        updateBot(tile);
 
         // Add cells onto the board based on the tile orientation
-        handleOrientation(tile, false);
-        System.out.println(", Piece placed successfully.\n===============");
+        handleOrientation(tile);
+        System.out.println("======== SUCCESS ========\n");
 
-        // Remove the piece from the player's pieces and show their next piece
-        if (isGreen) playerGreen.removeFirst();
-        else playerRed.removeFirst();
-
-        previewTiles();
+        previewTiles(!boardState.isGreenTurn());
         botPlay();
     }
 
-    private void handleOrientation(Tile tile, boolean useHoverOrientation) {
+    private void handleOrientation(Tile tile) {
         char x = tile.getPosition().getCharX();
         char y = tile.getPosition().getCharY();
         Shape shape = tile.getShape();
-        Orientation orientation;
-
-        if (useHoverOrientation) orientation = hoverOrientation;
-        else orientation = tile.getOrientation();
+        Orientation orientation = tile.getOrientation();
 
         switch (orientation) {
             case A :
@@ -428,6 +403,9 @@ public class Board extends Stage {
                 addCell((char)(x+1), y, shape.colourAtIndex(2));
                 break;
         }
+
+        if (boardState.getPlayerTurn() == Colour.Red) boardState.getGreenShapes().removeFirst();
+        else boardState.getRedShapes().removeFirst();
     }
 
     private void addCell(char x, char y, Colour colour) {
@@ -488,62 +466,67 @@ public class Board extends Stage {
         else return (x - 'A')+(y - 'A')*26;
     }
 
-    // Let the bots play a move if it is their turn
     private void botPlay() {
-        // Disable grid to let bot think
-        disableGrid();
+        if (boardState.isGreenTurn() && greenState.isHuman() || !boardState.isGreenTurn() && redState.isHuman()) {
+            enableGrid();
+            return;
+        } else if (boardState.getRedShapes().isEmpty()) {
+            endGame();
+            return;
+        } else {
+            disableGrid();
+        }
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        actualPlay();
+                    }
+                });
 
-        // Check if it's green's move and play accordingly
-        if (isGreen && greenState == Player.EasyBot) addTile(greenEasyBot.getMove());
-        if (isGreen && greenState == Player.HardBot) addTile(greenHardBot.getMove());
+            }
+        }, 100);
+    }
 
-        // Temporary workaround to prevent unavoidable exceptions
-        try {
-            if (!isGreen && redState == Player.EasyBot) addTile(redEasyBot.getMove());
-            if (!isGreen && redState == Player.HardBot) addTile(redHardBot.getMove());
-        } catch (Exception e) {
+    // Let the bots play a move if it is their turn
+    private void actualPlay() {
+        // Check for which bot to initialise
+        if (boardState.isGreenTurn() && greenState == Player.EasyBot) {
+            EasyBot bot = new EasyBot(boardState, true);
+            addTile(bot.getMove());
+            return;
+        } else if (boardState.isGreenTurn() && greenState == Player.HardBot) {
+            HardBot bot = new HardBot(boardState, true, greenDifficulty);
+            addTile(bot.getMove());
             return;
         }
 
-        enableGrid();
-    }
-
-    // Add a played tile to the bot - i.e. update their board states
-    private void updateBot(Tile tile) {
-        // Green bot
-        if (greenState == Player.EasyBot)
-            greenEasyBot.addTile(tile);
-        if (greenState == Player.HardBot)
-            greenHardBot.addTile(tile);
-
-        // Red Bot
-        if (redState == Player.EasyBot)
-            redEasyBot.addTile(tile);
-        if (redState == Player.HardBot)
-            redHardBot.addTile(tile);
-    }
-
-    // Initialise and setup the bots
-    private void setupBots(double greenDifficulty, double redDifficulty) {
-        // Green bot
-        if (greenState == Player.EasyBot)
-            greenEasyBot = new EasyBot(playerGreen, playerRed, true);
-        if (greenState == Player.HardBot)
-            greenHardBot = new HardBot(playerGreen, playerRed, true, greenDifficulty);
-
-        // Red Bot
-        if (redState == Player.EasyBot)
-            redEasyBot = new EasyBot(playerGreen, playerRed, false);
-        if (redState == Player.HardBot)
-            redHardBot = new HardBot(playerGreen, playerRed, false, redDifficulty);
+        // Temporary workaround to prevent unavoidable exceptions
+        try {
+            if (!boardState.isGreenTurn() && redState == Player.EasyBot) {
+                EasyBot bot = new EasyBot(boardState, false);
+                addTile(bot.getMove());
+            } else if (!boardState.isGreenTurn() && redState == Player.HardBot) {
+                HardBot bot = new HardBot(boardState, false, redDifficulty);
+                addTile(bot.getMove());
+            }
+        } catch (Exception e) {
+            return;
+        }
     }
 
     Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty) {
         // Set player states
         this.greenState = greenState;
         this.redState = redState;
+        this.greenDifficulty = (int)(greenDifficulty * 2.5 + 1.5);
+        this.redDifficulty = (int)(redDifficulty * 2.5 + 1.5);
 
         // Prepare and show stage
+        Stage primaryStage = new Stage();
         primaryStage.setTitle("StratoGame");
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/G.png")));
         primaryStage.setResizable(false);
@@ -556,13 +539,16 @@ public class Board extends Stage {
 
         newGrid();
         setupGame();
-        setupBots(greenDifficulty, redDifficulty);
 
         primaryStage.show();
 
+        primaryStage.setOnCloseRequest(event -> {
+            if (boardState.getRedShapes().isEmpty())
+                new Alert(Alert.AlertType.ERROR, "Game in progress");
+            primaryStage.close();
+        });
+
+        disableGrid();
         botPlay();
-
-
-        System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
     }
 }

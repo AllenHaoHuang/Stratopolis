@@ -1,6 +1,5 @@
 package comp1110.ass2.bots;
 
-import comp1110.ass2.StratoGame;
 import comp1110.ass2.logic.*;
 
 import java.util.LinkedList;
@@ -10,37 +9,41 @@ import java.util.LinkedList;
  */
 
 public class EasyBot extends Bot {
-    public EasyBot(LinkedList<Shape> playerGreen, LinkedList<Shape> playerRed, boolean isGreen) {
-        super(playerGreen, playerRed, isGreen);
+    // Constructors using that of the superclass 'Bot'
+    public EasyBot(BoardState parentGame, boolean isGreenPlayer) {
+        super(parentGame, isGreenPlayer);
     }
 
     public EasyBot(String placement, char myPiece, char opponentsPiece) {
         super(placement, myPiece, opponentsPiece);
-        System.out.println("placement: " + placement + ", mypiece: " + myPiece + ", opppiece: " +opponentsPiece);
     }
 
     @Override
     public Tile getMove() {
-        // Score the different tile placements - messages for debugging
-        LinkedList<Tile> possibleMoves = generatePossibleMoves();
+        // Setting up console message
+        if (myPlayer == Colour.Green) System.out.println("===== EASY GREEN BOT ===== ");
+        else System.out.println("===== EASY RED BOT ===== ");
+
+        // Get the shape the bot will be playing
+        Shape shape = (myPlayer == Colour.Green) ? game.getGreenShapes().getFirst()
+                : game.getRedShapes().getFirst();
+
+        // Generate the potential moves the bot can place, then loop through them and evaluate
+        LinkedList<Tile> possibleMoves = game.generatePossibleMoves(shape);
         Tile bestMove = possibleMoves.getFirst();
         int maxScore = 0;
 
-        if (isGreen) System.out.println("===============\nGreen Bot   Thinking...");
-        else System.out.println("===============\nRed Bot   Thinking...");
-
         for (Tile tile : possibleMoves) {
-            BoardState copy = new BoardState(game);
-            copy.addTile(tile);
-            int tileScore = copy.getScore(isGreen);
-            System.out.print(tile + ", "+ tileScore + " | ");
+            BoardState gameCopy = new BoardState(game);
+            gameCopy.addTile(tile);
+            int tileScore = gameCopy.getScore(myPlayer == Colour.Green);
             if (tileScore > maxScore) {
                 bestMove = tile;
                 maxScore = tileScore;
             }
         }
 
-        System.out.println("\nMAX SCORE: " + maxScore + ", FINAL CHOICE: " + bestMove);
+        System.out.println("MAX SCORE: " + maxScore + ", FINAL CHOICE: " + bestMove);
         return bestMove;
     }
 }

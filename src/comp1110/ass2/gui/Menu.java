@@ -171,7 +171,6 @@ public class Menu extends Application {
         // Open game board and pass player states
         startGame.setOnAction(event -> {
             new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty);
-            resetPlayerButtons();
         });
 
         // Close program
@@ -292,16 +291,9 @@ public class Menu extends Application {
         root.getChildren().add(gridPane);
     }
 
-    private void resetPlayerButtons() {
-        // Reset both players to human
-        greenPlayer = Player.Human;
-        greenBtn.setText(greenPlayer.toString());
-        redPlayer = Player.Human;
-        redBtn.setText(greenPlayer.toString());
-    }
-
     @Override
     public void start(Stage primaryStage) {
+        System.out.println("StratoGame initiated.");
         this.primaryStage = primaryStage;
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/R.png")));
         primaryStage.setTitle("StratoGame - Main Menu");
@@ -323,7 +315,6 @@ public class Menu extends Application {
         controlButtons();
         imagePanel();
 
-        System.out.println("width: " + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
         root.requestFocus();
     }
 

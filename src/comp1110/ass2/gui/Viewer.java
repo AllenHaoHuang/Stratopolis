@@ -271,7 +271,5 @@ public class Viewer extends Stage {
         defaultGrid();
         makeControls();
         primaryStage.show();
-
-        System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
     }
 }
