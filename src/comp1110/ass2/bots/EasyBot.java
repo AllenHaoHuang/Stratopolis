@@ -36,7 +36,7 @@ public class EasyBot extends Bot {
         for (Tile tile : possibleMoves) {
             BoardState gameCopy = new BoardState(game);
             gameCopy.addTile(tile);
-            int tileScore = gameCopy.getScore(myPlayer == Colour.Green);
+            int tileScore = gameCopy.getScore(myPlayer);
             if (tileScore > maxScore) {
                 bestMove = tile;
                 maxScore = tileScore;

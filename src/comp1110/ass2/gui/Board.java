@@ -45,6 +45,7 @@ class Board extends Stage {
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
+    private Stage parentStage;
     private final Stage primaryStage = new Stage();
     private final Group root = new Group();
     private final Group greenCurrentTile = new Group();
@@ -73,24 +74,32 @@ class Board extends Stage {
         greyPanelTop.setTranslateX(X_OFFSET);
         root.getChildren().addAll(greenPanel, redPanel, greyPanelTop);
         // Place labels to identify players
-        Label greenPlayer = new Label("Player Green");
-        Label redPlayer = new Label("Player Red");
+        Label greenPlayer = (greenState.isHuman()) ? new Label("Player Green")
+                : new Label(greenState.toString());
         greenPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
-        redPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
-        greenPlayer.setTranslateX(13);
+        greenPlayer.setPrefWidth(X_OFFSET);
+        greenPlayer.setAlignment(Pos.CENTER);
         greenPlayer.setTranslateY(10);
-        redPlayer.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE + 14);
+        Label redPlayer = (redState.isHuman()) ? new Label("Player Green")
+                : new Label(redState.toString());
+        redPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
+        redPlayer.setPrefWidth(X_OFFSET);
+        redPlayer.setAlignment(Pos.CENTER);
+        redPlayer.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
         redPlayer.setTranslateY(10);
         // Change position of pieces left
         greenPiecesLeft.setFont(Font.font(16));
-        redPiecesLeft.setFont(Font.font(16));
-        greenPiecesLeft.setTranslateX(13);
+        greenPiecesLeft.setPrefWidth(X_OFFSET);
+        greenPiecesLeft.setAlignment(Pos.CENTER);
         greenPiecesLeft.setTranslateY(180);
-        redPiecesLeft.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE + 10);
+        redPiecesLeft.setFont(Font.font(16));
+        redPiecesLeft.setPrefWidth(X_OFFSET);
+        redPiecesLeft.setAlignment(Pos.CENTER);
+        redPiecesLeft.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
         redPiecesLeft.setTranslateY(180);
         // Add labels for pieces left and whose turn it is
         playerTurn.setFont(Font.font("System", FontWeight.BOLD, 18));
-        playerTurn.setPrefWidth(676);
+        playerTurn.setPrefWidth(BOARD_WIDTH - 2 * X_OFFSET);
         playerTurn.setTranslateX(X_OFFSET);
         playerTurn.setTranslateY(10);
         playerTurn.setAlignment(Pos.CENTER);
@@ -170,18 +179,18 @@ class Board extends Stage {
             root.getChildren().remove(greenCurrentTile);
             greenCurrentTile.getChildren().clear();
             // Set up position of cells on screen
-            zero.setTranslateX(40); zero.setTranslateY(50);
-            one.setTranslateX(64); one.setTranslateY(50);
-            two.setTranslateX(40); two.setTranslateY(74);
+            zero.setTranslateX(41); zero.setTranslateY(50);
+            one.setTranslateX(zero.getTranslateX() + CELL_SIZE); one.setTranslateY(50);
+            two.setTranslateX(41); two.setTranslateY(zero.getTranslateY() + CELL_SIZE);
             greenCurrentTile.getChildren().addAll(zero, one, two);
             root.getChildren().add(greenCurrentTile);
         } else {
             root.getChildren().remove(redCurrentTile);
             redCurrentTile.getChildren().clear();
             // Set up position of cells on screen
-            zero.setTranslateX(BOARD_WIDTH - 90); zero.setTranslateY(50);
+            zero.setTranslateX(X_OFFSET + GRID_SIZE * CELL_SIZE + 41); zero.setTranslateY(50);
             one.setTranslateX(zero.getTranslateX() + CELL_SIZE); one.setTranslateY(50);
-            two.setTranslateX(zero.getTranslateX()); two.setTranslateY(74);
+            two.setTranslateX(zero.getTranslateX()); two.setTranslateY(zero.getTranslateY() + CELL_SIZE);
             redCurrentTile.getChildren().addAll(zero, one, two);
             root.getChildren().add(redCurrentTile);
         }
@@ -198,9 +207,9 @@ class Board extends Stage {
             root.getChildren().remove(greenNextTile);
             greenNextTile.getChildren().clear();
             // Set up position of cells on screen
-            zero.setTranslateX(40); zero.setTranslateY(115);
-            one.setTranslateX(64); one.setTranslateY(115);
-            two.setTranslateX(40); two.setTranslateY(139);
+            zero.setTranslateX(41); zero.setTranslateY(115);
+            one.setTranslateX(zero.getTranslateX() + CELL_SIZE); one.setTranslateY(115);
+            two.setTranslateX(41); two.setTranslateY(zero.getTranslateY() + CELL_SIZE);
             greenNextTile.getChildren().addAll(zero, one, two);
             greenNextTile.setOpacity(0.55);
             root.getChildren().add(greenNextTile);
@@ -208,9 +217,9 @@ class Board extends Stage {
             root.getChildren().remove(redNextTile);
             redNextTile.getChildren().clear();
             // Set up position of cells on screen
-            zero.setTranslateX(BOARD_WIDTH - 90); zero.setTranslateY(115);
+            zero.setTranslateX(X_OFFSET + GRID_SIZE * CELL_SIZE + 41); zero.setTranslateY(115);
             one.setTranslateX(zero.getTranslateX() + CELL_SIZE); one.setTranslateY(115);
-            two.setTranslateX(zero.getTranslateX()); two.setTranslateY(139);
+            two.setTranslateX(zero.getTranslateX()); two.setTranslateY(zero.getTranslateY() + CELL_SIZE);
             redNextTile.getChildren().addAll(zero, one, two);
             redNextTile.setOpacity(0.55);
             root.getChildren().add(redNextTile);
@@ -262,7 +271,7 @@ class Board extends Stage {
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                     "Do you really want to exit?", ButtonType.NO, ButtonType.YES);
             Optional<ButtonType> response = confirm.showAndWait();
-            if (response.isPresent() && ButtonType.YES.equals(response.get())) Platform.exit();
+            if (response.isPresent() && ButtonType.YES.equals(response.get())) System.exit(0);
         });
 
         VBox vBox = new VBox();
@@ -534,22 +543,18 @@ class Board extends Stage {
             return;
         }
 
-        // Temporary workaround to prevent unavoidable exceptions
-        try {
-            if (!boardState.isGreenTurn() && redState == Player.EasyBot) {
-                EasyBot bot = new EasyBot(boardState, false);
-                addTile(bot.getMove());
-            } else if (!boardState.isGreenTurn() && redState == Player.HardBot) {
-                HardBot bot = new HardBot(boardState, false, redDifficulty);
-                addTile(bot.getMove());
-            }
-        } catch (Exception e) {
-            return;
+        if (!boardState.isGreenTurn() && redState == Player.EasyBot) {
+            EasyBot bot = new EasyBot(boardState, false);
+            addTile(bot.getMove());
+        } else if (!boardState.isGreenTurn() && redState == Player.HardBot) {
+            HardBot bot = new HardBot(boardState, false, redDifficulty);
+            addTile(bot.getMove());
         }
     }
 
     Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty) {
         // Set player states
+        this.parentStage = parentStage;
         this.greenState = greenState;
         this.redState = redState;
         this.greenDifficulty = (int)(greenDifficulty);
@@ -572,8 +577,10 @@ class Board extends Stage {
 
         newGrid();
         setupGame();
+        disableGrid();
+        botPlay();
 
-        primaryStage.show();
+        primaryStage.showAndWait();
 
         primaryStage.setOnCloseRequest(event -> {
             if (!redState.isHuman() && !greenState.isHuman() && !boardState.isFinished()) {
@@ -589,8 +596,5 @@ class Board extends Stage {
                 primaryStage.close();
             }
         });
-
-        disableGrid();
-        botPlay();
     }
 }

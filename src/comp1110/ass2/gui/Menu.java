@@ -88,7 +88,9 @@ public class Menu extends Application {
         viewBtn.setLayoutX(primaryStage.getWidth() - 100);
         viewBtn.setOnAction(event -> {
             // Only allow one instance of Viewer
+            root.setDisable(true);
             new Viewer(primaryStage);
+            root.setDisable(false);
         });
 
         root.getChildren().addAll(howToPlay, help, viewBtn);
@@ -170,8 +172,10 @@ public class Menu extends Application {
 
         // Open game board and pass player states
         startGame.setOnAction(event -> {
+            root.setDisable(true);
             new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty);
             System.out.println("Board opened! " + greenPlayer + " vs. " + redPlayer);
+            root.setDisable(false);
         });
 
         // Close program
@@ -205,14 +209,14 @@ public class Menu extends Application {
             Rectangle white = new Rectangle(1, 1);
             white.setFill(Color.web("#FFFFFF"));
 
-            Slider greenSlider = new Slider(1, 5, greenDifficulty);
+            Slider greenSlider = new Slider(1, 3, greenDifficulty);
             greenSlider.setId("slider");
             greenSlider.setShowTickLabels(true);
             greenSlider.setShowTickMarks(true);
             greenSlider.setSnapToTicks(true);
             greenSlider.setPrefWidth(primaryStage.getWidth() - 160);
 
-            Slider redSlider = new Slider(1, 5, redDifficulty);
+            Slider redSlider = new Slider(1, 3, redDifficulty);
             redSlider.setId("slider");
             redSlider.setShowTickLabels(true);
             redSlider.setShowTickMarks(true);
@@ -222,7 +226,7 @@ public class Menu extends Application {
             vBox.getChildren().addAll(greenLabel, greenSlider, white, redLabel, redSlider);
             vBox.requestFocus();
 
-            Label instructions = new Label("1 = Easiest\n5 = Hardest");
+            Label instructions = new Label("1 = Easiest\n3 = Hardest");
             instructions.setTranslateX(-10);
             instructions.setFont(Font.font(16));
             instructions.setTextFill(Color.web("#3E50B5"));

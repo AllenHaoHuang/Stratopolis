@@ -9,8 +9,8 @@ import java.util.LinkedList;
  */
 
 /* We want to limit the access of this class to only this package */
-public abstract class Bot {
-
+abstract class Bot {
+    // For each bot we store the game state and which player the bot is
     BoardState game;
     Colour myPlayer;
 
@@ -39,9 +39,4 @@ public abstract class Bot {
 
     // To be implemented by any class that extends
     public abstract Tile getMove();
-
-    // Opponent placed a tile, add it to the bot's BoardState
-    public void addTile(Tile tile) {
-        game.addTile(tile);
-    }
 }
