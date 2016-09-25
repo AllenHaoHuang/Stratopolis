@@ -173,8 +173,8 @@ public class Menu extends Application {
         // Open game board and pass player states
         startGame.setOnAction(event -> {
             root.setDisable(true);
-            new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty);
             System.out.println("Board opened! " + greenPlayer + " vs. " + redPlayer);
+            new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty);
             root.setDisable(false);
         });
 
@@ -185,7 +185,7 @@ public class Menu extends Application {
                     "Do you really want to exit StratoGame?", ButtonType.NO, ButtonType.YES);
             // Check response and take action accordingly
             Optional<ButtonType> response = confirm.showAndWait();
-            if (response.isPresent() && ButtonType.YES.equals(response.get())) Platform.exit();
+            if (response.isPresent() && ButtonType.YES.equals(response.get())) System.exit(0);
         });
         // Show help message
         options.setOnAction(event -> {
