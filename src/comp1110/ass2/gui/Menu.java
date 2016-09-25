@@ -171,6 +171,7 @@ public class Menu extends Application {
         // Open game board and pass player states
         startGame.setOnAction(event -> {
             new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty);
+            System.out.println("Board opened! " + greenPlayer + " vs. " + redPlayer);
         });
 
         // Close program
@@ -226,32 +227,40 @@ public class Menu extends Application {
             instructions.setFont(Font.font(16));
             instructions.setTextFill(Color.web("#3E50B5"));
 
-            Button save = new Button("Save");
-            save.setId("control-btn");
+            Button close = new Button("Close");
+            close.setId("control-btn");
 
-            Button exitOptions = new Button("Back to Menu");
-            exitOptions.setId("control-btn");
+            Button save = new Button("Save and Exit");
+            save.setId("control-btn");
 
             HBox controls = new HBox();
             controls.setSpacing(20);
             controls.setPrefWidth(primaryStage.getWidth());
             controls.setAlignment(Pos.CENTER);
-            controls.getChildren().addAll(instructions, save, exitOptions);
+            controls.getChildren().addAll(instructions, close, save);
             controls.setTranslateY(350);
 
             root.getChildren().addAll(vBox, controls);
 
             // Save value
             save.setOnAction(saveEvent -> {
-                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) return;
-                redDifficulty = redSlider.getValue();
-                greenDifficulty = greenSlider.getValue();
-                Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
-                success.showAndWait();
+                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) {
+                    root.getChildren().removeAll(vBox, controls);
+                    hb.setVisible(true);
+                    middleComponents.setVisible(true);
+                } else {
+                    redDifficulty = redSlider.getValue();
+                    greenDifficulty = greenSlider.getValue();
+                    Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
+                    success.showAndWait();
+                    root.getChildren().removeAll(vBox, controls);
+                    hb.setVisible(true);
+                    middleComponents.setVisible(true);
+                }
             });
 
             // Close options menu, check if user has saved first
-            exitOptions.setOnAction(exitEvent -> {
+            close.setOnAction(exitEvent -> {
                 if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);

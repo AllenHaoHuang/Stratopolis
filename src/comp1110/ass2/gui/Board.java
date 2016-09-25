@@ -7,8 +7,11 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -19,10 +22,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Board extends Stage {
+class Board extends Stage {
     /* Constants */
     private static final int BOARD_WIDTH = 933;
     private static final int BOARD_HEIGHT = 720;
@@ -41,6 +45,7 @@ public class Board extends Stage {
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
+    private final Stage primaryStage = new Stage();
     private final Group root = new Group();
     private final Group greenCurrentTile = new Group();
     private final Group greenNextTile = new Group();
@@ -51,7 +56,6 @@ public class Board extends Stage {
     private Label greenPiecesLeft = new Label();
     private Label redPiecesLeft = new Label();
     private Label playerTurn = new Label();
-
 
     /* Prepare everything accordingly for play */
     private void setupGame() {
@@ -215,7 +219,7 @@ public class Board extends Stage {
 
     private void endGame() {
         // Game state to terminal
-        System.out.println("Placement String: " + boardState.getPlacementString());
+        System.out.println("\nPlacement String: " + boardState.getPlacementString());
         // Update label text and disable grid
         disableGrid();
 
@@ -226,31 +230,57 @@ public class Board extends Stage {
         playerTurn.setTextFill(Color.DEEPPINK);
         playerTurn.setText("Game finished.");
 
-        Alert test = new Alert(Alert.AlertType.INFORMATION);
         if (greenScore > redScore) {
+            playerTurn.setText("Player Green wins! Green = " + greenScore + ", Red = " + redScore);
             System.out.println("Player Green wins! Green = " + greenScore + ", Red = " + redScore);
-            test.setTitle("Player Green wins!");
-            test.setHeaderText("Player Green wins!");
-            test.setContentText("Player Green wins with a score of "
-                    + greenScore + ", while Player Red scored " + redScore);
-            test.showAndWait();
         } else if (redScore > greenScore) {
-            System.out.println("Player Red Wins! Green = " + greenScore + ", Red = " + redScore);
-            test.setTitle("Player Red wins!");
-            test.setHeaderText("Player Red wins!");
-            test.setContentText("Player Red wins with a score of "
-                    + redScore + ", while Player Green scored " + greenScore);
-            test.showAndWait();
+            playerTurn.setText("Player Red wins! Green = " + greenScore + ", Red = " + redScore);
+            System.out.println("Player Red wins! Green = " + greenScore + ", Red = " + redScore);
         } else {
+            playerTurn.setText("Tie! Green = " + greenScore + ", Red = " + redScore);
             System.out.println("Tie! Green = " + greenScore + ", Red = " + redScore);
-            test.setTitle("Tie!");
-            test.setHeaderText("Both players tie!");
-            test.setContentText("Player Green and Red tie at " +
-                    greenScore + " points each");
-            test.showAndWait();
         }
 
         /* Controls to set up new game if necessary */
+        Button playAgain = new Button("Play\nAgain");
+        playAgain.setId("control-btn");
+        playAgain.setPrefWidth(100);
+        playAgain.setOnAction(event -> {
+            resetGame();
+            System.out.println("\nNew game! " + greenState + " vs. " + redState);
+        });
+        Button menu = new Button("Menu");
+        menu.setId("control-btn");
+        menu.setPrefWidth(100);
+        menu.setOnAction(event -> {
+            primaryStage.close();
+        });
+        Button exit = new Button("Exit");
+        exit.setId("control-btn");
+        exit.setPrefWidth(100);
+        exit.setOnAction(event -> {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Do you really want to exit?", ButtonType.NO, ButtonType.YES);
+            Optional<ButtonType> response = confirm.showAndWait();
+            if (response.isPresent() && ButtonType.YES.equals(response.get())) Platform.exit();
+        });
+
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(playAgain, menu, exit);
+        vBox.setTranslateX((X_OFFSET - 100) / 2);
+        vBox.setTranslateY(BOARD_HEIGHT - 200);
+        vBox.setSpacing(20);
+
+        root.getChildren().addAll(vBox);
+        root.requestFocus();
+    }
+
+    private void resetGame() {
+        boardState = new BoardState();
+        newGrid();
+        setupGame();
+        disableGrid();
+        botPlay();
     }
 
     // We create the default grid
@@ -369,7 +399,6 @@ public class Board extends Stage {
 
         // Add cells onto the board based on the tile orientation
         handleOrientation(tile);
-        System.out.println("======== SUCCESS ========\n");
 
         previewTiles(!boardState.isGreenTurn());
         botPlay();
@@ -474,6 +503,7 @@ public class Board extends Stage {
             endGame();
             return;
         } else {
+            playerTurn.setText(playerTurn.getText() + ". Bot thinking...");
             disableGrid();
         }
         Timer timer = new Timer();
@@ -526,7 +556,6 @@ public class Board extends Stage {
         this.redDifficulty = (int)(redDifficulty);
 
         // Prepare and show stage
-        Stage primaryStage = new Stage();
         primaryStage.setTitle("StratoGame");
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/G.png")));
         primaryStage.setResizable(false);
@@ -537,15 +566,28 @@ public class Board extends Stage {
         primaryStage.initModality(Modality.WINDOW_MODAL);
         primaryStage.initOwner(parentStage);
 
+        // Add CSS Stylesheet for buttons
+        String style = getClass().getResource("assets/theme.css").toExternalForm();
+        scene.getStylesheets().add(style);
+
         newGrid();
         setupGame();
 
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(event -> {
-            if (boardState.getRedShapes().isEmpty())
-                new Alert(Alert.AlertType.ERROR, "Game in progress");
-            primaryStage.close();
+            if (!redState.isHuman() && !greenState.isHuman() && !boardState.isFinished()) {
+                new Alert(Alert.AlertType.ERROR, "Bot vs Bot game in progress."
+                            + " Please wait until the game is finished.").showAndWait();
+                event.consume();
+            } else if (!boardState.isFinished()){
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Game in progress. Do you really want to close?", ButtonType.NO, ButtonType.YES);
+                Optional<ButtonType> response = confirm.showAndWait();
+                if (response.isPresent() && ButtonType.NO.equals(response.get())) event.consume();
+            } else {
+                primaryStage.close();
+            }
         });
 
         disableGrid();

@@ -5,6 +5,7 @@ import comp1110.ass2.logic.Tile;
 import comp1110.ass2.logic.BoardState;
 
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  Created by William Shen on 15/08/16
@@ -20,29 +21,27 @@ public class HardBot extends Bot {
     }
 
     public Tile getMove() {
+        // Elapsed time calculator from http://memorynotfound.com/calculating-elapsed-time-java/
+        long startTime = System.nanoTime();
+
         // Score the different tile placements - messages for debugging
         Shape shape;
         if (myPlayer.isGreen()) {
             shape = game.getGreenShapes().getFirst();
-            System.out.println("===== MINIMAX: Green Bot, Depth: " + lookahead + " =====");
+            System.out.print("\nAlphaBeta Green Bot, Depth: " + lookahead);
         } else {
             shape = game.getRedShapes().getFirst();
-            System.out.println("===== MINIMAX: Red Bot, Depth: " + lookahead + " =====");
+            System.out.print("\nAlphaBeta Red Bot, Depth: " + lookahead);
         }
-
         LinkedList<Tile> possibleMoves = game.generatePossibleMoves(shape);
         Tile bestMove = possibleMoves.getFirst();
-        int maxScore = 0;
-
-        System.out.print("Thinking");
+        int maxScore = -9999;
 
         for (Tile tile : possibleMoves) {
             BoardState node = new BoardState(game);
             node.addTile(tile);
 
-            int tileScore = MiniMax.start(node, lookahead - 1, this.myPlayer, true);
-
-            System.out.print(".");
+            int tileScore = AlphaBeta.start(node, lookahead - 1, this.myPlayer, true, -9999, 9999);
 
             if (tileScore > maxScore) {
                 bestMove = tile;
@@ -50,7 +49,10 @@ public class HardBot extends Bot {
             }
         }
 
-        System.out.println("\nMAX SCORE: " + maxScore + ", FINAL CHOICE: " + bestMove);
+        long timeElapsed = System.nanoTime() - startTime;
+
+        System.out.println("\nTIME ELAPSED: " + TimeUnit.NANOSECONDS.toMillis(timeElapsed)
+                + "ms, MAX SCORE: " + maxScore + ", FINAL CHOICE: " + bestMove);
         return bestMove;
     }
 

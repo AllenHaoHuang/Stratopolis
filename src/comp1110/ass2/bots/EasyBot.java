@@ -21,8 +21,8 @@ public class EasyBot extends Bot {
     @Override
     public Tile getMove() {
         // Setting up console message
-        if (myPlayer == Colour.Green) System.out.println("===== EASY GREEN BOT ===== ");
-        else System.out.println("===== EASY RED BOT ===== ");
+        if (myPlayer == Colour.Green) System.out.print("\nEasy Green Bot, ");
+        else System.out.print("\nEasy Red Bot, ");
 
         // Get the shape the bot will be playing
         Shape shape = (myPlayer == Colour.Green) ? game.getGreenShapes().getFirst()

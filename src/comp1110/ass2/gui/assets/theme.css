@@ -84,8 +84,9 @@
 }
 
 #control-btn {
+    -fx-text-alignment: center;
     -fx-border-color: darkgrey;
-    -fx-background-color: "#E9E9ED";
+    -fx-background-color: #E9E9ED;
     -fx-font-size: 18px;
     -fx-background-radius: 3px;
 }
