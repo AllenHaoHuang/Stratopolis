@@ -48,8 +48,9 @@ class Board extends Stage {
     private Player redState;
     private int greenDifficulty;
     private int redDifficulty;
-    private int greenHintCount = 5;
-    private int redHintCount = 5;
+    private int hintCount;
+    private int greenHintCount;
+    private int redHintCount;
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
@@ -68,6 +69,8 @@ class Board extends Stage {
 
     private Button greenHint = new Button();
     private Button redHint = new Button();
+    private Label greenHintLbl;
+    private Label redHintLbl;
 
     /* Prepare everything accordingly for play */
     private void setupGame() {
@@ -116,8 +119,8 @@ class Board extends Stage {
         playerTurn.setAlignment(Pos.CENTER);
         root.getChildren().addAll(greenPlayer, redPlayer, greenPiecesLeft, redPiecesLeft, playerTurn);
         // Hint button
-        if (greenState.isHuman()) {
-            Label greenHintLbl = new Label("Hints Left: " + greenHintCount);
+        if (greenState.isHuman() && greenHintCount != 0) {
+            greenHintLbl = new Label("Hints Left: " + greenHintCount);
             greenHintLbl.setPrefWidth(X_OFFSET);
             greenHintLbl.setAlignment(Pos.CENTER);
             greenHintLbl.setFont(Font.font(16));
@@ -140,8 +143,8 @@ class Board extends Stage {
                 greenHintLbl.setText("Hints Left: " + --greenHintCount);
             });
         }
-        if (redState.isHuman()) {
-            Label redHintLbl = new Label("Hints Left: " + redHintCount);
+        if (redState.isHuman() && redHintCount != 0) {
+            redHintLbl = new Label("Hints Left: " + redHintCount);
             redHintLbl.setPrefWidth(X_OFFSET);
             redHintLbl.setAlignment(Pos.CENTER);
             redHintLbl.setFont(Font.font(16));
@@ -194,12 +197,14 @@ class Board extends Stage {
             playerTurn.setTextFill(Color.RED);
             playerTurn.setText("Red Player's Turn");
             if (redHintCount != 0) redHint.setDisable(false);
+            greenHint.setDisable(true);
         } else {
             redPiecesLeft.setText(redShapes.size() + " piece(s) left."
                     + "\nScore = " + boardState.getScore(false));
             playerTurn.setTextFill(Color.GREEN);
             playerTurn.setText("Green Player's Turn");
             if (greenHintCount != 0) greenHint.setDisable(false);
+            redHint.setDisable(true);
         }
         
         // Check if we are approaching the end game state
@@ -294,8 +299,9 @@ class Board extends Stage {
     private void endGame() {
         // Game state to terminal
         System.out.println("\nPlacement String: " + boardState.getPlacementString());
-        // Update label text and disable grid
+        // Update label text and disable grid, remove hint controls
         disableGrid();
+        root.getChildren().removeAll(greenHint, greenHintLbl, redHint, redHintLbl);
 
         // Show who has won the game and display scores
         int greenScore = boardState.getScore(true);
@@ -349,8 +355,11 @@ class Board extends Stage {
         root.requestFocus();
     }
 
+    // Start new game
     private void resetGame() {
         boardState = new BoardState();
+        greenHintCount = hintCount;
+        redHintCount = hintCount;
         newGrid();
         setupGame();
         disableGrid();
@@ -386,6 +395,7 @@ class Board extends Stage {
             root.getChildren().get(i).setDisable(false);
     }
 
+    // Get the tile returned by the bot and show it on the screen
     private void showHint(Tile tile) {
         char x = tile.getPosition().getCharX();
         char y = tile.getPosition().getCharY();
@@ -415,6 +425,7 @@ class Board extends Stage {
         root.getChildren().add(hintTile);
     }
 
+    // Show a cell of a hint tile on the screen
     private void hintCell(char x, char y) {
         // Create new cell, change its properties and add to group
         Cell cell = new Cell();
@@ -660,12 +671,13 @@ class Board extends Stage {
         }
     }
 
-    Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty) {
+    Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty, int hintCount) {
         // Set player states and difficulty
         this.greenState = greenState;
         this.redState = redState;
         this.greenDifficulty = (int)(greenDifficulty);
         this.redDifficulty = (int)(redDifficulty);
+        this.hintCount = this.greenHintCount = this.redHintCount = hintCount;
 
         // Prepare and show stage
         primaryStage.setTitle("StratoGame");

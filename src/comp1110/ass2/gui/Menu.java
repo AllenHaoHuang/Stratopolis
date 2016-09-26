@@ -43,6 +43,7 @@ public class Menu extends Application {
 
     private double redDifficulty = 2;
     private double greenDifficulty = 2;
+    private int hintCount = 0;
 
     private void addPanels() {
         // Create panels and add to root
@@ -168,7 +169,7 @@ public class Menu extends Application {
             // Open game board and pass player states
             root.setDisable(true);
             System.out.println("Board opened! " + greenPlayer + " vs. " + redPlayer);
-            new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty);
+            new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty, hintCount);
             root.setDisable(false);
         });
 
@@ -209,9 +210,6 @@ public class Menu extends Application {
             redLabel.setFont(Font.font(20));
             redLabel.setTextFill(Color.RED);
 
-            Rectangle white = new Rectangle(1, 1);
-            white.setFill(Color.web("#FFFFFF"));
-
             Slider greenSlider = new Slider(1, 3, greenDifficulty);
             greenSlider.setId("slider");
             greenSlider.setShowTickLabels(true);
@@ -226,13 +224,18 @@ public class Menu extends Application {
             redSlider.setSnapToTicks(true);
             redSlider.setPrefWidth(primaryStage.getWidth() - 160);
 
-            // Create new VBox to store labels and buttons
-            VBox vBox = new VBox();
-            vBox.setAlignment(Pos.CENTER);
-            vBox.setSpacing(15);
-            vBox.setTranslateX(80);
-            vBox.setTranslateY(115);
-            vBox.getChildren().addAll(greenLabel, greenSlider, white, redLabel, redSlider);
+            // Selecting number of hints, use HBox
+            Label hintLabel = new Label("Number of Hints: ");
+            hintLabel.setFont(Font.font(18));
+
+            ComboBox hintCombo = new ComboBox();
+            hintCombo.getItems().addAll(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+            hintCombo.setValue(hintCount);
+
+            HBox hint = new HBox();
+            hint.setAlignment(Pos.CENTER);
+            hint.setSpacing(10);
+            hint.getChildren().addAll(hintLabel, hintCombo);
 
             // Set bottom controls and label and add to HBox
             Label instructions = new Label("1 = Easiest\n3 = Hardest");
@@ -248,23 +251,31 @@ public class Menu extends Application {
 
             HBox controls = new HBox();
             controls.setSpacing(20);
-            controls.setPrefWidth(primaryStage.getWidth());
             controls.setAlignment(Pos.CENTER);
             controls.getChildren().addAll(instructions, close, save);
-            controls.setTranslateY(350);
 
-            root.getChildren().addAll(vBox, controls);
+            // Create new VBox to store all the options
+            VBox vBox = new VBox();
+            vBox.setAlignment(Pos.CENTER);
+            vBox.setSpacing(15);
+            vBox.setTranslateX(80);
+            vBox.setTranslateY(95);
+            vBox.getChildren().addAll(greenLabel, greenSlider, redLabel, redSlider, hint, controls);
+
+            root.getChildren().addAll(vBox);
             root.requestFocus();
 
             // Save and exit button clicked, we save the value
             save.setOnAction(saveEvent -> {
-                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) {
+                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()
+                        && hintCount == (int) hintCombo.getValue()) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
                 } else {
                     redDifficulty = redSlider.getValue();
                     greenDifficulty = greenSlider.getValue();
+                    hintCount = (int) hintCombo.getValue();
                     Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
                     success.showAndWait();
                     root.getChildren().removeAll(vBox, controls);
@@ -275,7 +286,8 @@ public class Menu extends Application {
 
             // Close options menu, check if user has saved first and ask accordingly
             close.setOnAction(exitEvent -> {
-                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) {
+                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()
+                        && hintCount == (int) hintCombo.getValue()) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
@@ -286,6 +298,7 @@ public class Menu extends Application {
                     if (result.isPresent() && result.get() == ButtonType.YES) {
                         redDifficulty = redSlider.getValue();
                         greenDifficulty = greenSlider.getValue();
+                        hintCount = (int) hintCombo.getValue();
                     }
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
