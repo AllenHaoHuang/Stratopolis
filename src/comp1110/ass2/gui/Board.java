@@ -48,6 +48,8 @@ class Board extends Stage {
     private Player redState;
     private int greenDifficulty;
     private int redDifficulty;
+    private int greenHintCount = 5;
+    private int redHintCount = 5;
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
@@ -58,10 +60,14 @@ class Board extends Stage {
     private final Group redCurrentTile = new Group();
     private final Group redNextTile = new Group();
     private final Group hoverCurrentTile = new Group();
+    private final Group hintTile = new Group();
 
     private Label greenPiecesLeft = new Label();
     private Label redPiecesLeft = new Label();
     private Label playerTurn = new Label();
+
+    private Button greenHint = new Button();
+    private Button redHint = new Button();
 
     /* Prepare everything accordingly for play */
     private void setupGame() {
@@ -85,7 +91,7 @@ class Board extends Stage {
         greenPlayer.setPrefWidth(X_OFFSET);
         greenPlayer.setAlignment(Pos.CENTER);
         greenPlayer.setTranslateY(10);
-        Label redPlayer = (redState.isHuman()) ? new Label("Player Green")
+        Label redPlayer = (redState.isHuman()) ? new Label("Player Red")
                 : new Label(redState.toString());
         redPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
         redPlayer.setPrefWidth(X_OFFSET);
@@ -109,6 +115,57 @@ class Board extends Stage {
         playerTurn.setTranslateY(10);
         playerTurn.setAlignment(Pos.CENTER);
         root.getChildren().addAll(greenPlayer, redPlayer, greenPiecesLeft, redPiecesLeft, playerTurn);
+        // Hint button
+        if (greenState.isHuman()) {
+            Label greenHintLbl = new Label("Hints Left: " + greenHintCount);
+            greenHintLbl.setPrefWidth(X_OFFSET);
+            greenHintLbl.setAlignment(Pos.CENTER);
+            greenHintLbl.setFont(Font.font(16));
+            greenHintLbl.setTranslateY(BOARD_HEIGHT - 85);
+            greenHint = new Button("Hint");
+            greenHint.setId("control-btn");
+            greenHint.setPrefWidth(80);
+            greenHint.setTranslateX(27);
+            greenHint.setTranslateY(BOARD_HEIGHT - 50);
+            root.getChildren().addAll(greenHintLbl, greenHint);
+            // Show hint by using EasyMove
+            greenHint.setOnAction(event -> {
+                if (greenHintCount == 0) {
+                    greenHint.setDisable(true);
+                    return;
+                }
+                greenHint.setDisable(true);
+                EasyBot hint = new EasyBot(boardState, true);
+                showHint(hint.getMove());
+                greenHintLbl.setText("Hints Left: " + --greenHintCount);
+            });
+        }
+        if (redState.isHuman()) {
+            Label redHintLbl = new Label("Hints Left: " + redHintCount);
+            redHintLbl.setPrefWidth(X_OFFSET);
+            redHintLbl.setAlignment(Pos.CENTER);
+            redHintLbl.setFont(Font.font(16));
+            redHintLbl.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
+            redHintLbl.setTranslateY(BOARD_HEIGHT - 85);
+            redHint = new Button("Hint");
+            redHint.setDisable(true);
+            redHint.setId("control-btn");
+            redHint.setPrefWidth(80);
+            redHint.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE + 27);
+            redHint.setTranslateY(BOARD_HEIGHT - 50);
+            root.getChildren().addAll(redHintLbl, redHint);
+            // Show hint by using EasyMove
+            redHint.setOnAction(event -> {
+                if (redHintCount == 0) {
+                    redHint.setDisable(true);
+                    return;
+                }
+                redHint.setDisable(true);
+                EasyBot hint = new EasyBot(boardState, false);
+                showHint(hint.getMove());
+                redHintLbl.setText("Hints Left: " + --redHintCount);
+            });
+        }
         // Initialise the 'deck' of tiles for the players and display them
         setupPlayerTiles();
     }
@@ -116,9 +173,10 @@ class Board extends Stage {
     private void setupPlayerTiles() {
         // Create the pieces for the players
         boardState.createPlayerPieces();
-        // Show the tile previews
+        // Show the tile previews and disable red player hint button
         previewTiles(true);
         previewTiles(false);
+        redHint.setDisable(true);
         // Set player's turn
         playerTurn.setTextFill(Color.GREEN);
         playerTurn.setText("Green Player's Turn");
@@ -135,11 +193,13 @@ class Board extends Stage {
                     + "\nScore = " + boardState.getScore(true));
             playerTurn.setTextFill(Color.RED);
             playerTurn.setText("Red Player's Turn");
+            if (redHintCount != 0) redHint.setDisable(false);
         } else {
             redPiecesLeft.setText(redShapes.size() + " piece(s) left."
                     + "\nScore = " + boardState.getScore(false));
             playerTurn.setTextFill(Color.GREEN);
             playerTurn.setText("Green Player's Turn");
+            if (greenHintCount != 0) greenHint.setDisable(false);
         }
         
         // Check if we are approaching the end game state
@@ -326,6 +386,44 @@ class Board extends Stage {
             root.getChildren().get(i).setDisable(false);
     }
 
+    private void showHint(Tile tile) {
+        char x = tile.getPosition().getCharX();
+        char y = tile.getPosition().getCharY();
+        switch (tile.getOrientation()) {
+            case A :
+                hintCell(x, y);
+                hintCell((char)(x+1), y);
+                hintCell(x, (char)(y+1));
+                break;
+            case B :
+                hintCell(x, y);
+                hintCell(x, (char)(y+1));
+                hintCell((char)(x-1), y);
+                break;
+            case C :
+                hintCell(x, y);
+                hintCell((char)(x-1), y);
+                hintCell(x, (char)(y-1));
+                break;
+            case D :
+                hintCell(x, y);
+                hintCell(x, (char)(y-1));
+                hintCell((char)(x+1), y);
+                break;
+        }
+        hintTile.setMouseTransparent(true);
+        root.getChildren().add(hintTile);
+    }
+
+    private void hintCell(char x, char y) {
+        // Create new cell, change its properties and add to group
+        Cell cell = new Cell();
+        cell.setTranslateX(translateX(x));
+        cell.setTranslateY(translateY(y));
+        cell.setOpacity(0.8);
+        hintTile.getChildren().add(cell);
+    }
+
     private void hoverTile(char x, char y) {
         if (boardState.getRedShapes().isEmpty()) {
             endGame();
@@ -388,6 +486,9 @@ class Board extends Stage {
         Tile tile = new Tile(new Position(x, y), shape, hoverOrientation);
         // Add a new tile to our board if it is valid
         if (boardState.isTileValid(tile)) {
+            // Remove hint tile and add new tile to board
+            root.getChildren().remove(hintTile);
+            hintTile.getChildren().clear();
             boardState.addTile(tile);
         } else {
             // When tile placement is not valid, we show an error message
@@ -409,6 +510,8 @@ class Board extends Stage {
 
     // Add tile to board for bot, assume valid tile input
     private void addTile(Tile tile) {
+        root.getChildren().remove(hintTile);
+        hintTile.getChildren().clear();
         boardState.addTile(tile);
 
         // Add cells onto the board based on the tile orientation

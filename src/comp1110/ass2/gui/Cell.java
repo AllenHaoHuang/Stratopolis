@@ -59,6 +59,13 @@ class Cell extends StackPane {
         getChildren().add(cell);
     }
 
+    // For creating a hint tile
+    Cell() {
+        setCellStroke();
+        cell.setFill(Color.YELLOW);
+        getChildren().add(cell);
+    }
+
     // Set default cell border/stroke for a Cell
     private void setCellStroke() {
         cell.setStroke(Color.rgb(54, 54, 54));
