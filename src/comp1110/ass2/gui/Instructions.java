@@ -6,8 +6,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class Instructions extends Stage {
-
+class Instructions extends Stage {
     private static final int WIDTH = 500;
     private static final int HEIGHT = 500;
 

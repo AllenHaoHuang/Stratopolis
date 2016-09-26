@@ -1,6 +1,6 @@
 package comp1110.ass2.gui;
 
-import comp1110.ass2.bots.Player;
+import comp1110.ass2.logic.Player;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -26,6 +26,12 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * `Board` is the window in which games are played, it is
+ * initialised in Menu.
+ *
+ * @author William Shen - u6096655
+ */
 class Board extends Stage {
     /* Constants */
     private static final int BOARD_WIDTH = 933;
@@ -45,7 +51,6 @@ class Board extends Stage {
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
-    private Stage parentStage;
     private final Stage primaryStage = new Stage();
     private final Group root = new Group();
     private final Group greenCurrentTile = new Group();
@@ -302,7 +307,7 @@ class Board extends Stage {
                 // Build a new cell with the identifiers and add to root
                 char x = (char) (j + 'A');
                 char y = (char) (i + 'A');
-                addCell(x, y, Colour.NULL);
+                addCell(x, y, null);
             }
         }
         // Set the initial 'MMUA' piece
@@ -450,7 +455,7 @@ class Board extends Stage {
         // Creating a new cell
         Cell cell;
         // Handling grid identifier cells
-        if (colour == Colour.NULL) {
+        if (colour == null) {
             cell = new Cell("" + x + y);
             cell.setTranslateX((x - 'A') * CELL_SIZE + X_OFFSET);
             cell.setTranslateY((y - 'A') * CELL_SIZE + Y_OFFSET);
@@ -487,9 +492,9 @@ class Board extends Stage {
             root.getChildren().remove(hoverCurrentTile);
             hoverCurrentTile.getChildren().clear();
             if (event.getDeltaY() < 0)
-                hoverOrientation = Orientation.next(hoverOrientation);
+                hoverOrientation = hoverOrientation.next();
             else
-                hoverOrientation = Orientation.previous(hoverOrientation);
+                hoverOrientation = hoverOrientation.previous();
             hoverTile(x, y);
         });
     }
@@ -553,8 +558,7 @@ class Board extends Stage {
     }
 
     Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty) {
-        // Set player states
-        this.parentStage = parentStage;
+        // Set player states and difficulty
         this.greenState = greenState;
         this.redState = redState;
         this.greenDifficulty = (int)(greenDifficulty);
@@ -580,12 +584,10 @@ class Board extends Stage {
         disableGrid();
         botPlay();
 
-        primaryStage.showAndWait();
-
         primaryStage.setOnCloseRequest(event -> {
             if (!redState.isHuman() && !greenState.isHuman() && !boardState.isFinished()) {
                 new Alert(Alert.AlertType.ERROR, "Bot vs Bot game in progress."
-                            + " Please wait until the game is finished.").showAndWait();
+                        + " Please wait until the game is finished.").showAndWait();
                 event.consume();
             } else if (!boardState.isFinished()){
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
@@ -596,5 +598,7 @@ class Board extends Stage {
                 primaryStage.close();
             }
         });
+
+        primaryStage.showAndWait();
     }
 }

@@ -1,11 +1,13 @@
 package comp1110.ass2.logic;
 
 /**
- * Created by Allen Huang on 15/08/2016.
- * Edited by Marvin and William on 15/08/2016.
+ * `Score` allows us to score board states for the
+ * green player and red player
+ *
+ * @author Marvin Yang - u5894100
+ * @author William Shen - u6096655
  */
-
-public class Score {
+class Score {
     // Helper variables to calculate score
     private static final int GRID_SIZE = 26;
     private static Colour[][] colourArray = new Colour[GRID_SIZE][GRID_SIZE];
@@ -13,14 +15,14 @@ public class Score {
     private static int exploreHeight = 0;
     private static Colour searchColour;
 
-    public static int getScore(BoardState board, boolean isGreen) {
+    static int getScore(BoardState board, boolean isGreen) {
         // Initialise the arrays and variables
         colourArray = board.getColourArray();
         heightArray = board.getHeightArray();
 
+        // Set current maximum area and height to 0 and set the search colour
         int maxArea = 0;
         int maxHeight = 0;
-
         if (isGreen) searchColour = Colour.Green;
         else searchColour = Colour.Red;
 

@@ -1,17 +1,17 @@
 package comp1110.ass2.logic;
 
 /**
- *  Created by William Shen on 15/08/16
+ * `Orientation` is the enumeration used to identify the
+ * orientation of a tile:
+ *    - A: upright
+ *    - B: rotate 90 degrees clockwise
+ *    - C: rotated 180 degrees
+ *    - D: rotate 90 degrees anticlockwise
+ *
+ * @author William Shen - u6096655
  */
-
 public enum Orientation {
-    /** The orientation of a piece:
-     *    A: upright
-     *    B: rotate 90 degrees clockwise
-     *    C: rotated 180 degrees
-     *    D: rotate 90 degrees anticlockwise
-     */
-    A, B, C, D, NULL;
+    A, B, C, D;
 
     /* Return the Orientation enum given a character input */
     public static Orientation fromChar(char ch) {
@@ -19,8 +19,7 @@ public enum Orientation {
             case 'A': return Orientation.A;
             case 'B': return Orientation.B;
             case 'C': return Orientation.C;
-            case 'D': return Orientation.D;
-            default : return NULL;
+            default : return Orientation.D;
         }
     }
 
@@ -30,30 +29,22 @@ public enum Orientation {
             case A : return 'A';
             case B : return 'B';
             case C : return 'C';
-            case D : return 'D';
-            default : return '\0';
+            default : return 'D';
         }
     }
 
+    // For storing static enum values
+    private static Orientation[] enumValues = values();
+
     /* Return the next Orientation enum for scrolling on the board */
-    public static Orientation next(Orientation orientation) {
-        switch (orientation) {
-            case A : return B;
-            case B : return C;
-            case C : return D;
-            case D : return A;
-            default : return NULL;
-        }
+    public Orientation next() {
+        return values()[(ordinal() + 1) % enumValues.length];
     }
 
     /* Return the previous Orientation enum for scrolling on the board */
-    public static Orientation previous(Orientation orientation) {
-        switch (orientation) {
-            case A : return D;
-            case B : return A;
-            case C : return B;
-            case D : return C;
-            default : return NULL;
-        }
+    public Orientation previous() {
+        int rem = (ordinal() - 1) % enumValues.length;
+        if (rem < 0) rem += enumValues.length;
+        return values()[rem];
     }
 }

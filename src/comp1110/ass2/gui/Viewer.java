@@ -1,13 +1,8 @@
 package comp1110.ass2.gui;
 
-import comp1110.ass2.gui.Cell;
-import comp1110.ass2.gui.Menu;
 import comp1110.ass2.logic.Colour;
 import comp1110.ass2.logic.Orientation;
 import comp1110.ass2.logic.Shape;
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -17,29 +12,22 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import comp1110.ass2.StratoGame;
-import javafx.stage.StageStyle;
 
 import java.util.Arrays;
 
+
 /**
- * A very simple viewer for piece placements in the link game.
- * <p>
- * NOTE: This class is separate from your main game class.  This
- * class does not play a game, it just illustrates various piece
- * placements.
+ * `Viewer` allows us to view piece placements in StratoGame
+ * given an input string
+ *
+ * @author William Shen - u6096655
+ * @author Marvin Yang - u5894100
  */
-public class Viewer extends Stage {
+class Viewer extends Stage {
     /* board layout */
     private static final int VIEWER_WIDTH = 675;
     private static final int VIEWER_HEIGHT = 710;
@@ -50,10 +38,10 @@ public class Viewer extends Stage {
     private static final int X_OFFSET = 15;
     private static final int Y_OFFSET = 10;
 
+    // JavaFX Variables
     private final Group root = new Group();
     private final Group controls = new Group();
     private final Stage primaryStage = new Stage();
-
     private TextField textField;
 
     // Array to store heights
@@ -117,8 +105,6 @@ public class Viewer extends Stage {
                     setCell(originX, (char) (originY - 1), shapeID.colourAtIndex(1));
                     setCell((char) (originX + 1), originY, shapeID.colourAtIndex(2));
                     break;
-                case NULL:
-                    break;
             }
         }
     }
@@ -162,12 +148,9 @@ public class Viewer extends Stage {
                 heightArray[x][y]++;
                 heightArray[x][y - 1]++;
                 heightArray[x + 1][y]++;
-                return;
-            case NULL:
         }
     }
 
-    /* We get the index in the Scene `root`, of the position given */
     /* We get the index in the Scene `root`, of the position given */
     private int getIndex(char x, char y) {
         if (y - 'A' == 0) return x - 'A';

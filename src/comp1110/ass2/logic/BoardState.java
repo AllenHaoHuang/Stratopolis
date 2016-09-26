@@ -5,6 +5,15 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 
+/**
+ * `BoardState` allows us initiate objects that
+ * hold the entire board state. We can add tiles,
+ * check if tiles are valid, etc. to the board
+ *
+ * @author Allen Huang - u6096857
+ * @author William Shen - u6096655
+ * @author Marvin Yang - u5894100
+ */
 public class BoardState {
     // Constants
     private static final int BOARD_SIZE = 26;

@@ -1,12 +1,14 @@
 package comp1110.ass2.logic;
 
 /**
- *  Created by William Shen on 15/08/16
+ * `Colour` is the enumeration used to identify the
+ * colour of a cell, or the colour of a player
+ *
+ * @author William Shen - u6096655
  */
-
 public enum Colour {
     // The colours on our pieces
-    Red, Green, Black, NULL;
+    Red, Green, Black;
 
     public static Colour getValue(Colour colour) {
         switch (colour) {
@@ -14,19 +16,18 @@ public enum Colour {
                 return Red;
             case Green :
                 return Green;
-            case Black :
-                return Black;
             default :
-                return NULL;
+                return Black;
         }
     }
+
     public Colour nextPlayer() {
         if (this == Red)
             return Green;
         else if (this == Green)
             return Red;
         else
-            return NULL;
+            return Black;
     }
 
     public boolean isGreen() {
