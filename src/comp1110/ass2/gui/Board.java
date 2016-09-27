@@ -1,7 +1,9 @@
 package comp1110.ass2.gui;
 
 import comp1110.ass2.logic.Player;
+import comp1110.ass2.logic.Shape;
 import javafx.application.Platform;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -11,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -20,7 +23,9 @@ import comp1110.ass2.logic.*;
 import comp1110.ass2.bots.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Timer;
@@ -644,7 +649,6 @@ class Board extends Stage {
                         actualPlay();
                     }
                 });
-
             }
         }, 100);
     }
@@ -693,6 +697,34 @@ class Board extends Stage {
         // Add CSS Stylesheet for buttons
         String style = getClass().getResource("assets/theme.css").toExternalForm();
         scene.getStylesheets().add(style);
+
+        /* Rotate tiles if UP or DOWN arrow key is pressed - this isn't the best code */
+        scene.setOnKeyPressed(event -> {
+            // Consume and return if bot is thinking and key press
+            if (boardState.isGreenTurn() && !greenState.isHuman()
+                    || !boardState.isGreenTurn() && !redState.isHuman()) {
+                event.consume();
+                return;
+            }
+            // Get which grid (x, y) the mouse pointer is currently at
+            Point p = MouseInfo.getPointerInfo().getLocation();
+            Point2D local = root.screenToLocal(p.getX(), p.getY());
+            char x = (char)((local.getX() - X_OFFSET)/CELL_SIZE + 'A');
+            char y = (char)((local.getY() - Y_OFFSET)/CELL_SIZE + 'A');
+
+            // Rotate clockwise for down key and anticlockwise for up key
+            if (event.getCode() == KeyCode.UP) {
+                root.getChildren().remove(hoverCurrentTile);
+                hoverCurrentTile.getChildren().clear();
+                hoverOrientation = hoverOrientation.previous();
+                hoverTile(x, y);
+            } else if (event.getCode() == KeyCode.DOWN) {
+                root.getChildren().remove(hoverCurrentTile);
+                hoverCurrentTile.getChildren().clear();
+                hoverOrientation = hoverOrientation.next();
+                hoverTile(x, y);
+            }
+        });
 
         newGrid();
         setupGame();

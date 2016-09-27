@@ -44,6 +44,7 @@ public class Menu extends Application {
     private double redDifficulty = 2;
     private double greenDifficulty = 2;
     private int hintCount = 0;
+    private boolean musicOn = false;
 
     private void addPanels() {
         // Create panels and add to root
@@ -230,10 +231,16 @@ public class Menu extends Application {
             hintCombo.getItems().addAll(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
             hintCombo.setValue(hintCount);
 
-            HBox hint = new HBox();
-            hint.setAlignment(Pos.CENTER);
-            hint.setSpacing(10);
-            hint.getChildren().addAll(hintLabel, hintCombo);
+            Label musicLabel = new Label("   Music: ");
+            musicLabel.setFont(Font.font(18));
+
+            CheckBox musicCheck = new CheckBox();
+            musicCheck.setSelected(musicOn);
+
+            HBox prev = new HBox();
+            prev.setAlignment(Pos.CENTER);
+            prev.setSpacing(10);
+            prev.getChildren().addAll(hintLabel, hintCombo, musicLabel, musicCheck);
 
             // Set bottom controls and label and add to HBox
             Label instructions = new Label("1 = Easiest\n3 = Hardest");
@@ -258,7 +265,7 @@ public class Menu extends Application {
             vBox.setSpacing(15);
             vBox.setTranslateX(80);
             vBox.setTranslateY(95);
-            vBox.getChildren().addAll(greenLabel, greenSlider, redLabel, redSlider, hint, controls);
+            vBox.getChildren().addAll(greenLabel, greenSlider, redLabel, redSlider, prev, controls);
 
             root.getChildren().addAll(vBox);
             root.requestFocus();
@@ -266,7 +273,7 @@ public class Menu extends Application {
             // Save and exit button clicked, we save the value
             save.setOnAction(saveEvent -> {
                 if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()
-                        && hintCount == (int) hintCombo.getValue()) {
+                        && hintCount == (int) hintCombo.getValue() && musicOn == musicCheck.isSelected()    ) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
@@ -274,6 +281,7 @@ public class Menu extends Application {
                     redDifficulty = redSlider.getValue();
                     greenDifficulty = greenSlider.getValue();
                     hintCount = (int) hintCombo.getValue();
+                    musicOn = musicCheck.isSelected();
                     Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
                     success.showAndWait();
                     root.getChildren().removeAll(vBox, controls);
@@ -297,6 +305,7 @@ public class Menu extends Application {
                         redDifficulty = redSlider.getValue();
                         greenDifficulty = greenSlider.getValue();
                         hintCount = (int) hintCombo.getValue();
+                        musicOn = musicCheck.isSelected();
                     }
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
