@@ -56,12 +56,12 @@ public class Menu extends Application {
     }
 
     private void topButtons() {
-        Button howToPlay = new Button("H");
+        Button howToPlay = new Button("I");
         howToPlay.setId("round-btn-blue");
         howToPlay.setTooltip(new Tooltip("How to Play StratoGame"));
         howToPlay.setLayoutX(primaryStage.getWidth() - 200);
         howToPlay.setOnAction(event -> {
-            new Alert(Alert.AlertType.ERROR, "Under Construction.").showAndWait();
+            new Instructions(primaryStage);
             /* Open form with instructions on how to play
             new Instructions(primaryStage); */
         });
