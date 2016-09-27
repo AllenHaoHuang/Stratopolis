@@ -6,9 +6,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by allen on 18/09/2016.
- */
 public class OrientationTest {
     @Test
     public void fromChar() throws Exception {
@@ -33,8 +30,6 @@ public class OrientationTest {
         for (int i = 0; i < Orientation.values().length; i++) {
             orientationArr[i] = (char)(i+'A');
         }
-        // Set up last value for NULL enum type
-        orientationArr[Orientation.values().length-1] = '\0';
         // Check toChar works properly
         int j = 0;
         for (Orientation orientation : Orientation.values()) {
@@ -46,9 +41,17 @@ public class OrientationTest {
 
     @Test
     public void next() throws Exception {
-        assertTrue("Expected B for next orientation after A", Orientation.next(Orientation.A) == Orientation.B);
-        assertTrue("Expected C for next orientation after B", Orientation.next(Orientation.B) == Orientation.C);
-        assertTrue("Expected D for next orientation after C", Orientation.next(Orientation.C) == Orientation.D);
-        assertTrue("Expected A for next orientation after D", Orientation.next(Orientation.D) == Orientation.A);
+        assertTrue("Expected B for next orientation after A", Orientation.A.next() == Orientation.B);
+        assertTrue("Expected C for next orientation after B", Orientation.B.next() == Orientation.C);
+        assertTrue("Expected D for next orientation after C", Orientation.C.next() == Orientation.D);
+        assertTrue("Expected A for next orientation after D", Orientation.D.next() == Orientation.A);
+    }
+
+    @Test
+    public void previous() throws Exception {
+        assertEquals(Orientation.D, Orientation.A.previous());
+        assertEquals(Orientation.A, Orientation.B.previous());
+        assertEquals(Orientation.B, Orientation.C.previous());
+        assertEquals(Orientation.C, Orientation.D.previous());
     }
 }

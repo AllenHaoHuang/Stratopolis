@@ -1,9 +1,11 @@
 We declare that the work we have submitted for Stage F of this assignment and all stages before it is entirely our own work, with the following documented exceptions:
 
-* The idea of using <...> to make the game run faster came from a discussion with <...> (noted in source code comments)
+* Enumeration next from http://stackoverflow.com/questions/17006239/whats-the-best-way-to-implement-next-and-previous-on-an-enum-type
 
-* The code in class <...> is based on a solution we found when researching the problem (URL provided in source code comments)
+* Button CSS in themes.css from http://docs.oracle.com/javafx/2/get_started/css.htm
 
-* ....
+* Calculating elapsed time for HardBot: http://memorynotfound.com/calculating-elapsed-time-java/
 
-Signed: Mary Jones (u2345678), Bob Smith (u3456789), and Sue Black (u0123456)
+* Alpha-Beta Pruning based off pseudocode here: https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
+
+Signed: William Shen (u6096655), Allen Huang (u6096857), and Marvin Yang (u5894100)

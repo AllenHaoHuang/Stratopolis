@@ -1,9 +1,12 @@
 package comp1110.ass2.logic;
 
 /**
- *  Created by William Shen on 15/08/16
+ * `Tile` is the class we use to represent a tile
+ * i.e. a Shapes position and orientation on the board
+ *
+ * @author William Shen - u6096655
+ * @author Allen Huang - u6096857
  */
-
 public class Tile {
     private Position position;
     private Shape shape;
@@ -18,9 +21,9 @@ public class Tile {
     }
 
     // Returns the fields of a Tile object
-    public Position getPosition() {return position;}
-    public Shape getShape() {return shape;}
-    public Orientation getOrientation() {return orientation;}
+    public Position getPosition() { return position; }
+    public Shape getShape() { return shape; }
+    public Orientation getOrientation() { return orientation; }
 
     /**
      *  Return the position of a specific cell of a Tile on the board.
@@ -28,7 +31,7 @@ public class Tile {
      *     [0]  [1]
      *     [2]
      */
-    public Position positionAtIndex(int index) {
+    private Position positionAtIndex(int index) {
         // Return the position of the origin cell if zero index is requested
         if (index == 0) return position;
 
@@ -57,12 +60,12 @@ public class Tile {
     }
 
     // Get the x-coordinate at a specific index of a tile
-    public int getX(int index) {
+    int getX(int index) {
         return positionAtIndex(index).getX();
     }
 
     // Get the y-coordinate at a specific index of a tile
-    public int getY(int index) {
+    int getY(int index) {
         return positionAtIndex(index).getY();
     }
 

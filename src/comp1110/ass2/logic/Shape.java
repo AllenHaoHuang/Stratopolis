@@ -3,10 +3,7 @@ package comp1110.ass2.logic;
 import static comp1110.ass2.logic.Colour.*;
 
 /**
- * Created by William Shen on 15/08/16
- */
-
-/**
+ * 'Shape' represents each shape possibility as described on the assignment.
  * We represent a L-tile as a triple (a, b, c). We encode a piece with indexes:
  *      [a]  [b]
  *      [c]
@@ -19,6 +16,8 @@ import static comp1110.ass2.logic.Colour.*;
  *      [a]  =  RED
  *      [b]  =  GREEN
  * The initial orientation of 'U' with this configuration is 'A'
+ *
+ * @author William Shen - u6096655
  */
 
 public enum Shape {
@@ -45,9 +44,7 @@ public enum Shape {
     S(Green, Green, Red),
     T(Green, Green, Green),
     // Starting Shape: 'U'
-    U(Red, Green),
-    // Undefined Shape : NULL
-    NULL(Black, Black, Black);
+    U(Red, Green);
 
     // Array representing colours in a piece/tile
     final Colour[] colours;
@@ -95,8 +92,7 @@ public enum Shape {
             case 'R': return Shape.R;
             case 'S': return Shape.S;
             case 'T': return Shape.T;
-            case 'U': return Shape.U;
-            default : return NULL;
+            default : return Shape.U;
         }
     }
 
@@ -123,8 +119,7 @@ public enum Shape {
             case R : return 'R';
             case S : return 'S';
             case T : return 'T';
-            case U : return 'U';
-            default : return '\0';
+            default : return 'U';
         }
     }
 }

@@ -5,7 +5,10 @@ import comp1110.ass2.logic.*;
 import java.util.LinkedList;
 
 /**
- *  Created by William Shen on 15/08/16
+ * `Bot` is the abstract class and is the framework
+ * we base EasyBot and HardBot off
+ *
+ * @author William Shen - u6096655
  */
 
 /* We want to limit the access of this class to only this package */

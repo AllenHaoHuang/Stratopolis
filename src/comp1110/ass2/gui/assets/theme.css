@@ -1,4 +1,11 @@
-/* Some button styling from http://docs.oracle.com/javafx/2/get_started/css.htm */
+/**
+ * `theme.css` stores all the properties given to the relevant
+ * labels, buttons, and controls
+ *
+ * @author William Shen - u6096655
+ *
+ * Some button styling based off http://docs.oracle.com/javafx/2/get_started/css.htm
+ */
 
 #title-txt {
     -fx-font-size: 30px;

@@ -29,8 +29,6 @@ public class ShapeTest {
         for (int i = 0; i < Shape.values().length; i++) {
             charArr[i] = (char)(i+'A');
         }
-        // Set up last value for NULL enum type
-        charArr[Shape.values().length-1] = '\0';
         // Check fromChar works properly
         int j = 0;
         for (Shape shp : Shape.values()) {

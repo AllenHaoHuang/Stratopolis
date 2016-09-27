@@ -8,23 +8,26 @@ import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
 /**
- *  Created by William Shen on 15/08/16
+ * `HardBot` is a bot that will use Alpha-Beta pruning with
+ * a given lookahead to play the most desirable move.
+ *
+ * @author Allen Huang - u6096857
+ * @author William Shen - u6096655
  */
-
 public class HardBot extends Bot {
-
     private int lookahead;
 
+    // Constructor using superclass and set lookahead
     public HardBot(BoardState parentGame, boolean isGreenPlayer, int lookahead) {
         super(parentGame, isGreenPlayer);
         this.lookahead = lookahead;
     }
 
     public Tile getMove() {
-        // Elapsed time calculator from http://memorynotfound.com/calculating-elapsed-time-java/
+        // We want to show how long the bot took to think
         long startTime = System.nanoTime();
 
-        // Score the different tile placements - messages for debugging
+        // Get the relevant shape and output console message
         Shape shape;
         if (myPlayer.isGreen()) {
             shape = game.getGreenShapes().getFirst();
@@ -33,25 +36,26 @@ public class HardBot extends Bot {
             shape = game.getRedShapes().getFirst();
             System.out.print("\nAlphaBeta Red Bot, Depth: " + lookahead);
         }
+
+        // Generate the potential moves the bot can place, then loop through them and evaluate
         LinkedList<Tile> possibleMoves = game.generatePossibleMoves(shape);
         Tile bestMove = possibleMoves.getFirst();
         int maxScore = -9999;
 
         for (Tile tile : possibleMoves) {
+            // Create a board state with the current tile added
             BoardState node = new BoardState(game);
             node.addTile(tile);
-
+            // Get the score for the board and update the bestMove and maxScore accordingly
             int tileScore = AlphaBeta.start(node, lookahead - 1, this.myPlayer, true, -9999, 9999);
-
             if (tileScore > maxScore) {
                 bestMove = tile;
                 maxScore = tileScore;
             }
         }
 
-        long timeElapsed = System.nanoTime() - startTime;
-
-        System.out.println("\nTIME ELAPSED: " + TimeUnit.NANOSECONDS.toMillis(timeElapsed)
+        // Calculate how many milliseconds have elapsed and output console message
+        System.out.println("\nTIME ELAPSED: " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)
                 + "ms, MAX SCORE: " + maxScore + ", FINAL CHOICE: " + bestMove);
         return bestMove;
     }

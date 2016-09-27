@@ -1,6 +1,6 @@
 package comp1110.ass2.gui;
 
-import comp1110.ass2.bots.Player;
+import comp1110.ass2.logic.Player;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -26,6 +26,12 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * `Board` is the window in which games are played, it is
+ * initialised in Menu.
+ *
+ * @author William Shen - u6096655
+ */
 class Board extends Stage {
     /* Constants */
     private static final int BOARD_WIDTH = 933;
@@ -42,10 +48,12 @@ class Board extends Stage {
     private Player redState;
     private int greenDifficulty;
     private int redDifficulty;
+    private int hintCount;
+    private int greenHintCount;
+    private int redHintCount;
     private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
-    private Stage parentStage;
     private final Stage primaryStage = new Stage();
     private final Group root = new Group();
     private final Group greenCurrentTile = new Group();
@@ -53,10 +61,16 @@ class Board extends Stage {
     private final Group redCurrentTile = new Group();
     private final Group redNextTile = new Group();
     private final Group hoverCurrentTile = new Group();
+    private final Group hintTile = new Group();
 
     private Label greenPiecesLeft = new Label();
     private Label redPiecesLeft = new Label();
     private Label playerTurn = new Label();
+
+    private Button greenHint = new Button();
+    private Button redHint = new Button();
+    private Label greenHintLbl;
+    private Label redHintLbl;
 
     /* Prepare everything accordingly for play */
     private void setupGame() {
@@ -80,7 +94,7 @@ class Board extends Stage {
         greenPlayer.setPrefWidth(X_OFFSET);
         greenPlayer.setAlignment(Pos.CENTER);
         greenPlayer.setTranslateY(10);
-        Label redPlayer = (redState.isHuman()) ? new Label("Player Green")
+        Label redPlayer = (redState.isHuman()) ? new Label("Player Red")
                 : new Label(redState.toString());
         redPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
         redPlayer.setPrefWidth(X_OFFSET);
@@ -104,6 +118,57 @@ class Board extends Stage {
         playerTurn.setTranslateY(10);
         playerTurn.setAlignment(Pos.CENTER);
         root.getChildren().addAll(greenPlayer, redPlayer, greenPiecesLeft, redPiecesLeft, playerTurn);
+        // Hint button
+        if (greenState.isHuman() && greenHintCount != 0) {
+            greenHintLbl = new Label("Hints Left: " + greenHintCount);
+            greenHintLbl.setPrefWidth(X_OFFSET);
+            greenHintLbl.setAlignment(Pos.CENTER);
+            greenHintLbl.setFont(Font.font(16));
+            greenHintLbl.setTranslateY(BOARD_HEIGHT - 85);
+            greenHint = new Button("Hint");
+            greenHint.setId("control-btn");
+            greenHint.setPrefWidth(80);
+            greenHint.setTranslateX(27);
+            greenHint.setTranslateY(BOARD_HEIGHT - 50);
+            root.getChildren().addAll(greenHintLbl, greenHint);
+            // Show hint by using EasyMove
+            greenHint.setOnAction(event -> {
+                if (greenHintCount == 0) {
+                    greenHint.setDisable(true);
+                    return;
+                }
+                greenHint.setDisable(true);
+                EasyBot hint = new EasyBot(boardState, true);
+                showHint(hint.getMove());
+                greenHintLbl.setText("Hints Left: " + --greenHintCount);
+            });
+        }
+        if (redState.isHuman() && redHintCount != 0) {
+            redHintLbl = new Label("Hints Left: " + redHintCount);
+            redHintLbl.setPrefWidth(X_OFFSET);
+            redHintLbl.setAlignment(Pos.CENTER);
+            redHintLbl.setFont(Font.font(16));
+            redHintLbl.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
+            redHintLbl.setTranslateY(BOARD_HEIGHT - 85);
+            redHint = new Button("Hint");
+            redHint.setDisable(true);
+            redHint.setId("control-btn");
+            redHint.setPrefWidth(80);
+            redHint.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE + 27);
+            redHint.setTranslateY(BOARD_HEIGHT - 50);
+            root.getChildren().addAll(redHintLbl, redHint);
+            // Show hint by using EasyMove
+            redHint.setOnAction(event -> {
+                if (redHintCount == 0) {
+                    redHint.setDisable(true);
+                    return;
+                }
+                redHint.setDisable(true);
+                EasyBot hint = new EasyBot(boardState, false);
+                showHint(hint.getMove());
+                redHintLbl.setText("Hints Left: " + --redHintCount);
+            });
+        }
         // Initialise the 'deck' of tiles for the players and display them
         setupPlayerTiles();
     }
@@ -111,9 +176,10 @@ class Board extends Stage {
     private void setupPlayerTiles() {
         // Create the pieces for the players
         boardState.createPlayerPieces();
-        // Show the tile previews
+        // Show the tile previews and disable red player hint button
         previewTiles(true);
         previewTiles(false);
+        redHint.setDisable(true);
         // Set player's turn
         playerTurn.setTextFill(Color.GREEN);
         playerTurn.setText("Green Player's Turn");
@@ -130,11 +196,15 @@ class Board extends Stage {
                     + "\nScore = " + boardState.getScore(true));
             playerTurn.setTextFill(Color.RED);
             playerTurn.setText("Red Player's Turn");
+            if (redHintCount != 0) redHint.setDisable(false);
+            greenHint.setDisable(true);
         } else {
             redPiecesLeft.setText(redShapes.size() + " piece(s) left."
                     + "\nScore = " + boardState.getScore(false));
             playerTurn.setTextFill(Color.GREEN);
             playerTurn.setText("Green Player's Turn");
+            if (greenHintCount != 0) greenHint.setDisable(false);
+            redHint.setDisable(true);
         }
         
         // Check if we are approaching the end game state
@@ -229,8 +299,9 @@ class Board extends Stage {
     private void endGame() {
         // Game state to terminal
         System.out.println("\nPlacement String: " + boardState.getPlacementString());
-        // Update label text and disable grid
+        // Update label text and disable grid, remove hint controls
         disableGrid();
+        root.getChildren().removeAll(greenHint, greenHintLbl, redHint, redHintLbl);
 
         // Show who has won the game and display scores
         int greenScore = boardState.getScore(true);
@@ -284,8 +355,11 @@ class Board extends Stage {
         root.requestFocus();
     }
 
+    // Start new game
     private void resetGame() {
         boardState = new BoardState();
+        greenHintCount = hintCount;
+        redHintCount = hintCount;
         newGrid();
         setupGame();
         disableGrid();
@@ -302,7 +376,7 @@ class Board extends Stage {
                 // Build a new cell with the identifiers and add to root
                 char x = (char) (j + 'A');
                 char y = (char) (i + 'A');
-                addCell(x, y, Colour.NULL);
+                addCell(x, y, null);
             }
         }
         // Set the initial 'MMUA' piece
@@ -319,6 +393,46 @@ class Board extends Stage {
     private void enableGrid() {
         for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++)
             root.getChildren().get(i).setDisable(false);
+    }
+
+    // Get the tile returned by the bot and show it on the screen
+    private void showHint(Tile tile) {
+        char x = tile.getPosition().getCharX();
+        char y = tile.getPosition().getCharY();
+        switch (tile.getOrientation()) {
+            case A :
+                hintCell(x, y);
+                hintCell((char)(x+1), y);
+                hintCell(x, (char)(y+1));
+                break;
+            case B :
+                hintCell(x, y);
+                hintCell(x, (char)(y+1));
+                hintCell((char)(x-1), y);
+                break;
+            case C :
+                hintCell(x, y);
+                hintCell((char)(x-1), y);
+                hintCell(x, (char)(y-1));
+                break;
+            case D :
+                hintCell(x, y);
+                hintCell(x, (char)(y-1));
+                hintCell((char)(x+1), y);
+                break;
+        }
+        hintTile.setMouseTransparent(true);
+        root.getChildren().add(hintTile);
+    }
+
+    // Show a cell of a hint tile on the screen
+    private void hintCell(char x, char y) {
+        // Create new cell, change its properties and add to group
+        Cell cell = new Cell();
+        cell.setTranslateX(translateX(x));
+        cell.setTranslateY(translateY(y));
+        cell.setOpacity(0.8);
+        hintTile.getChildren().add(cell);
     }
 
     private void hoverTile(char x, char y) {
@@ -383,6 +497,9 @@ class Board extends Stage {
         Tile tile = new Tile(new Position(x, y), shape, hoverOrientation);
         // Add a new tile to our board if it is valid
         if (boardState.isTileValid(tile)) {
+            // Remove hint tile and add new tile to board
+            root.getChildren().remove(hintTile);
+            hintTile.getChildren().clear();
             boardState.addTile(tile);
         } else {
             // When tile placement is not valid, we show an error message
@@ -404,6 +521,8 @@ class Board extends Stage {
 
     // Add tile to board for bot, assume valid tile input
     private void addTile(Tile tile) {
+        root.getChildren().remove(hintTile);
+        hintTile.getChildren().clear();
         boardState.addTile(tile);
 
         // Add cells onto the board based on the tile orientation
@@ -450,7 +569,7 @@ class Board extends Stage {
         // Creating a new cell
         Cell cell;
         // Handling grid identifier cells
-        if (colour == Colour.NULL) {
+        if (colour == null) {
             cell = new Cell("" + x + y);
             cell.setTranslateX((x - 'A') * CELL_SIZE + X_OFFSET);
             cell.setTranslateY((y - 'A') * CELL_SIZE + Y_OFFSET);
@@ -487,9 +606,9 @@ class Board extends Stage {
             root.getChildren().remove(hoverCurrentTile);
             hoverCurrentTile.getChildren().clear();
             if (event.getDeltaY() < 0)
-                hoverOrientation = Orientation.next(hoverOrientation);
+                hoverOrientation = hoverOrientation.next();
             else
-                hoverOrientation = Orientation.previous(hoverOrientation);
+                hoverOrientation = hoverOrientation.previous();
             hoverTile(x, y);
         });
     }
@@ -552,13 +671,13 @@ class Board extends Stage {
         }
     }
 
-    Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty) {
-        // Set player states
-        this.parentStage = parentStage;
+    Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty, int hintCount) {
+        // Set player states and difficulty
         this.greenState = greenState;
         this.redState = redState;
         this.greenDifficulty = (int)(greenDifficulty);
         this.redDifficulty = (int)(redDifficulty);
+        this.hintCount = this.greenHintCount = this.redHintCount = hintCount;
 
         // Prepare and show stage
         primaryStage.setTitle("StratoGame");
@@ -580,12 +699,10 @@ class Board extends Stage {
         disableGrid();
         botPlay();
 
-        primaryStage.showAndWait();
-
         primaryStage.setOnCloseRequest(event -> {
             if (!redState.isHuman() && !greenState.isHuman() && !boardState.isFinished()) {
                 new Alert(Alert.AlertType.ERROR, "Bot vs Bot game in progress."
-                            + " Please wait until the game is finished.").showAndWait();
+                        + " Please wait until the game is finished.").showAndWait();
                 event.consume();
             } else if (!boardState.isFinished()){
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
@@ -596,5 +713,7 @@ class Board extends Stage {
                 primaryStage.close();
             }
         });
+
+        primaryStage.showAndWait();
     }
 }
