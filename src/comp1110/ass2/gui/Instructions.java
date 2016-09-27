@@ -17,7 +17,7 @@ import static java.awt.SystemColor.TEXT;
 import static java.awt.SystemColor.info;
 import static java.awt.SystemColor.text;
 
-public class Instructions extends Stage {
+class Instructions extends Stage {
 
     private static final int WIDTH = 500;
     private static final int HEIGHT = 500;
@@ -172,8 +172,6 @@ public class Instructions extends Stage {
 
         addPanels();
         addcontains();
-
-        System.out.println("width:" + primaryStage.getWidth() + ", height: " + primaryStage.getHeight());
     }
 
 

@@ -1,8 +1,7 @@
 package comp1110.ass2.gui;
 
-import comp1110.ass2.bots.Player;
+import comp1110.ass2.logic.Player;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -20,7 +19,13 @@ import javafx.stage.Stage;
 
 import java.util.Optional;
 
-/* Fancy yet ugly material design based main menu */
+/**
+ * `Menu` is the main window from which everything is launched from.
+ * The UI is easy to use, with colours and layouts based on material
+ * design
+ *
+ * @author William Shen - u6096655
+ */
 public class Menu extends Application {
     private static final int WIDTH = 500;
     private static final int HEIGHT = 455;
@@ -38,6 +43,7 @@ public class Menu extends Application {
 
     private double redDifficulty = 2;
     private double greenDifficulty = 2;
+    private int hintCount = 0;
 
     private void addPanels() {
         // Create panels and add to root
@@ -55,15 +61,21 @@ public class Menu extends Application {
         root.getChildren().addAll(mainPanel, topPanel, middlePanel);
     }
 
-    private void topButtons() {
-        Button howToPlay = new Button("I");
+    private void addTop() {
+        // Main title label near the top
+        Label title = new Label ("StratoGame");
+        title.setId("title-txt");
+        title.setLayoutX(65);
+        title.setLayoutY(20);
+
+        Button howToPlay = new Button("H");
         howToPlay.setId("round-btn-blue");
         howToPlay.setTooltip(new Tooltip("How to Play StratoGame"));
         howToPlay.setLayoutX(primaryStage.getWidth() - 200);
         howToPlay.setOnAction(event -> {
+            root.setDisable(true);
             new Instructions(primaryStage);
-            /* Open form with instructions on how to play
-            new Instructions(primaryStage) */
+            root.setDisable(false);
         });
 
         Button help = new Button("?");
@@ -87,22 +99,17 @@ public class Menu extends Application {
         viewBtn.setTooltip(new Tooltip("Open Viewer"));
         viewBtn.setLayoutX(primaryStage.getWidth() - 100);
         viewBtn.setOnAction(event -> {
-            // Only allow one instance of Viewer
+            // Only allow one instance of Viewer, grey out Menu controls
             root.setDisable(true);
             new Viewer(primaryStage);
             root.setDisable(false);
         });
 
-        root.getChildren().addAll(howToPlay, help, viewBtn);
+        root.getChildren().addAll(title, howToPlay, help, viewBtn);
     }
 
     private void addMiddle() {
-        // Set up labels and add css properties and add to root
-        Label title = new Label ("StratoGame");
-        title.setId("title-txt");
-        title.setLayoutX(65);
-        title.setLayoutY(20);
-
+        // Labels to identify players
         Label greenLabel = new Label("Player Green");
         greenLabel.setFont(Font.font(22));
         greenLabel.setTextFill(Color.GREEN);
@@ -120,6 +127,7 @@ public class Menu extends Application {
         info.setAlignment(Pos.CENTER);
         info.setLayoutY(HEIGHT - 80);
 
+        // Buttons to allow players to select who to play against
         greenBtn.setId("player-btn-green");
         greenBtn.setOnAction(event -> {
             greenPlayer = greenPlayer.getNext();
@@ -132,7 +140,7 @@ public class Menu extends Application {
             redBtn.setText(redPlayer.toString());
         });
 
-        // Add player labels and controls to GridPane
+        // Add player labels and controls to GridPane for layout
         GridPane gridpane = new GridPane();
         gridpane.add(greenLabel, 0, 0);
         gridpane.add(redLabel, 1, 0);
@@ -145,40 +153,27 @@ public class Menu extends Application {
         gridpane.setAlignment(Pos.CENTER);
 
         middleComponents.getChildren().addAll(gridpane, info);
-        root.getChildren().addAll(title, middleComponents);
+        root.getChildren().add(middleComponents);
     }
 
     private void controlButtons() {
-        // Create buttons, add CSS and group into HBox
+        // Create control buttons, add CSS and group into HBox
         Button options = new Button("Options");
         options.setId("control-btn");
 
         Button startGame = new Button("Start Game");
         startGame.setId("control-btn");
+        startGame.setOnAction(event -> {
+            // Open game board and pass player states
+            root.setDisable(true);
+            System.out.println("Board opened! " + greenPlayer + " vs. " + redPlayer);
+            new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty, hintCount);
+            root.setDisable(false);
+        });
 
         Button exit = new Button("Exit");
         exit.setId("control-btn");
         exit.setPrefWidth(80);
-
-        HBox hb = new HBox();
-        hb.setPrefWidth(primaryStage.getWidth() - 130);
-        hb.setSpacing(25);
-        hb.setAlignment(Pos.CENTER);
-        hb.setLayoutX(65);
-        hb.setLayoutY(HEIGHT - 145);
-        hb.getChildren().addAll(startGame, options, exit);
-
-        root.getChildren().add(hb);
-
-        // Open game board and pass player states
-        startGame.setOnAction(event -> {
-            root.setDisable(true);
-            System.out.println("Board opened! " + greenPlayer + " vs. " + redPlayer);
-            new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty);
-            root.setDisable(false);
-        });
-
-        // Close program
         exit.setOnAction(event -> {
             // Make user confirm they want to exit
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
@@ -187,17 +182,24 @@ public class Menu extends Application {
             Optional<ButtonType> response = confirm.showAndWait();
             if (response.isPresent() && ButtonType.YES.equals(response.get())) System.exit(0);
         });
-        // Show help message
+
+        // Create new HBox to center and align buttons
+        HBox hb = new HBox();
+        hb.setPrefWidth(primaryStage.getWidth() - 130);
+        hb.setSpacing(25);
+        hb.setAlignment(Pos.CENTER);
+        hb.setLayoutX(65);
+        hb.setLayoutY(HEIGHT - 145);
+        hb.getChildren().addAll(startGame, options, exit);
+        root.getChildren().add(hb);
+
+        // Handle options button click
         options.setOnAction(event -> {
+            // Hide the current middle components and controls
             hb.setVisible(false);
             middleComponents.setVisible(false);
 
-            VBox vBox = new VBox();
-            vBox.setAlignment(Pos.CENTER);
-            vBox.setSpacing(15);
-            vBox.setTranslateX(80);
-            vBox.setTranslateY(115);
-
+            // Set labels and sliders
             Label greenLabel = new Label("Hard Bot Difficulty (for Player Green)");
             greenLabel.setFont(Font.font(20));
             greenLabel.setTextFill(Color.GREEN);
@@ -205,9 +207,6 @@ public class Menu extends Application {
             Label redLabel = new Label("Hard Bot Difficulty (for Player Red)");
             redLabel.setFont(Font.font(20));
             redLabel.setTextFill(Color.RED);
-
-            Rectangle white = new Rectangle(1, 1);
-            white.setFill(Color.web("#FFFFFF"));
 
             Slider greenSlider = new Slider(1, 3, greenDifficulty);
             greenSlider.setId("slider");
@@ -223,9 +222,20 @@ public class Menu extends Application {
             redSlider.setSnapToTicks(true);
             redSlider.setPrefWidth(primaryStage.getWidth() - 160);
 
-            vBox.getChildren().addAll(greenLabel, greenSlider, white, redLabel, redSlider);
-            vBox.requestFocus();
+            // Selecting number of hints, use HBox
+            Label hintLabel = new Label("Number of Hints: ");
+            hintLabel.setFont(Font.font(18));
 
+            ComboBox hintCombo = new ComboBox();
+            hintCombo.getItems().addAll(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
+            hintCombo.setValue(hintCount);
+
+            HBox hint = new HBox();
+            hint.setAlignment(Pos.CENTER);
+            hint.setSpacing(10);
+            hint.getChildren().addAll(hintLabel, hintCombo);
+
+            // Set bottom controls and label and add to HBox
             Label instructions = new Label("1 = Easiest\n3 = Hardest");
             instructions.setTranslateX(-10);
             instructions.setFont(Font.font(16));
@@ -239,22 +249,31 @@ public class Menu extends Application {
 
             HBox controls = new HBox();
             controls.setSpacing(20);
-            controls.setPrefWidth(primaryStage.getWidth());
             controls.setAlignment(Pos.CENTER);
             controls.getChildren().addAll(instructions, close, save);
-            controls.setTranslateY(350);
 
-            root.getChildren().addAll(vBox, controls);
+            // Create new VBox to store all the options
+            VBox vBox = new VBox();
+            vBox.setAlignment(Pos.CENTER);
+            vBox.setSpacing(15);
+            vBox.setTranslateX(80);
+            vBox.setTranslateY(95);
+            vBox.getChildren().addAll(greenLabel, greenSlider, redLabel, redSlider, hint, controls);
 
-            // Save value
+            root.getChildren().addAll(vBox);
+            root.requestFocus();
+
+            // Save and exit button clicked, we save the value
             save.setOnAction(saveEvent -> {
-                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) {
+                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()
+                        && hintCount == (int) hintCombo.getValue()) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
                 } else {
                     redDifficulty = redSlider.getValue();
                     greenDifficulty = greenSlider.getValue();
+                    hintCount = (int) hintCombo.getValue();
                     Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
                     success.showAndWait();
                     root.getChildren().removeAll(vBox, controls);
@@ -263,9 +282,10 @@ public class Menu extends Application {
                 }
             });
 
-            // Close options menu, check if user has saved first
+            // Close options menu, check if user has saved first and ask accordingly
             close.setOnAction(exitEvent -> {
-                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()) {
+                if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()
+                        && hintCount == (int) hintCombo.getValue()) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
@@ -276,6 +296,7 @@ public class Menu extends Application {
                     if (result.isPresent() && result.get() == ButtonType.YES) {
                         redDifficulty = redSlider.getValue();
                         greenDifficulty = greenSlider.getValue();
+                        hintCount = (int) hintCombo.getValue();
                     }
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
@@ -306,28 +327,30 @@ public class Menu extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        System.out.println("StratoGame initiated.");
+        // Set properties for stage
         this.primaryStage = primaryStage;
+        System.out.println("StratoGame initiated.");
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("assets/R.png")));
         primaryStage.setTitle("StratoGame - Main Menu");
+        primaryStage.setResizable(false);
+
+        // Initialise scene and add to stage
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
         primaryStage.show();
 
-        primaryStage.setOnCloseRequest(event -> {
-            Platform.exit();
-        });
-
+        // Add CSS stylesheet
         String style = getClass().getResource("assets/theme.css").toExternalForm();
         scene.getStylesheets().add(style);
 
+        // Add components to root
         addPanels();
-        topButtons();
+        addTop();
         addMiddle();
         controlButtons();
         imagePanel();
 
+        // Set focus on none of the controls
         root.requestFocus();
     }
 
