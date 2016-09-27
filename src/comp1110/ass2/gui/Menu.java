@@ -63,7 +63,7 @@ public class Menu extends Application {
         howToPlay.setOnAction(event -> {
             new Instructions(primaryStage);
             /* Open form with instructions on how to play
-            new Instructions(primaryStage); */
+            new Instructions(primaryStage) */
         });
 
         Button help = new Button("?");

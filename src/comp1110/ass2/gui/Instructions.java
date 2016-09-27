@@ -47,7 +47,7 @@ public class Instructions extends Stage {
 
         root.getChildren().addAll(mainPanel, leftPanel, rightTopPanel);
     }
-
+    //add contains
     private void addcontains() {
         Label title = new Label("Instruction");
         title.setRotate(-90);
