@@ -23,23 +23,6 @@ abstract class Bot {
         myPlayer = (isGreenPlayer) ? Colour.Green : Colour.Red;
     }
 
-    // Used for object initialisation from valid placement string, task 10
-    Bot(String placement, char myPiece, char opponentsPiece) {
-        // Create new game state
-        game = new BoardState(placement);
-
-        // Check if player red or player green
-        if (myPiece >= 'A' && myPiece <= 'J') {
-            this.myPlayer = Colour.Red;
-            game.getRedShapes().add(Shape.fromChar(myPiece));
-            game.getGreenShapes().add(Shape.fromChar(opponentsPiece));
-        } else {
-            this.myPlayer = Colour.Green;
-            game.getGreenShapes().add(Shape.fromChar(myPiece));
-            game.getRedShapes().add(Shape.fromChar(opponentsPiece));
-        }
-    }
-
     // To be implemented by any class that extends
     public abstract Tile getMove();
 }

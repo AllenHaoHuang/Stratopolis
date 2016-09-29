@@ -55,6 +55,7 @@ class Cell extends StackPane {
         else cell.setStroke(Color.LIGHTPINK);
         cell.setStrokeType(StrokeType.INSIDE);
         cell.setStrokeWidth(2);
+        cell.setOpacity(0.85);
         setCellColour(colour);
         getChildren().add(cell);
     }
@@ -63,6 +64,7 @@ class Cell extends StackPane {
     Cell() {
         setCellStroke();
         cell.setFill(Color.YELLOW);
+        cell.setOpacity(0.8);
         getChildren().add(cell);
     }
 

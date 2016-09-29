@@ -16,10 +16,6 @@ public class EasyBot extends Bot {
         super(parentGame, isGreenPlayer);
     }
 
-    public EasyBot(String placement, char myPiece, char opponentsPiece) {
-        super(placement, myPiece, opponentsPiece);
-    }
-
     @Override
     public Tile getMove() {
         // Set up console message and get the relevant shape

@@ -71,24 +71,7 @@ public class Tile {
 
     /* Checks that no part of the tile extends beyond the board */
     public boolean isOnBoard() {
-        /* We check the Tile over the orientation. Recall that a coordinate on the board
-         * is encoded as (x,y) where 'A' <= x <= 'Z' and 'A' <= y <= 'Z' */
-        switch (orientation) {
-            case A:
-                // At right or bottom edge of the board
-                return (!(position.getCharX() == 'Z' || position.getCharY() == 'Z'));
-            case B:
-                // At left or bottom edge of the board
-                return (!(position.getCharX() == 'A' || position.getCharY() == 'Z'));
-            case C:
-                // At left or top edge of the board
-                return (!(position.getCharX() == 'A' || position.getCharY() == 'A'));
-            case D:
-                // At right or top edge of the board
-                return (!(position.getCharX() == 'Z' || position.getCharY() == 'A'));
-            default:
-                return false;
-        }
+        return Position.isOnBoard(orientation, position.getCharX(), position.getCharY());
     }
     
     // Prints out tile in 4-character string format

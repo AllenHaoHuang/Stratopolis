@@ -111,7 +111,7 @@ public class BoardState {
     }
 
     // Returning a copy of the height and colour array for scoring
-    public int[][] getHeightArray() {
+    int[][] getHeightArray() {
         int[][] newHeightArray = new int[BOARD_SIZE][BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++)
             for (int j = 0; j < BOARD_SIZE; j++)
@@ -119,7 +119,7 @@ public class BoardState {
         return newHeightArray;
     }
 
-    public Colour[][] getColourArray() {
+    Colour[][] getColourArray() {
         Colour[][] newColourArray = new Colour[BOARD_SIZE][BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++)
             for (int j = 0; j < BOARD_SIZE; j++)

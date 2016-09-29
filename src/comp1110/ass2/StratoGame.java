@@ -183,8 +183,7 @@ public class StratoGame {
      * @return A string indicating a valid tile placement that represents your move.
      */
     static String generateMove(String placement, char piece, char opponentsPiece) {
-        // FIXME Task 10: generate a valid move
-        EasyBot easyBot = new EasyBot(placement, piece, opponentsPiece);
-        return (easyBot.getMove()).toString();
+        BoardState game = new BoardState(placement);
+        return game.generatePossibleMoves(Shape.fromChar(piece)).getFirst().toString();
     }
 }

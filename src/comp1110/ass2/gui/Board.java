@@ -23,7 +23,6 @@ import comp1110.ass2.logic.*;
 import comp1110.ass2.bots.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -436,11 +435,11 @@ class Board extends Stage {
         Cell cell = new Cell();
         cell.setTranslateX(translateX(x));
         cell.setTranslateY(translateY(y));
-        cell.setOpacity(0.8);
         hintTile.getChildren().add(cell);
     }
 
     private void hoverTile(char x, char y) {
+        // Check end game state
         if (boardState.getRedShapes().isEmpty()) {
             endGame();
             return;
@@ -487,11 +486,9 @@ class Board extends Stage {
 
     private void hoverCell(char x, char y, Colour colour) {
         // Create new cell, change its properties and add to group
-        Cell cell;
-        cell = new Cell(colour, boardState.isGreenTurn());
+        Cell cell = new Cell(colour, boardState.isGreenTurn());
         cell.setTranslateX(translateX(x));
         cell.setTranslateY(translateY(y));
-        cell.setOpacity(0.85);
         hoverCurrentTile.getChildren().add(cell);
     }
 
@@ -517,9 +514,9 @@ class Board extends Stage {
 
         // Add cells onto the board based on the tile orientation
         handleOrientation(tile);
-
         previewTiles(!boardState.isGreenTurn());
-        // Reset preview orientation
+
+        // Reset preview orientation and check if bot is playing
         hoverOrientation = Orientation.A;
         botPlay();
     }
@@ -533,17 +530,18 @@ class Board extends Stage {
         // Add cells onto the board based on the tile orientation
         handleOrientation(tile);
 
+        // Preview next tiles and play game for bot
         previewTiles(!boardState.isGreenTurn());
         botPlay();
     }
 
     private void handleOrientation(Tile tile) {
+        // Add cells with their given colours given their orientation
         char x = tile.getPosition().getCharX();
         char y = tile.getPosition().getCharY();
         Shape shape = tile.getShape();
-        Orientation orientation = tile.getOrientation();
 
-        switch (orientation) {
+        switch (tile.getOrientation()) {
             case A :
                 addCell(x, y, shape.colourAtIndex(0));
                 addCell((char)(x+1), y, shape.colourAtIndex(1));
@@ -566,6 +564,7 @@ class Board extends Stage {
                 break;
         }
 
+        // Remove tiles from player pieces accordingly, recall player turn is inverted in BoardState
         if (boardState.getPlayerTurn() == Colour.Red) boardState.getGreenShapes().removeFirst();
         else boardState.getRedShapes().removeFirst();
     }
@@ -590,7 +589,7 @@ class Board extends Stage {
             root.getChildren().set(getIndex(x, y), cell);
         }
 
-        cell.setCursor(Cursor.DISAPPEAR);
+        cell.setCursor(Cursor.NONE);
 
         /* Add a tile to the board state and GUI grid */
         cell.setOnMouseClicked(event -> {
@@ -607,7 +606,7 @@ class Board extends Stage {
         });
         /* Change the orientation of a preview tile on the GUI grid */
         cell.setOnScroll(event -> {
-            // Remove the current tile preview and draw another one
+            // Remove the current tile preview and draw another one based on scroll direction
             root.getChildren().remove(hoverCurrentTile);
             hoverCurrentTile.getChildren().clear();
             if (event.getDeltaY() < 0)
@@ -619,8 +618,8 @@ class Board extends Stage {
     }
 
     // Calculate how many pixels to translate x and y by on window
-    private int translateX(char x) { return (x - 'A')* CELL_SIZE + X_OFFSET; }
-    private int translateY(char y) { return (y - 'A')* CELL_SIZE + Y_OFFSET; }
+    private int translateX(char x) { return (x - 'A') * CELL_SIZE + X_OFFSET; }
+    private int translateY(char y) { return (y - 'A') * CELL_SIZE + Y_OFFSET; }
 
     /* We get the index in the Scene `root`, of the position given */
     private int getIndex(char x, char y) {
@@ -629,6 +628,7 @@ class Board extends Stage {
     }
 
     private void botPlay() {
+        // Check if the current player is human or not, or if it is the end of the game and act accordingly
         if (boardState.isGreenTurn() && greenState.isHuman() || !boardState.isGreenTurn() && redState.isHuman()) {
             enableGrid();
             return;
@@ -639,16 +639,12 @@ class Board extends Stage {
             playerTurn.setText(playerTurn.getText() + ". Bot thinking...");
             disableGrid();
         }
+        // Delay the play of the bot so we can see placements as they occur
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        actualPlay();
-                    }
-                });
+                Platform.runLater(() -> actualPlay());
             }
         }, 100);
     }
@@ -673,6 +669,18 @@ class Board extends Stage {
             HardBot bot = new HardBot(boardState, false, redDifficulty);
             addTile(bot.getMove());
         }
+    }
+
+    // Move Cursor bot from http://stackoverflow.com/questions/37500567/javafx-how-to-position-the-mouse
+    private void moveCursor(double x, double y) {
+        Platform.runLater(() -> {
+            try {
+                Robot robot = new Robot();
+                robot.mouseMove((int) x, (int) y);
+            } catch (AWTException e) {
+                System.out.println("Something went horribly wrong...");
+            }
+        });
     }
 
     Board(Stage parentStage, Player greenState, Player redState, double greenDifficulty, double redDifficulty, int hintCount) {
@@ -713,16 +721,39 @@ class Board extends Stage {
             char y = (char)((local.getY() - Y_OFFSET)/CELL_SIZE + 'A');
 
             // Rotate clockwise for down key and anticlockwise for up key
-            if (event.getCode() == KeyCode.UP) {
+            if (event.getCode() == KeyCode.Q && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.U && !boardState.isGreenTurn()) {
                 root.getChildren().remove(hoverCurrentTile);
                 hoverCurrentTile.getChildren().clear();
                 hoverOrientation = hoverOrientation.previous();
                 hoverTile(x, y);
-            } else if (event.getCode() == KeyCode.DOWN) {
+            } else if (event.getCode() == KeyCode.E && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.O && !boardState.isGreenTurn()) {
                 root.getChildren().remove(hoverCurrentTile);
                 hoverCurrentTile.getChildren().clear();
                 hoverOrientation = hoverOrientation.next();
                 hoverTile(x, y);
+            } else if (event.getCode() == KeyCode.W && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.I && !boardState.isGreenTurn()) {
+                // Must be within the game grid
+                if (x >= 'A' && x <= 'Z' && y > 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, x, (char)(y-1)))
+                    moveCursor(p.getX(), p.getY() - CELL_SIZE);
+            } else if (event.getCode() == KeyCode.A && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.J && !boardState.isGreenTurn()) {
+                if (x > 'A' && x <= 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, (char)(x-1), y))
+                    moveCursor(p.getX() - CELL_SIZE, p.getY());
+            } else if (event.getCode() == KeyCode.S && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.K && !boardState.isGreenTurn()) {
+                if (x >= 'A' && x <= 'Z' && y >= 'A' && y < 'Z' && Position.isOnBoard(hoverOrientation, x, (char)(y+1)))
+                    moveCursor(p.getX(), p.getY() + CELL_SIZE);
+            } else if (event.getCode() == KeyCode.D && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.L && !boardState.isGreenTurn()) {
+                if (x >= 'A' && x < 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, (char)(x+1), y))
+                    moveCursor(p.getX() + CELL_SIZE, p.getY());
+            } else if (event.getCode() == KeyCode.CAPS && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn()) {
+                if (x >= 'A' && x <= 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, x, y))
+                    addTile(x, y);
             }
         });
 
