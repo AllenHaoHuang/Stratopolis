@@ -3,9 +3,11 @@ package comp1110.ass2.gui;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -23,6 +25,7 @@ class Instructions extends Stage {
 
     private Stage primaryStage = new Stage();
     private Group root = new Group();
+    private Group controls = new Group();
 
     private void addPanels() {
         Rectangle mainPanel = new Rectangle(primaryStage.getWidth(), primaryStage.getHeight());
@@ -58,7 +61,7 @@ class Instructions extends Stage {
 
         Text block = new Text("Player can choose either Green or Red. For each colour, "
                                 + "there are 20 tiles. By using the mouse, you can `hover` the"
-                                + "piece to the place you want.\n\n"
+                                + " piece to the place you want.\n\n"
                                 + "As for the placement, you have two options. The first one, "
                                 + "your placement have to attach with other tile on grid (no "
                                 + "matter green black or red). The second one, you can place "
@@ -77,7 +80,27 @@ class Instructions extends Stage {
         root.getChildren().addAll(title,topicLeft,block,topicformainbody);
     }
 
-    //
+
+    // Make a button for the users to quit the instruction
+    private void makeControl(){
+        Button menu = new Button("Close");
+        menu.setId("control-btn");
+        menu.setOnAction(event -> {
+            primaryStage.close();
+        });
+
+        HBox hb = new HBox();
+        hb.getChildren().addAll(menu);
+        hb.setSpacing(10);
+        hb.setPrefWidth(WIDTH-50);
+        hb.setAlignment(Pos.CENTER);
+        hb.setLayoutX(-150);
+        hb.setLayoutY(HEIGHT - 60);
+        controls.getChildren().add(hb);
+        root.getChildren().addAll(hb);
+
+    }
+
 
     Instructions(Stage parentStage) {
         primaryStage.setTitle("How to Play StratoGame - Instructions");
@@ -98,6 +121,7 @@ class Instructions extends Stage {
 
         addPanels();
         addcontains();
+        makeControl();
     }
 }
 
