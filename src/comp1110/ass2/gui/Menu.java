@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -34,6 +35,8 @@ public class Menu extends Application {
     private Stage primaryStage;
     private Group root = new Group();
     private Group middleComponents = new Group();
+    private Font openSansRegular;
+    private Font openSansBold;
 
     private Button greenBtn = new Button("Human");
     private Button redBtn = new Button ("Human");
@@ -92,6 +95,7 @@ public class Menu extends Application {
                     + " There are 3 kinds of players - Human, Easy Bot, and Hard Bot. Once you have "
                     + "selected the players, press 'Start Game'.\n\nTo read how to play StratoGame,"
                     + " click on the 'H' near the top of the window. To open the viewer, click on the 'V'");
+            message.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             message.showAndWait();
         });
 
@@ -112,17 +116,17 @@ public class Menu extends Application {
     private void addMiddle() {
         // Labels to identify players
         Label greenLabel = new Label("Player Green");
-        greenLabel.setFont(Font.font(22));
+        greenLabel.setFont(Font.font("Open Sans", 20));
         greenLabel.setTextFill(Color.GREEN);
         GridPane.setHalignment(greenLabel, HPos.CENTER);
 
         Label redLabel = new Label("Player Red");
-        redLabel.setFont(Font.font(22));
+        redLabel.setFont(Font.font("Open Sans", 20));
         redLabel.setTextFill(Color.RED);
         GridPane.setHalignment(redLabel, HPos.CENTER);
 
         Label info = new Label("By William Shen, Allen Huang and Marvin Yang");
-        info.setFont(Font.font(16));
+        info.setFont(openSansRegular);
         info.setTextFill(Color.web("#3E50B5"));
         info.setPrefWidth(primaryStage.getWidth());
         info.setAlignment(Pos.CENTER);
@@ -202,11 +206,11 @@ public class Menu extends Application {
 
             // Set labels and sliders
             Label greenLabel = new Label("Hard Bot Difficulty (for Player Green)");
-            greenLabel.setFont(Font.font(20));
+            greenLabel.setFont(Font.font("Open Sans", 18));
             greenLabel.setTextFill(Color.GREEN);
 
             Label redLabel = new Label("Hard Bot Difficulty (for Player Red)");
-            redLabel.setFont(Font.font(20));
+            redLabel.setFont(Font.font("Open Sans", 18));
             redLabel.setTextFill(Color.RED);
 
             Slider greenSlider = new Slider(1, 3, greenDifficulty);
@@ -225,14 +229,14 @@ public class Menu extends Application {
 
             // Selecting number of hints, use HBox
             Label hintLabel = new Label("Number of Hints: ");
-            hintLabel.setFont(Font.font(18));
+            hintLabel.setFont(Font.font("Open Sans", 18));
 
             ComboBox hintCombo = new ComboBox();
             hintCombo.getItems().addAll(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
             hintCombo.setValue(hintCount);
 
             Label musicLabel = new Label("   Music: ");
-            musicLabel.setFont(Font.font(18));
+            musicLabel.setFont(Font.font("Open Sans", 18));
 
             CheckBox musicCheck = new CheckBox();
             musicCheck.setSelected(musicOn);
@@ -245,7 +249,7 @@ public class Menu extends Application {
             // Set bottom controls and label and add to HBox
             Label instructions = new Label("1 = Easiest\n3 = Hardest");
             instructions.setTranslateX(-10);
-            instructions.setFont(Font.font(16));
+            instructions.setFont(Font.font("Open Sans", 16));
             instructions.setTextFill(Color.web("#3E50B5"));
 
             Button close = new Button("Close");
@@ -262,7 +266,7 @@ public class Menu extends Application {
             // Create new VBox to store all the options
             VBox vBox = new VBox();
             vBox.setAlignment(Pos.CENTER);
-            vBox.setSpacing(15);
+            vBox.setSpacing(18);
             vBox.setTranslateX(80);
             vBox.setTranslateY(95);
             vBox.getChildren().addAll(greenLabel, greenSlider, redLabel, redSlider, prev, controls);
@@ -351,6 +355,10 @@ public class Menu extends Application {
         // Add CSS stylesheet
         String style = getClass().getResource("assets/theme.css").toExternalForm();
         scene.getStylesheets().add(style);
+
+        // Add Open Sans Font
+        openSansRegular = Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Regular.ttf"), 16);
+        openSansBold = Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Bold.ttf"), 16);
 
         // Add components to root
         addPanels();

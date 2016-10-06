@@ -14,6 +14,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -106,14 +107,14 @@ class Board extends Stage {
         redPlayer.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
         redPlayer.setTranslateY(10);
         // Change position of pieces left
-        greenPiecesLeft.setFont(Font.font(16));
+        greenPiecesLeft.setFont(Font.font("Open Sans", 16));
         greenPiecesLeft.setPrefWidth(X_OFFSET);
         greenPiecesLeft.setAlignment(Pos.CENTER);
         greenPiecesLeft.setTranslateY(180);
-        redPiecesLeft.setFont(Font.font(16));
+        redPiecesLeft.setFont(Font.font("Open Sans", 16));
         redPiecesLeft.setPrefWidth(X_OFFSET);
         redPiecesLeft.setAlignment(Pos.CENTER);
-        redPiecesLeft.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
+        redPiecesLeft.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE - 5);
         redPiecesLeft.setTranslateY(180);
         // Add labels for pieces left and whose turn it is
         playerTurn.setFont(Font.font("System", FontWeight.BOLD, 18));
@@ -196,14 +197,14 @@ class Board extends Stage {
 
         // Show how many pieces a player has left and the score
         if (isGreenTurn) {
-            greenPiecesLeft.setText(greenShapes.size() + " piece(s) left."
+            greenPiecesLeft.setText(greenShapes.size() + " piece(s) left"
                     + "\nScore = " + boardState.getScore(true));
             playerTurn.setTextFill(Color.RED);
             playerTurn.setText("Red Player's Turn");
             if (redHintCount != 0) redHint.setDisable(false);
             greenHint.setDisable(true);
         } else {
-            redPiecesLeft.setText(redShapes.size() + " piece(s) left."
+            redPiecesLeft.setText(redShapes.size() + " piece(s) left"
                     + "\nScore = " + boardState.getScore(false));
             playerTurn.setTextFill(Color.GREEN);
             playerTurn.setText("Green Player's Turn");
@@ -702,9 +703,10 @@ class Board extends Stage {
         primaryStage.initModality(Modality.WINDOW_MODAL);
         primaryStage.initOwner(parentStage);
 
-        // Add CSS Stylesheet for buttons
+        // Add CSS Stylesheet and add Open Sans for buttons
         String style = getClass().getResource("assets/theme.css").toExternalForm();
         scene.getStylesheets().add(style);
+        Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Regular.ttf"), 16);
 
         /* Rotate tiles if UP or DOWN arrow key is pressed - this isn't the best code */
         scene.setOnKeyPressed(event -> {
@@ -764,8 +766,10 @@ class Board extends Stage {
 
         primaryStage.setOnCloseRequest(event -> {
             if (!redState.isHuman() && !greenState.isHuman() && !boardState.isFinished()) {
-                new Alert(Alert.AlertType.ERROR, "Bot vs Bot game in progress."
-                        + " Please wait until the game is finished.").showAndWait();
+                Alert message = new Alert(Alert.AlertType.ERROR, "Bot vs Bot game in progress."
+                        + " Please wait until the game is finished.");
+                message.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                message.showAndWait();
                 event.consume();
             } else if (!boardState.isFinished()){
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,

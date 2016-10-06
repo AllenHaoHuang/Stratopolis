@@ -44,18 +44,18 @@ class Instructions extends Stage {
         Label title = new Label("Instructions");
         title.setRotate(-90);
         title.setTextFill(Color.WHITE);
-        title.setFont(Font.font(70));
+        title.setFont(Font.font("Open Sans", 70));
         title.setLayoutX(-120);
         title.setLayoutY(200);
 
         Label topicLeft = new Label("StratoGame");
-        topicLeft.setFont(Font.font(37));
+        topicLeft.setFont(Font.font("Open Sans", 37));
         topicLeft.setTextFill(Color.WHITE);
         topicLeft.setLayoutX(140);
         topicLeft.setLayoutY(40);
 
         Label topicformainbody = new Label("Basic Rules:");
-        topicformainbody.setFont(Font.font(20));
+        topicformainbody.setFont(Font.font("Open Sans", 20));
         topicformainbody.setLayoutX(140);
         topicformainbody.setLayoutY(100);
 
@@ -72,7 +72,7 @@ class Instructions extends Stage {
                                 + "contiguous squares of your color,and then multiplying the "
                                 + "number of squares forming the region by the maximum "
                                 + "height of tiles in the region.");
-        block.setFont(Font.font(16));
+        block.setFont(Font.font("Open Sans", 15.5));
         block.setWrappingWidth(WIDTH - 140);
         block.setLayoutX(140);
         block.setLayoutY(150);
@@ -115,9 +115,10 @@ class Instructions extends Stage {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        // Add CSS Stylesheet for buttons
+        // Add CSS Stylesheet for buttons and load font
         String style = getClass().getResource("assets/theme.css").toExternalForm();
         scene.getStylesheets().add(style);
+        Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Regular.ttf"), 16);
 
         addPanels();
         addcontains();
