@@ -13,6 +13,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -47,6 +48,12 @@ public class Menu extends Application {
     private double redDifficulty = 2;
     private double greenDifficulty = 2;
     private int hintCount = 0;
+
+    private static final String URI_BASE = "assets/";
+    // If you want another song put it into assets and copy name here
+    private static final String LOOP_URI = Board.class.getResource(URI_BASE + "Septette for the Dead Princess.mp3").toString();
+    private AudioClip loop;
+
     private boolean musicOn = false;
 
     private void addPanels() {
@@ -277,7 +284,7 @@ public class Menu extends Application {
             // Save and exit button clicked, we save the value
             save.setOnAction(saveEvent -> {
                 if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()
-                        && hintCount == (int) hintCombo.getValue() && musicOn == musicCheck.isSelected()    ) {
+                        && hintCount == (int) hintCombo.getValue() && musicOn == musicCheck.isSelected()) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
@@ -292,6 +299,7 @@ public class Menu extends Application {
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
                 }
+                playMusic();
             });
 
             // Close options menu, check if user has saved first and ask accordingly
@@ -338,6 +346,24 @@ public class Menu extends Application {
         root.getChildren().add(gridPane);
     }
 
+
+    private void setUpSoundLoop() {
+        try {
+            loop = new AudioClip(LOOP_URI);
+            loop.setCycleCount(AudioClip.INDEFINITE);
+        } catch (Exception e) {
+            System.err.println(":-( something bad happened ("+LOOP_URI+"): "+e);
+        }
+    }
+
+    private void playMusic() {
+        // to stop same track being repeated multiple times
+        loop.stop();
+        if (musicOn) {
+            loop.play();
+        }
+    }
+
     @Override
     public void start(Stage primaryStage) {
         // Set properties for stage
@@ -366,6 +392,7 @@ public class Menu extends Application {
         addMiddle();
         controlButtons();
         imagePanel();
+        setUpSoundLoop();
 
         // Set focus on none of the controls
         root.requestFocus();
