@@ -21,7 +21,7 @@ import static java.awt.SystemColor.text;
 
 class Instructions extends Stage {
     private static final int WIDTH = 500;
-    private static final int HEIGHT = 530;
+    private static final int HEIGHT = 600;
 
     private Stage primaryStage = new Stage();
     private Group root = new Group();
@@ -59,19 +59,19 @@ class Instructions extends Stage {
         topicformainbody.setLayoutX(140);
         topicformainbody.setLayoutY(100);
 
-        Text block = new Text("Player can choose either Green or Red. For each colour, "
-                                + "there are 20 tiles. By using the mouse, you can `hover` the"
-                                + " piece to the place you want.\n\n"
-                                + "As for the placement, you have two options. The first one, "
-                                + "your placement have to attach with other tile on grid (no "
-                                + "matter green black or red). The second one, you can place "
-                                + "tile at top of existing placements, but make sure the tile "
-                                + "placed have the exactly same color with tiles on the grid "
-                                + "and the under tiles must have same height on each square.\n\n"
+        Text block = new Text("Player can choose either Green or Red. For each player, "
+                                + "you have twenty tiles. By using the mouse, you can hover over to the"
+                                + " position you want to place your tile on Alternatively, Player Green can use WASD and Caps Lock"
+                                + "and Player Red can use IJKL and Enter.\n\n"
+                                + "There are two rules for a tile placement."
+                                + "\n1. Your placement must be attached with another tile on grid (no colour constraints)."
+                                + "\n2. You can place a tile above existing ones, but each colour may be stacked only on top of itself or black. "
+                                + "There must also be no overhangs, and each stacked tile must straddle at least two tiles below\n\n"
                                 + "Your score is calculated by finding the largest region of "
-                                + "contiguous squares of your color,and then multiplying the "
+                                + "connected tiles of your colour,and then multiplying the "
                                 + "number of squares forming the region by the maximum "
                                 + "height of tiles in the region.");
+
         block.setFont(Font.font("Open Sans", 15.5));
         block.setWrappingWidth(WIDTH - 140);
         block.setLayoutX(140);
