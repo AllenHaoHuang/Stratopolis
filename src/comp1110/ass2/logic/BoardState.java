@@ -88,8 +88,10 @@ public class BoardState {
     public LinkedList<Shape> getGreenShapes() { return greenShapes; }
     public LinkedList<Shape> getRedShapes() { return redShapes; }
 
+    /*
     public void removeGreenShape() { greenShapes.removeFirst(); }
     public void removeRedShape() { redShapes.removeFirst(); }
+    */
 
     // Return whose turn it is in colours
     public Colour getPlayerTurn() {
@@ -224,6 +226,11 @@ public class BoardState {
         placementString += tile.toString();
         // Update positions to check
         updatePositionsToCheck();
+        if (playerTurn == Colour.Green) {
+            greenShapes.removeFirstOccurrence(tile.getShape());
+        } else {
+            redShapes.removeFirstOccurrence(tile.getShape());
+        }
         // Invert player turn
         playerTurn = playerTurn.nextPlayer();
     }

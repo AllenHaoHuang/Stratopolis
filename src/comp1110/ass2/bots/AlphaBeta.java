@@ -4,8 +4,9 @@ import comp1110.ass2.logic.BoardState;
 import comp1110.ass2.logic.Colour;
 import comp1110.ass2.logic.Shape;
 import comp1110.ass2.logic.Tile;
+import sun.awt.image.ImageWatched;
 
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * This class is used to start a recursive instance of
@@ -16,65 +17,73 @@ import java.util.LinkedList;
  * @author William Shen - u6096655
  */
 class AlphaBeta {
-    static int start(BoardState node, int depth, Colour myPlayer, boolean isMax, int alpha, int beta) {
+    static double start(BoardState node, int depth, Colour myPlayer, boolean isMax, double alpha, double beta) {
         // If we run out of lookahead or the game is finished we return the heuristic
         if (depth == 0 || node.isFinished())
             return node.getScore(myPlayer) - node.getScore(myPlayer.nextPlayer());
 
+        LinkedList<Shape> shapes;
+        LinkedList<Shape> shapeNoRepeat = new LinkedList<>();
+        double finalScore = 0.0;
+
         // Check if this instance is a maximising or minimising player
         if (isMax) {
-            // Get the relevant shape and remove it from the board
-            Shape shape;
             if (myPlayer.isGreen()) {
-                shape = node.getGreenShapes().getFirst();
-                node.removeGreenShape();
-            } else {
-                shape = node.getRedShapes().getFirst();
-                node.removeRedShape();
-            }
+                shapes = node.getGreenShapes();
+                // makes a new linked list with no repeat
+                Set<Shape> hs = new HashSet<>();
+                hs.addAll(shapes);
+                shapeNoRepeat.addAll(hs);
 
-            // Generate all the possible moves given the shape and loop through them
-            LinkedList<Tile> possibleMoves = node.generatePossibleMoves(shape);
-            for (Tile tile : possibleMoves) {
-                // Create a new board state if the given tile is placed
-                BoardState child = new BoardState(node);
-                child.addTile(tile);
-                // Recursive call on Alpha-Beta bot as minimising player
-                int score = start(child, depth-1, myPlayer, false, alpha, beta);
-                // We break if we have an beta cut-off
-                alpha = Math.max(score, alpha);
-                if (alpha >= beta) break;
+                for (Shape s : shapeNoRepeat) {
+                    LinkedList<Tile> possibleMoves = node.generatePossibleMoves(s);
+                    int count = 0;
+                    double tileTotalScore = 0;
+
+                    for (Tile tile : possibleMoves) {
+                        // Create a new board state if the given tile is placed
+                        BoardState child = new BoardState(node);
+                        child.addTile(tile);
+                        // Recursive call on Alpha-Beta bot as minimising player
+                        double score = start(child, depth - 1, myPlayer, false, alpha, beta);
+                        // We break if we have an beta cut-off
+                        alpha = Math.max(score, alpha);
+                        if (alpha >= beta) break;
+                        tileTotalScore += alpha;
+                        count++;
+                    }
+                    finalScore += (tileTotalScore / count) * (Collections.frequency(shapes, s) / shapes.size());
+                }
             }
-            return alpha;
         } else {
-            // Get the relevant shape and remove it from the board
-            Shape shape;
-            if (myPlayer.isGreen()) {
-                shape = node.getRedShapes().getFirst();
-                node.removeRedShape();
-            } else {
-                shape = node.getGreenShapes().getFirst();
-                node.removeGreenShape();
-            }
+            shapes = node.getRedShapes();
+            // makes a new linked list with no repeat
+            Set<Shape> hs = new HashSet<>();
+            hs.addAll(shapes);
+            shapeNoRepeat.addAll(hs);
 
-            // Generate all the possible moves given the shape and loop through them
-            LinkedList<Tile> possibleMoves = node.generatePossibleMoves(shape);
-            for (Tile tile : possibleMoves) {
-                // Create a new board state if the given tile is placed
-                BoardState child = new BoardState(node);
-                child.addTile(tile);
-                // Recursive call on Alpha-Beta bot as maximising player
-                int score = start(child, depth-1, myPlayer, true, alpha, beta);
-                // We break if we have an alpha cut-off
-                beta = Math.min(score, beta);
-                if (alpha >= beta) break;
+            for (Shape s : shapeNoRepeat) {
+                LinkedList<Tile> possibleMoves = node.generatePossibleMoves(s);
+                int count = 0;
+                double tileTotalScore = 0;
+
+                for (Tile tile : possibleMoves) {
+                    // Create a new board state if the given tile is placed
+                    BoardState child = new BoardState(node);
+                    child.addTile(tile);
+                    // Recursive call on Alpha-Beta bot as maximising player
+                    double score = start(child, depth-1, myPlayer, true, alpha, beta);
+                    // We break if we have an alpha cut-off
+                    beta = Math.min(score, beta);
+                    if (alpha >= beta) break;
+                    tileTotalScore += beta;
+                    count++;
+                }
+                finalScore += (tileTotalScore / count) * (Collections.frequency(shapes, s) / shapes.size());
             }
-            return beta;
         }
-
+        return finalScore;
     }
-
-
 }
 
 
