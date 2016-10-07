@@ -102,7 +102,7 @@ class Board extends Stage {
         Label redPlayer = (redState.isHuman()) ? new Label("Player Red")
                 : new Label(redState.toString());
         redPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
-        redPlayer.setPrefWidth(X_OFFSET);
+        redPlayer.setPrefWidth(X_OFFSET - 5);
         redPlayer.setAlignment(Pos.CENTER);
         redPlayer.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
         redPlayer.setTranslateY(10);
@@ -119,7 +119,7 @@ class Board extends Stage {
         // Add labels for pieces left and whose turn it is
         playerTurn.setFont(Font.font("System", FontWeight.BOLD, 18));
         playerTurn.setPrefWidth(BOARD_WIDTH - 2 * X_OFFSET);
-        playerTurn.setTranslateX(X_OFFSET);
+        playerTurn.setTranslateX(X_OFFSET+5);
         playerTurn.setTranslateY(10);
         playerTurn.setAlignment(Pos.CENTER);
         root.getChildren().addAll(greenPlayer, redPlayer, greenPiecesLeft, redPiecesLeft, playerTurn);
@@ -203,6 +203,8 @@ class Board extends Stage {
             playerTurn.setText("Red Player's Turn");
             if (redHintCount != 0) redHint.setDisable(false);
             greenHint.setDisable(true);
+            greenNextTile.setVisible(false);
+            redNextTile.setVisible(true);
         } else {
             redPiecesLeft.setText(redShapes.size() + " piece(s) left"
                     + "\nScore = " + boardState.getScore(false));
@@ -210,6 +212,8 @@ class Board extends Stage {
             playerTurn.setText("Green Player's Turn");
             if (greenHintCount != 0) greenHint.setDisable(false);
             redHint.setDisable(true);
+            redNextTile.setVisible(false);
+            greenNextTile.setVisible(true);
         }
         
         // Check if we are approaching the end game state

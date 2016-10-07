@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -18,7 +19,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import java.util.Optional;
 
 /**
@@ -49,12 +52,13 @@ public class Menu extends Application {
     private double greenDifficulty = 2;
     private int hintCount = 0;
 
+    private boolean musicOn = false;
+
+    /* where to find media assets */
     private static final String URI_BASE = "assets/";
-    // If you want another song put it into assets and copy name here
-    private static final String LOOP_URI = Board.class.getResource(URI_BASE + "Septette for the Dead Princess.mp3").toString();
+    private static final String LOOP_URI = Menu.class.getResource(URI_BASE + "whitepeople.wav").toString();
     private AudioClip loop;
 
-    private boolean musicOn = false;
 
     private void addPanels() {
         // Create panels and add to root
@@ -292,14 +296,14 @@ public class Menu extends Application {
                     redDifficulty = redSlider.getValue();
                     greenDifficulty = greenSlider.getValue();
                     hintCount = (int) hintCombo.getValue();
-                    musicOn = musicCheck.isSelected();
+                    musicOn = !musicCheck.isSelected();
+                    toggleSoundLoop();
                     Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
                     success.showAndWait();
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
                 }
-                playMusic();
             });
 
             // Close options menu, check if user has saved first and ask accordingly
@@ -317,11 +321,12 @@ public class Menu extends Application {
                         redDifficulty = redSlider.getValue();
                         greenDifficulty = greenSlider.getValue();
                         hintCount = (int) hintCombo.getValue();
-                        musicOn = musicCheck.isSelected();
+                        musicOn = !musicCheck.isSelected();
                     }
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
+                    toggleSoundLoop();
                 }
             });
         });
@@ -347,6 +352,10 @@ public class Menu extends Application {
     }
 
 
+
+    /**
+     * Set up the sound loop (to play when the 'M' key is pressed)
+     */
     private void setUpSoundLoop() {
         try {
             loop = new AudioClip(LOOP_URI);
@@ -356,13 +365,18 @@ public class Menu extends Application {
         }
     }
 
-    private void playMusic() {
-        // to stop same track being repeated multiple times
-        loop.stop();
-        if (musicOn) {
+
+    /**
+     * Turn the sound loop on or off
+     */
+    private void toggleSoundLoop() {
+        if (musicOn)
+            loop.stop();
+        else
             loop.play();
-        }
+        musicOn = !musicOn;
     }
+
 
     @Override
     public void start(Stage primaryStage) {

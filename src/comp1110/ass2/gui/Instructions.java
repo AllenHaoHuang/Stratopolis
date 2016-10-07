@@ -60,8 +60,8 @@ class Instructions extends Stage {
         topicformainbody.setLayoutY(100);
 
         Text block = new Text("Player can choose either Green or Red. For each player, "
-                                + "you have twenty tiles. By using the mouse, you can hover over to the"
-                                + " position you want to place your tile on Alternatively, Player Green can use WASD and Caps Lock"
+                                + "you have twenty tiles. By using the mouse, you can hover over to the "
+                                + "position you want to place your tile on Alternatively, Player Green can use WASD and Caps Lock "
                                 + "and Player Red can use IJKL and Enter.\n\n"
                                 + "There are two rules for a tile placement."
                                 + "\n1. Your placement must be attached with another tile on grid (no colour constraints)."
