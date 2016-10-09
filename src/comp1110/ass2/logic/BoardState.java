@@ -88,10 +88,8 @@ public class BoardState {
     public LinkedList<Shape> getGreenShapes() { return greenShapes; }
     public LinkedList<Shape> getRedShapes() { return redShapes; }
 
-    /*
     public void removeGreenShape() { greenShapes.removeFirst(); }
     public void removeRedShape() { redShapes.removeFirst(); }
-    */
 
     // Return whose turn it is in colours
     public Colour getPlayerTurn() {
