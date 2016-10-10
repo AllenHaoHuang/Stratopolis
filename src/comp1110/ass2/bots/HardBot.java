@@ -47,7 +47,7 @@ public class HardBot extends Bot {
             BoardState node = new BoardState(game);
             node.addTile(tile);
             // Get the score for the board and update the bestMove and maxScore accordingly
-            double tileScore = AlphaBeta.start(node, lookahead - 1, this.myPlayer, true, -9999, 9999);
+            double tileScore = AlphaBeta.start(node, lookahead ,lookahead - 1, this.myPlayer, true, -9999, 9999);
             if (tileScore > maxScore) {
                 bestMove = tile;
                 maxScore = tileScore;

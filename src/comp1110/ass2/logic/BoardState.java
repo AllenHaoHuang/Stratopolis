@@ -14,7 +14,7 @@ import java.util.LinkedList;
  * @author William Shen - u6096655
  * @author Marvin Yang - u5894100
  */
-public class BoardState {
+public class BoardState{
     // Constants
     private static final int BOARD_SIZE = 26;
 
@@ -44,7 +44,8 @@ public class BoardState {
         pieceIDArray[12][12] = pieceID;
         pieceIDArray[12][13] = pieceID++;
 
-        updatePositionsToCheck();
+        updatePositonsAround(12,12);
+        updatePositonsAround(12,13);
     }
 
     /* Constructor for Board State given a valid placement string */
@@ -59,13 +60,11 @@ public class BoardState {
                     Orientation.fromChar(placement.charAt(i + 3)));
             this.addTile(substringTile);
         }
-        updatePositionsToCheck();
     }
 
     /* Constructor for Board State given an old state - i.e. makes a copy*/
     public BoardState(BoardState oldState) {
         this(oldState.getPlacementString());
-        // Ignore the warnings, linked lists can be cast (I hope...)
         this.greenShapes = (LinkedList<Shape>) oldState.getGreenShapes().clone();
         this.redShapes = (LinkedList<Shape>) oldState.getRedShapes().clone();
         this.playerTurn = Colour.getValue(playerTurn);
@@ -95,9 +94,6 @@ public class BoardState {
 
     public LinkedList<Shape> getGreenShapes() { return greenShapes; }
     public LinkedList<Shape> getRedShapes() { return redShapes; }
-
-    public void removeGreenShape() { greenShapes.removeFirst(); }
-    public void removeRedShape() { redShapes.removeFirst(); }
 
     // Return whose turn it is in colours
     public Colour getPlayerTurn() {
@@ -133,6 +129,24 @@ public class BoardState {
             for (int j = 0; j < BOARD_SIZE; j++)
                 newColourArray[i][j] = colourArray[i][j];
         return newColourArray;
+    }
+
+    int getPieceID() {return pieceID;}
+
+    int[][] getPieceIDArray() {
+        int[][] newPieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
+        for (int i = 0; i < BOARD_SIZE; i++)
+            for (int j = 0; j < BOARD_SIZE; j++)
+                newPieceIDArray[i][j] = pieceIDArray[i][j];
+        return newPieceIDArray;
+    }
+
+    boolean[][] getPossiblePosArray() {
+        boolean[][] newPossiblePosArray = new boolean[BOARD_SIZE][BOARD_SIZE];
+        for (int i = 0; i < BOARD_SIZE; i++)
+            for (int j = 0; j < BOARD_SIZE; j++)
+                newPossiblePosArray[i][j] = possiblePosArray[i][j];
+        return newPossiblePosArray;
     }
 
     // Check that the tile is adjacent to another tile by checking the height neighbouring cells
@@ -220,6 +234,8 @@ public class BoardState {
         colourArray[tile.getX(0)][tile.getY(0)] = tile.getShape().colourAtIndex(0);
         colourArray[tile.getX(1)][tile.getY(1)] = tile.getShape().colourAtIndex(1);
         colourArray[tile.getX(2)][tile.getY(2)] = tile.getShape().colourAtIndex(2);
+        // Update positions to check
+        updatePositonsToCheck(tile);
         // Update height at board cells
         heightArray[tile.getX(0)][tile.getY(0)]++;
         heightArray[tile.getX(1)][tile.getY(1)]++;
@@ -230,14 +246,7 @@ public class BoardState {
         pieceIDArray[tile.getX(2)][tile.getY(2)] = pieceID++;
         // Update placement string
         placementString += tile.toString();
-        // Update positions to check
-        updatePositionsToCheck();
-        /*if (playerTurn == Colour.Green) {
-            greenShapes.removeFirstOccurrence(tile.getShape());
-        } else {
-            redShapes.removeFirstOccurrence(tile.getShape());
-        }*/
-        // Invert player turn
+
         playerTurn = playerTurn.nextPlayer();
     }
 
@@ -262,56 +271,47 @@ public class BoardState {
         return placementString;
     }
 
-    // Returns arrays on which positions to check
-    public boolean[][] getPossiblePosArray() {
-        return possiblePosArray;
+    public void updatePositonsToCheck(Tile tile) {
+        int xCoord = tile.getX(0);
+        int yCoord = tile.getY(0);
+
+        if (heightArray[xCoord][yCoord] == 0) {
+            possiblePosArray[xCoord][yCoord] = true;
+            updatePositonsAround(xCoord, yCoord);
+            updatePositonsAround(tile.getX(1), tile.getY(1));
+            updatePositonsAround(tile.getX(2), tile.getY(2));
+        }
     }
 
-    // Positions to check
-    public void updatePositionsToCheck() {
-        // Firstly makes a 2-D boolean array that is true for a position if that positions height
-        // is larger than 0 or is adjacent to a position of height larger than 0
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (heightArray[i][j] > 0) {
-                    possiblePosArray[i][j] = true;
+    public void updatePositonsAround(int x, int y) {
+        boolean notOnLeft = (x % BOARD_SIZE != 0);
+        boolean notOnRight = (x % BOARD_SIZE != BOARD_SIZE - 1);
+        boolean notOnTop = (y % BOARD_SIZE != 0);
+        boolean notOnBottom = (y % BOARD_SIZE != BOARD_SIZE - 1);
 
-                    if (i % BOARD_SIZE == 0 && j % BOARD_SIZE == 0) {
-                        possiblePosArray[i + 1][j] = true;
-                        possiblePosArray[i][j + 1] = true;
-                    } else if (i % BOARD_SIZE == 0 && j % BOARD_SIZE == BOARD_SIZE - 1) {
-                        possiblePosArray[i + 1][j] = true;
-                        possiblePosArray[i - 1][j] = true;
-                    } else if (i % BOARD_SIZE == BOARD_SIZE - 1 && j % BOARD_SIZE == 0) {
-                        possiblePosArray[i - 1][j] = true;
-                        possiblePosArray[i + 1][j] = true;
-                    } else if (i % BOARD_SIZE == BOARD_SIZE - 1 && j % BOARD_SIZE == BOARD_SIZE - 1) {
-                        possiblePosArray[i - 1][j] = true;
-                        possiblePosArray[i - 1][j] = true;
-                    } else if (i % BOARD_SIZE == 0) {
-                        possiblePosArray[i + 1][j] = true;
-                        possiblePosArray[i][j + 1] = true;
-                        possiblePosArray[i][j - 1] = true;
-                    } else if (i % BOARD_SIZE == BOARD_SIZE - 1) {
-                        possiblePosArray[i - 1][j] = true;
-                        possiblePosArray[i][j + 1] = true;
-                        possiblePosArray[i][j - 1] = true;
-                    } else if (j % BOARD_SIZE == 0) {
-                        possiblePosArray[i - 1][j] = true;
-                        possiblePosArray[i + 1][j] = true;
-                        possiblePosArray[i][j + 1] = true;
-                    } else if (j % BOARD_SIZE == BOARD_SIZE - 1) {
-                        possiblePosArray[i - 1][j] = true;
-                        possiblePosArray[i + 1][j] = true;
-                        possiblePosArray[i][j - 1] = true;
-                    } else {
-                        possiblePosArray[i + 1][j] = true;
-                        possiblePosArray[i - 1][j] = true;
-                        possiblePosArray[i][j + 1] = true;
-                        possiblePosArray[i][j - 1] = true;
-                    }
-                }
-            }
+        if (notOnLeft) {
+            possiblePosArray[x-1][y] = true;
+        }
+        if (notOnRight) {
+            possiblePosArray[x+1][y] = true;
+        }
+        if (notOnTop) {
+            possiblePosArray[x][y-1] = true;
+        }
+        if (notOnBottom) {
+            possiblePosArray[x][y+1] = true;
+        }
+        if (notOnLeft && notOnTop) {
+            possiblePosArray[x-1][y-1] = true;
+        }
+        if (notOnLeft && notOnBottom) {
+            possiblePosArray[x-1][y+1] = true;
+        }
+        if (notOnRight && notOnTop) {
+            possiblePosArray[x+1][y-1] = true;
+        }
+        if (notOnRight && notOnBottom) {
+            possiblePosArray[x+1][y+1] = true;
         }
     }
 
