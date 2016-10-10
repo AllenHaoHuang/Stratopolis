@@ -48,10 +48,10 @@ class AlphaBeta {
                     // We break if we have an beta cut-off
                     alpha = Math.max(score, alpha);
                     if (alpha >= beta) break;
-                    tileTotalScore += alpha;
+                    tileTotalScore += alpha * ((double)Collections.frequency(shapes, s) / shapes.size());
                     count++;
                 }
-                finalScore += ((tileTotalScore / count) * ((double)Collections.frequency(shapes, s) / shapes.size()));
+                finalScore += (tileTotalScore / count);
                 System.out.println("finalscore is " + finalScore);
                 System.out.println("shapes size is" + shapes.size());
             }
@@ -79,10 +79,10 @@ class AlphaBeta {
                     // We break if we have an alpha cut-off
                     beta = Math.min(score, beta);
                     if (alpha >= beta) break;
-                    tileTotalScore += beta;
+                    tileTotalScore += beta * ((double)Collections.frequency(shapes, s) / shapes.size());
                     count++;
                 }
-                finalScore += (tileTotalScore / count) * ((double) Collections.frequency(shapes, s) / shapes.size());
+                finalScore += (tileTotalScore / count);
                 System.out.println("Shape size is " + shapes.size());
                 System.out.println("finalscore is " + finalScore);
             }
