@@ -6,8 +6,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -15,32 +13,36 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import static java.awt.SystemColor.TEXT;
-import static java.awt.SystemColor.info;
-import static java.awt.SystemColor.text;
-
+/**
+ * `Instructions` allows users to view the instructions for the game
+ *
+ * @author Marvin Yang - u5894100
+ */
 class Instructions extends Stage {
-    private static final int WIDTH = 500;
-    private static final int HEIGHT = 600;
+    private static final int WIDTH = 550;
+    private static final int HEIGHT = 625;
 
     private Stage primaryStage = new Stage();
     private Group root = new Group();
-    private Group controls = new Group();
 
     private void addPanels() {
-        Rectangle mainPanel = new Rectangle(primaryStage.getWidth(), primaryStage.getHeight());
+        // Add the panels for UI
+        Rectangle mainPanel = new Rectangle(568, 672);
         mainPanel.setFill(Color.web("#E9E9ED"));
 
-        Rectangle leftPanel = new Rectangle(130, primaryStage.getHeight());
+        Rectangle leftPanel = new Rectangle(130, 672);
         leftPanel.setFill(Color.BLUEVIOLET);
+        leftPanel.setOpacity(0.8);
 
-        Rectangle rightTopPanel = new Rectangle(130, 0,primaryStage.getWidth()-130,90);
+        Rectangle rightTopPanel = new Rectangle(130, 0, 438, 90);
         rightTopPanel.setFill(Color.web("#3E50B5"));
+        rightTopPanel.setOpacity(0.9);
 
         root.getChildren().addAll(mainPanel, leftPanel, rightTopPanel);
     }
-    //add contains
-    private void addcontains() {
+
+    // Add labels and text
+    private void addContains() {
         Label title = new Label("Instructions");
         title.setRotate(-90);
         title.setTextFill(Color.WHITE);
@@ -54,53 +56,45 @@ class Instructions extends Stage {
         topicLeft.setLayoutX(140);
         topicLeft.setLayoutY(40);
 
-        Label topicformainbody = new Label("Basic Rules:");
-        topicformainbody.setFont(Font.font("Open Sans", 20));
-        topicformainbody.setLayoutX(140);
-        topicformainbody.setLayoutY(100);
+        Label topicMain = new Label("Basic Rules:");
+        topicMain.setFont(Font.font("Open Sans", 20));
+        topicMain.setLayoutX(140);
+        topicMain.setLayoutY(100);
 
         Text block = new Text("Player can choose either Green or Red. For each player, "
-                                + "you have twenty tiles. By using the mouse, you can hover over to the "
-                                + "position you want to place your tile on Alternatively, Player Green can use WASD and Caps Lock "
-                                + "and Player Red can use IJKL and Enter.\n\n"
-                                + "There are two rules for a tile placement."
-                                + "\n1. Your placement must be attached with another tile on grid (no colour constraints)."
-                                + "\n2. You can place a tile above existing ones, but each colour may be stacked only on top of itself or black. "
-                                + "There must also be no overhangs, and each stacked tile must straddle at least two tiles below\n\n"
-                                + "Your score is calculated by finding the largest region of "
-                                + "connected tiles of your colour,and then multiplying the "
-                                + "number of squares forming the region by the maximum "
-                                + "height of tiles in the region.");
-
+                + "you have twenty tiles. By using the mouse, you can hover over to the "
+                + "position you want to place your tile on Alternatively, Player Green can use WASD and Caps Lock "
+                + "and Player Red can use IJKL and Enter.\n\n"
+                + "There are two rules for a tile placement."
+                + "\n1. Your placement must be attached with another tile on grid (no colour constraints)."
+                + "\n2. You can place a tile above existing ones, but each colour may be stacked only on top of itself or black. "
+                + "There must also be no overhangs, and each stacked tile must straddle at least two tiles below\n\n"
+                + "Your score is calculated by finding the largest region of "
+                + "connected tiles of your colour,and then multiplying the "
+                + "number of squares forming the region by the maximum "
+                + "height of tiles in the region.\nThe player with the higher score wins. If the scores are equal, "
+                + "ties will be broken according to the value of the next largest region; cascading to smaller regions if ties persist;"
+                + "and ultimately to a random choice in the unlikely event that it remains unbroken.");
         block.setFont(Font.font("Open Sans", 15.5));
         block.setWrappingWidth(WIDTH - 140);
         block.setLayoutX(140);
         block.setLayoutY(150);
 
-        root.getChildren().addAll(title,topicLeft,block,topicformainbody);
+        root.getChildren().addAll(title, topicLeft, block, topicMain);
     }
 
-
-    // Make a button for the users to quit the instruction
+    // Make a button for the users to close the form
     private void makeControl(){
         Button menu = new Button("Close");
+        menu.setAlignment(Pos.CENTER);
+        menu.setTranslateX(30);
+        menu.setTranslateY(HEIGHT - 50);
         menu.setId("control-btn");
         menu.setOnAction(event -> {
             primaryStage.close();
         });
-
-        HBox hb = new HBox();
-        hb.getChildren().addAll(menu);
-        hb.setSpacing(10);
-        hb.setPrefWidth(WIDTH-50);
-        hb.setAlignment(Pos.CENTER);
-        hb.setLayoutX(-150);
-        hb.setLayoutY(HEIGHT - 60);
-        controls.getChildren().add(hb);
-        root.getChildren().addAll(hb);
-
+        root.getChildren().addAll(menu);
     }
-
 
     Instructions(Stage parentStage) {
         primaryStage.setTitle("How to Play StratoGame - Instructions");
@@ -113,7 +107,6 @@ class Instructions extends Stage {
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         primaryStage.setScene(scene);
-        primaryStage.show();
 
         // Add CSS Stylesheet for buttons and load font
         String style = getClass().getResource("assets/theme.css").toExternalForm();
@@ -121,8 +114,10 @@ class Instructions extends Stage {
         Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Regular.ttf"), 16);
 
         addPanels();
-        addcontains();
+        addContains();
         makeControl();
+
+        primaryStage.showAndWait();
     }
 }
 

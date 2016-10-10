@@ -36,7 +36,7 @@ public enum Orientation {
     // For storing static enum values
     private static Orientation[] enumValues = values();
 
-    /* Return the next Orientation enum for scrolling on the board */
+    /* Return the next Orientation enum for changing hover piece orientation on the board */
     public Orientation next() {
         return values()[(ordinal() + 1) % enumValues.length];
     }

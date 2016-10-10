@@ -45,6 +45,7 @@ public class EasyBot extends Bot {
             }
         }
 
+        // Print console message and return the best move
         System.out.println("MAX SCORE: " + maxScore + ", FINAL CHOICE: " + bestMove);
         return bestMove;
     }

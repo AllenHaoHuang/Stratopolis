@@ -30,17 +30,17 @@ import java.util.Optional;
  * design
  *
  * @author William Shen - u6096655
+ *
+ * The implementation for music was based off COMP1110 Assignment 1 by Steve Blackburn
  */
 public class Menu extends Application {
     private static final int WIDTH = 500;
     private static final int HEIGHT = 455;
 
-    // So we can return to menu
+    // JavaFX Variables
     private Stage primaryStage;
     private Group root = new Group();
     private Group middleComponents = new Group();
-    private Font openSansRegular;
-    private Font openSansBold;
 
     private Button greenBtn = new Button("Human");
     private Button redBtn = new Button ("Human");
@@ -48,18 +48,18 @@ public class Menu extends Application {
     private Player greenPlayer = Player.Human;
     private Player redPlayer = Player.Human;
 
+    // Default option values
     private double redDifficulty = 2;
     private double greenDifficulty = 2;
     private int hintCount = 0;
-
     private boolean musicOn = false;
 
-    /* where to find media assets */
+    // Specify location of music file
     private static final String URI_BASE = "assets/";
-    //private static final String LOOP_URI = Menu.class.getResource(URI_BASE + "whitepeople.wav").toString();
+    private static final String LOOP_URI = Menu.class.getResource(URI_BASE + "drums.wav").toString();
     private AudioClip loop;
 
-
+    // Add main panels to create skeleton
     private void addPanels() {
         // Create panels and add to root
         Rectangle mainPanel = new Rectangle(primaryStage.getWidth(), primaryStage.getHeight());
@@ -76,6 +76,7 @@ public class Menu extends Application {
         root.getChildren().addAll(mainPanel, topPanel, middlePanel);
     }
 
+    // Add top control buttons for Instructions, Help, and Viewer
     private void addTop() {
         // Main title label near the top
         Label title = new Label ("StratoGame");
@@ -88,6 +89,7 @@ public class Menu extends Application {
         howToPlay.setTooltip(new Tooltip("How to Play StratoGame"));
         howToPlay.setLayoutX(primaryStage.getWidth() - 200);
         howToPlay.setOnAction(event -> {
+            // Only allow one instance, block out Menu controls
             root.setDisable(true);
             new Instructions(primaryStage);
             root.setDisable(false);
@@ -98,6 +100,7 @@ public class Menu extends Application {
         help.setTooltip(new Tooltip("Help"));
         help.setLayoutX(primaryStage.getWidth() - 150);
         help.setOnAction(event -> {
+            // Show help message for 'Menu'
             Alert message = new Alert(Alert.AlertType.INFORMATION);
             message.setTitle("StratoGame - Help");
             message.setHeaderText("Main Menu Help");
@@ -124,6 +127,7 @@ public class Menu extends Application {
         root.getChildren().addAll(title, howToPlay, help, viewBtn);
     }
 
+    // Add main control panel - i.e. white central block
     private void addMiddle() {
         // Labels to identify players
         Label greenLabel = new Label("Player Green");
@@ -137,19 +141,18 @@ public class Menu extends Application {
         GridPane.setHalignment(redLabel, HPos.CENTER);
 
         Label info = new Label("By William Shen, Allen Huang and Marvin Yang");
-        info.setFont(openSansRegular);
+        info.setFont(Font.font("Open Sans", 16));
         info.setTextFill(Color.web("#3E50B5"));
         info.setPrefWidth(primaryStage.getWidth());
         info.setAlignment(Pos.CENTER);
         info.setLayoutY(HEIGHT - 80);
 
-        // Buttons to allow players to select who to play against
+        // Buttons to allow players to select who to play against, changes text based on player state
         greenBtn.setId("player-btn-green");
         greenBtn.setOnAction(event -> {
             greenPlayer = greenPlayer.getNext();
             greenBtn.setText(greenPlayer.toString());
         });
-
         redBtn.setId("player-btn-red");
         redBtn.setOnAction(event -> {
             redPlayer = redPlayer.getNext();
@@ -172,11 +175,9 @@ public class Menu extends Application {
         root.getChildren().add(middleComponents);
     }
 
+    // Creates the 'Start Game', 'Options' and 'Exit' buttons
     private void controlButtons() {
         // Create control buttons, add CSS and group into HBox
-        Button options = new Button("Options");
-        options.setId("control-btn");
-
         Button startGame = new Button("Start Game");
         startGame.setId("control-btn");
         startGame.setOnAction(event -> {
@@ -186,6 +187,9 @@ public class Menu extends Application {
             new Board(primaryStage, greenPlayer, redPlayer, greenDifficulty, redDifficulty, hintCount);
             root.setDisable(false);
         });
+
+        Button options = new Button("Options");
+        options.setId("control-btn");
 
         Button exit = new Button("Exit");
         exit.setId("control-btn");
@@ -215,7 +219,7 @@ public class Menu extends Application {
             hb.setVisible(false);
             middleComponents.setVisible(false);
 
-            // Set labels and sliders
+            // Create and set labels and sliders
             Label greenLabel = new Label("Hard Bot Difficulty (for Player Green)");
             greenLabel.setFont(Font.font("Open Sans", 18));
             greenLabel.setTextFill(Color.GREEN);
@@ -224,6 +228,7 @@ public class Menu extends Application {
             redLabel.setFont(Font.font("Open Sans", 18));
             redLabel.setTextFill(Color.RED);
 
+            // Set default difficulties to class variable. The difficulty represent hard bot depth
             Slider greenSlider = new Slider(1, 3, greenDifficulty);
             greenSlider.setId("slider");
             greenSlider.setShowTickLabels(true);
@@ -238,20 +243,20 @@ public class Menu extends Application {
             redSlider.setSnapToTicks(true);
             redSlider.setPrefWidth(primaryStage.getWidth() - 160);
 
-            // Selecting number of hints, use HBox
+            // For selecting number of hints using a ComboBox
             Label hintLabel = new Label("Number of Hints: ");
             hintLabel.setFont(Font.font("Open Sans", 18));
-
             ComboBox hintCombo = new ComboBox();
             hintCombo.getItems().addAll(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20);
             hintCombo.setValue(hintCount);
 
+            // CheckBox to turn music on and off
             Label musicLabel = new Label("   Music: ");
             musicLabel.setFont(Font.font("Open Sans", 18));
-
             CheckBox musicCheck = new CheckBox();
             musicCheck.setSelected(musicOn);
 
+            // Add all to HBox for alignment
             HBox prev = new HBox();
             prev.setAlignment(Pos.CENTER);
             prev.setSpacing(10);
@@ -263,6 +268,7 @@ public class Menu extends Application {
             instructions.setFont(Font.font("Open Sans", 16));
             instructions.setTextFill(Color.web("#3E50B5"));
 
+            // Exit controls, add to HBox for alignment
             Button close = new Button("Close");
             close.setId("control-btn");
 
@@ -287,17 +293,21 @@ public class Menu extends Application {
 
             // Save and exit button clicked, we save the value
             save.setOnAction(saveEvent -> {
+                // If no values have changed we simply close the options
                 if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()
                         && hintCount == (int) hintCombo.getValue() && musicOn == musicCheck.isSelected()) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
                 } else {
+                    // Update the values and show success message
                     redDifficulty = redSlider.getValue();
                     greenDifficulty = greenSlider.getValue();
                     hintCount = (int) hintCombo.getValue();
-                    musicOn = !musicCheck.isSelected();
-                    //toggleSoundLoop();
+                    if (musicOn != musicCheck.isSelected()) {
+                        musicOn = !musicCheck.isSelected();
+                        toggleSoundLoop();
+                    }
                     Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
                     success.showAndWait();
                     root.getChildren().removeAll(vBox, controls);
@@ -308,12 +318,14 @@ public class Menu extends Application {
 
             // Close options menu, check if user has saved first and ask accordingly
             close.setOnAction(exitEvent -> {
+                // If no values have been changed we simply close the options
                 if (greenDifficulty == greenSlider.getValue() && redDifficulty == redSlider.getValue()
                         && hintCount == (int) hintCombo.getValue()) {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
                 } else {
+                    // Warn user they do not have saved values, and save and close accordingly
                     Alert alert = new Alert(Alert.AlertType.WARNING, "You have unsaved changes. Do you" +
                             " want to save the new difficulties?", ButtonType.NO, ButtonType.YES);
                     Optional<ButtonType> result = alert.showAndWait();
@@ -321,19 +333,20 @@ public class Menu extends Application {
                         redDifficulty = redSlider.getValue();
                         greenDifficulty = greenSlider.getValue();
                         hintCount = (int) hintCombo.getValue();
-                        musicOn = !musicCheck.isSelected();
-                    }
+                        if (musicOn != musicCheck.isSelected()) {
+                            musicOn = !musicCheck.isSelected();
+                            toggleSoundLoop();
+                        }                    }
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
-                    //toggleSoundLoop();
                 }
             });
         });
     }
 
     private void imagePanel() {
-        // Set up fancy strip of tiles
+        // Set up fancy strip of tiles at bottom
         GridPane gridPane = new GridPane();
         gridPane.setPrefWidth(primaryStage.getWidth());
         gridPane.setHgap(3);
@@ -351,12 +364,7 @@ public class Menu extends Application {
         root.getChildren().add(gridPane);
     }
 
-
-
-    /**
-     * Set up the sound loop (to play when the 'M' key is pressed)
-     */
-    /*
+    // Set up the sound loop (plays when checkbox is checked and saved)
     private void setUpSoundLoop() {
         try {
             loop = new AudioClip(LOOP_URI);
@@ -366,19 +374,14 @@ public class Menu extends Application {
         }
     }
 
-
-    /**
-     * Turn the sound loop on or off
-     */
-    /*
+    // Turn the sound loop on or off
     private void toggleSoundLoop() {
         if (musicOn)
             loop.stop();
         else
             loop.play();
         musicOn = !musicOn;
-    }*/
-
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -399,8 +402,8 @@ public class Menu extends Application {
         scene.getStylesheets().add(style);
 
         // Add Open Sans Font
-        openSansRegular = Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Regular.ttf"), 16);
-        openSansBold = Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Bold.ttf"), 16);
+        Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Regular.ttf"), 16);
+        Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Bold.ttf"), 16);
 
         // Add components to root
         addPanels();
@@ -408,7 +411,7 @@ public class Menu extends Application {
         addMiddle();
         controlButtons();
         imagePanel();
-        //setUpSoundLoop();
+        setUpSoundLoop();
 
         // Set focus on none of the controls
         root.requestFocus();

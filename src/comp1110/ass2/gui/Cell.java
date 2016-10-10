@@ -60,7 +60,7 @@ class Cell extends StackPane {
         getChildren().add(cell);
     }
 
-    // For creating a hint tile
+    // For creating a hint tile, fill is yellow
     Cell() {
         setCellStroke();
         cell.setFill(Color.YELLOW);

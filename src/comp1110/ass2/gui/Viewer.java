@@ -19,7 +19,6 @@ import comp1110.ass2.StratoGame;
 
 import java.util.Arrays;
 
-
 /**
  * `Viewer` allows us to view piece placements in StratoGame
  * given an input string
@@ -28,7 +27,7 @@ import java.util.Arrays;
  * @author Marvin Yang - u5894100
  */
 class Viewer extends Stage {
-    /* board layout */
+    /* Board Layout */
     private static final int VIEWER_WIDTH = 675;
     private static final int VIEWER_HEIGHT = 710;
     private static final int GRID_SIZE = 26;
@@ -182,8 +181,7 @@ class Viewer extends Stage {
             for (int j = 0; j < GRID_SIZE; j++) { // rows
                 char x = (char) (j + 'A');
                 char y = (char) (i + 'A');
-                StringBuilder sb = new StringBuilder().append(x).append(y);
-                Cell cell = new Cell(sb.toString());
+                Cell cell = new Cell("" + x + y);
                 cell.setTranslateX(j * CELL_SIZE + X_OFFSET);
                 cell.setTranslateY(i * CELL_SIZE + Y_OFFSET);
                 root.getChildren().add(cell);

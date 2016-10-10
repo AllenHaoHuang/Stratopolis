@@ -1,10 +1,8 @@
 package comp1110.ass2;
 
-import comp1110.ass2.bots.EasyBot;
 import comp1110.ass2.logic.*;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 /**
  * This class provides the text interface for the Strato Game

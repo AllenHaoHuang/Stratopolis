@@ -2,8 +2,6 @@ package comp1110.ass2.bots;
 
 import comp1110.ass2.logic.*;
 
-import java.util.LinkedList;
-
 /**
  * `Bot` is the abstract class and is the framework
  * we base EasyBot and HardBot off
