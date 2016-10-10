@@ -85,6 +85,14 @@ public class BoardState {
         Collections.shuffle(redShapes);
     }
 
+    public LinkedList<Shape> getShapes(Colour colour) {
+        if (colour == Colour.Green) {
+            return greenShapes;
+        } else {
+            return redShapes;
+        }
+    }
+
     public LinkedList<Shape> getGreenShapes() { return greenShapes; }
     public LinkedList<Shape> getRedShapes() { return redShapes; }
 
@@ -224,11 +232,11 @@ public class BoardState {
         placementString += tile.toString();
         // Update positions to check
         updatePositionsToCheck();
-        if (playerTurn == Colour.Green) {
+        /*if (playerTurn == Colour.Green) {
             greenShapes.removeFirstOccurrence(tile.getShape());
         } else {
             redShapes.removeFirstOccurrence(tile.getShape());
-        }
+        }*/
         // Invert player turn
         playerTurn = playerTurn.nextPlayer();
     }
@@ -324,6 +332,14 @@ public class BoardState {
             }
         }
         return tileList;
+    }
+
+    public void removeTile (Tile tile) {
+        if (playerTurn == Colour.Green) {
+            greenShapes.removeFirstOccurrence(tile.getShape());
+        } else {
+            redShapes.removeFirstOccurrence(tile.getShape());
+        }
     }
 
     public boolean isFinished() {

@@ -28,35 +28,37 @@ class AlphaBeta {
 
         // Check if this instance is a maximising or minimising player
         if (isMax) {
-            if (myPlayer.isGreen()) {
-                shapes = node.getGreenShapes();
-                // makes a new linked list with no repeat
-                Set<Shape> hs = new HashSet<>();
-                hs.addAll(shapes);
-                shapeNoRepeat.addAll(hs);
+            shapes = node.getShapes(myPlayer);
+            // makes a new linked list with no repeat
+            Set<Shape> hs = new HashSet<>();
+            hs.addAll(shapes);
+            shapeNoRepeat.addAll(hs);
+            for (Shape s : shapeNoRepeat) {
+                LinkedList<Tile> possibleMoves = node.generatePossibleMoves(s);
+                int count = 0;
+                double tileTotalScore = 0;
 
-                for (Shape s : shapeNoRepeat) {
-                    LinkedList<Tile> possibleMoves = node.generatePossibleMoves(s);
-                    int count = 0;
-                    double tileTotalScore = 0;
-
-                    for (Tile tile : possibleMoves) {
-                        // Create a new board state if the given tile is placed
-                        BoardState child = new BoardState(node);
-                        child.addTile(tile);
-                        // Recursive call on Alpha-Beta bot as minimising player
-                        double score = start(child, depth - 1, myPlayer, false, alpha, beta);
-                        // We break if we have an beta cut-off
-                        alpha = Math.max(score, alpha);
-                        if (alpha >= beta) break;
-                        tileTotalScore += alpha;
-                        count++;
-                    }
-                    finalScore += (tileTotalScore / count) * (Collections.frequency(shapes, s) / shapes.size());
+                for (Tile tile : possibleMoves) {
+                    // Create a new board state if the given tile is placed
+                    BoardState child = new BoardState(node);
+                    child.addTile(tile);
+                    child.removeTile(tile);
+                    // Recursive call on Alpha-Beta bot as minimising player
+                    double score = start(child, depth - 1, myPlayer, false, alpha, beta);
+                    // We break if we have an beta cut-off
+                    alpha = Math.max(score, alpha);
+                    if (alpha >= beta) break;
+                    tileTotalScore += alpha;
+                    count++;
                 }
+                finalScore += ((tileTotalScore / count) * ((double)Collections.frequency(shapes, s) / shapes.size()));
+                System.out.println("finalscore is " + finalScore);
+                System.out.println("shapes size is" + shapes.size());
             }
+
+            return finalScore;
         } else {
-            shapes = node.getRedShapes();
+            shapes = node.getShapes(myPlayer);
             // makes a new linked list with no repeat
             Set<Shape> hs = new HashSet<>();
             hs.addAll(shapes);
@@ -71,6 +73,7 @@ class AlphaBeta {
                     // Create a new board state if the given tile is placed
                     BoardState child = new BoardState(node);
                     child.addTile(tile);
+                    child.removeTile(tile);
                     // Recursive call on Alpha-Beta bot as maximising player
                     double score = start(child, depth-1, myPlayer, true, alpha, beta);
                     // We break if we have an alpha cut-off
@@ -79,10 +82,12 @@ class AlphaBeta {
                     tileTotalScore += beta;
                     count++;
                 }
-                finalScore += (tileTotalScore / count) * (Collections.frequency(shapes, s) / shapes.size());
+                finalScore += (tileTotalScore / count) * ((double) Collections.frequency(shapes, s) / shapes.size());
+                System.out.println("Shape size is " + shapes.size());
+                System.out.println("finalscore is " + finalScore);
             }
+            return finalScore;
         }
-        return finalScore;
     }
 }
 

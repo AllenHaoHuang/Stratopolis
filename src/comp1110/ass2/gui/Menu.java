@@ -56,7 +56,7 @@ public class Menu extends Application {
 
     /* where to find media assets */
     private static final String URI_BASE = "assets/";
-    private static final String LOOP_URI = Menu.class.getResource(URI_BASE + "whitepeople.wav").toString();
+    //private static final String LOOP_URI = Menu.class.getResource(URI_BASE + "whitepeople.wav").toString();
     private AudioClip loop;
 
 
@@ -297,7 +297,7 @@ public class Menu extends Application {
                     greenDifficulty = greenSlider.getValue();
                     hintCount = (int) hintCombo.getValue();
                     musicOn = !musicCheck.isSelected();
-                    toggleSoundLoop();
+                    //toggleSoundLoop();
                     Alert success = new Alert(Alert.AlertType.INFORMATION, "Difficulties saved successfully.");
                     success.showAndWait();
                     root.getChildren().removeAll(vBox, controls);
@@ -326,7 +326,7 @@ public class Menu extends Application {
                     root.getChildren().removeAll(vBox, controls);
                     hb.setVisible(true);
                     middleComponents.setVisible(true);
-                    toggleSoundLoop();
+                    //toggleSoundLoop();
                 }
             });
         });
@@ -356,6 +356,7 @@ public class Menu extends Application {
     /**
      * Set up the sound loop (to play when the 'M' key is pressed)
      */
+    /*
     private void setUpSoundLoop() {
         try {
             loop = new AudioClip(LOOP_URI);
@@ -369,13 +370,14 @@ public class Menu extends Application {
     /**
      * Turn the sound loop on or off
      */
+    /*
     private void toggleSoundLoop() {
         if (musicOn)
             loop.stop();
         else
             loop.play();
         musicOn = !musicOn;
-    }
+    }*/
 
 
     @Override
@@ -406,7 +408,7 @@ public class Menu extends Application {
         addMiddle();
         controlButtons();
         imagePanel();
-        setUpSoundLoop();
+        //setUpSoundLoop();
 
         // Set focus on none of the controls
         root.requestFocus();

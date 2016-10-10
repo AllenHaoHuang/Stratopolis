@@ -40,7 +40,7 @@ public class HardBot extends Bot {
         // Generate the potential moves the bot can place, then loop through them and evaluate
         LinkedList<Tile> possibleMoves = game.generatePossibleMoves(shape);
         Tile bestMove = possibleMoves.getFirst();
-        int maxScore = -9999;
+        double maxScore = -9999;
 
         for (Tile tile : possibleMoves) {
             // Create a board state with the current tile added
@@ -50,7 +50,7 @@ public class HardBot extends Bot {
             double tileScore = AlphaBeta.start(node, lookahead - 1, this.myPlayer, true, -9999, 9999);
             if (tileScore > maxScore) {
                 bestMove = tile;
-                maxScore = (int)tileScore;
+                maxScore = tileScore;
             }
         }
 
