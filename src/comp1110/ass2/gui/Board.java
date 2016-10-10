@@ -760,10 +760,20 @@ class Board extends Stage {
             char x = (char)((local.getX() - X_OFFSET)/CELL_SIZE + 'A');
             char y = (char)((local.getY() - Y_OFFSET)/CELL_SIZE + 'A');
 
+<<<<<<< HEAD
             /* Rotate clockwise for E or O key and anticlockwise for Q or I key
              * W = up, A = left, S = down, D = right, CAPS LOCK = place tile
              * I = up, J = left, K = down, L = right, ENTER = place tile
              * We update the preview of the tile accordingly with the key movements */
+=======
+            // place piece with space bar
+            if (event.getCode() == KeyCode.SPACE && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn()) {
+                addTile(x, y);
+            }
+            
+            // Rotate clockwise for down key and anticlockwise for up key
+>>>>>>> 30d2bb99d834e38b034c578b2f38e9084dc8c096
             if (event.getCode() == KeyCode.Q && boardState.isGreenTurn()
                     || event.getCode() == KeyCode.U && boardState.isRedTurn()) {
                 root.getChildren().remove(hoverCurrentTile);
