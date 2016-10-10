@@ -726,6 +726,12 @@ class Board extends Stage {
             char x = (char)((local.getX() - X_OFFSET)/CELL_SIZE + 'A');
             char y = (char)((local.getY() - Y_OFFSET)/CELL_SIZE + 'A');
 
+            // place piece with space bar
+            if (event.getCode() == KeyCode.SPACE && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn()) {
+                addTile(x, y);
+            }
+            
             // Rotate clockwise for down key and anticlockwise for up key
             if (event.getCode() == KeyCode.Q && boardState.isGreenTurn()
                     || event.getCode() == KeyCode.U && !boardState.isGreenTurn()) {
