@@ -87,6 +87,9 @@ class AlphaBeta {
             for (Shape s : shapeNoRepeat) {
                 // For each shape generate a linked list having all possible moves
                 LinkedList<Tile> possibleMoves = node.generatePossibleMoves(s);
+                // stores current alpha and beta so when it can reset when going through different shapes
+                double originalAlpha = alpha;
+                double originalBeta = beta;
 
                 // probability of a shape being selected
                 double probability = (double)Collections.frequency(shapes, s) / shapes.size();
@@ -104,6 +107,8 @@ class AlphaBeta {
                 }
                 // the score of the node is equal to the weighted average of the alphas of its children
                 nodeScore += alpha * probability;
+                alpha = originalAlpha;
+                beta = originalBeta;
             }
 
             return nodeScore;
@@ -119,6 +124,10 @@ class AlphaBeta {
             for (Shape s : shapeNoRepeat) {
                 // For each shape generate a linked list having all possible moves
                 LinkedList<Tile> possibleMoves = node.generatePossibleMoves(s);
+
+                // stores current alpha and beta so when it can reset when going through different shapes
+                double originalAlpha = alpha;
+                double originalBeta = beta;
 
                 // probability of the shape being selected
                 double probability = (double)Collections.frequency(shapes, s) / shapes.size();
@@ -136,6 +145,8 @@ class AlphaBeta {
                 }
                 // the score of the node is equal to the weighted average of the betas of its children
                 nodeScore += beta * probability;
+                alpha = originalAlpha;
+                beta = originalBeta;
             }
             return nodeScore;
         }
