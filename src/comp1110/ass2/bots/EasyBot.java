@@ -38,7 +38,7 @@ public class EasyBot extends Bot {
             BoardState gameCopy = new BoardState(game);
             gameCopy.addTile(tile);
             // Get the score for the board and update the bestMove and maxScore accordingly
-            int tileScore = gameCopy.getScore(myPlayer);
+            int tileScore = gameCopy.getScore(myPlayer) - gameCopy.getScore(myPlayer.nextPlayer());
             if (tileScore > maxScore) {
                 bestMove = tile;
                 maxScore = tileScore;

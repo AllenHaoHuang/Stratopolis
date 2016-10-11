@@ -23,7 +23,7 @@ class AlphaBeta {
 
         // We can use normal alpha beta for the first 2 moves as the player has information to this
         if (original - depth > 2)
-            return imperfectAlphaBeta(node, depth, myPlayer, isMax, alpha, beta);
+            return probabilisticAlphaBeta(node, depth, myPlayer, isMax, alpha, beta);
 
         // Check if this instance is a maximising or minimising player
         if (isMax) {
@@ -64,28 +64,31 @@ class AlphaBeta {
 
     }
 
-    // FIXME: Comment all this extensively
-    private static double imperfectAlphaBeta(BoardState node, int depth, Colour myPlayer, boolean isMax, double alpha, double beta) {
+    private static double probabilisticAlphaBeta(BoardState node, int depth, Colour myPlayer, boolean isMax, double alpha, double beta) {
         // If we run out of lookahead or the game is finished we return the heuristic
         if (depth == 0 || node.isFinished())
             return node.getScore(myPlayer) - node.getScore(myPlayer.nextPlayer());
 
+        // Linked list that is going to contain all the shapes available
         LinkedList<Shape> shapes;
+        // Linked list that contains all the shapes available with no repeats
         LinkedList<Shape> shapeNoRepeat = new LinkedList<>();
-        double finalScore = 0.0;
 
         // Check if this instance is a maximising or minimising player
         if (isMax) {
             shapes = node.getShapes(myPlayer);
-            // makes a new linked list with no repeat
+            // generation of a list having no repeat
             Set<Shape> hs = new HashSet<>();
             hs.addAll(shapes);
             shapeNoRepeat.addAll(hs);
 
+            double nodeScore = 0.0;
+
             for (Shape s : shapeNoRepeat) {
+                // For each shape generate a linked list having all possible moves
                 LinkedList<Tile> possibleMoves = node.generatePossibleMoves(s);
-                int count = 0;
-                double tileTotalScore = 0;
+
+                // probability of a shape being selected
                 double probability = (double)Collections.frequency(shapes, s) / shapes.size();
 
                 for (Tile tile : possibleMoves) {
@@ -94,30 +97,30 @@ class AlphaBeta {
                     child.addTile(tile);
                     child.removeTile(tile);
                     // Recursive call on Alpha-Beta bot as minimising player
-                    double score = imperfectAlphaBeta(child, depth - 1, myPlayer, false, alpha, beta);
+                    double score = probabilisticAlphaBeta(child, depth - 1, myPlayer, false, alpha, beta);
                     // We break if we have an beta cut-off
                     alpha = Math.max(score, alpha);
                     if (alpha >= beta) break;
-                    tileTotalScore += alpha * probability;
-                    count++;
                 }
-                if (count != 0) {
-                    finalScore += (tileTotalScore / count);
-                }
+                // the score of the node is equal to the weighted average of the alphas of its children
+                nodeScore += alpha * probability;
             }
 
-            return finalScore;
+            return nodeScore;
         } else {
             shapes = node.getShapes(myPlayer.nextPlayer());
-            // makes a new linked list with no repeat
+            // generation of a list having no repeat
             Set<Shape> hs = new HashSet<>();
             hs.addAll(shapes);
             shapeNoRepeat.addAll(hs);
 
+            double nodeScore = 0.0;
+
             for (Shape s : shapeNoRepeat) {
+                // For each shape generate a linked list having all possible moves
                 LinkedList<Tile> possibleMoves = node.generatePossibleMoves(s);
-                int count = 0;
-                double tileTotalScore = 0;
+
+                // probability of the shape being selected
                 double probability = (double)Collections.frequency(shapes, s) / shapes.size();
 
                 for (Tile tile : possibleMoves) {
@@ -126,18 +129,15 @@ class AlphaBeta {
                     child.addTile(tile);
                     child.removeTile(tile);
                     // Recursive call on Alpha-Beta bot as maximising player
-                    double score = imperfectAlphaBeta(child, depth-1, myPlayer, true, alpha, beta);
+                    double score = probabilisticAlphaBeta(child, depth-1, myPlayer, true, alpha, beta);
                     // We break if we have an alpha cut-off
                     beta = Math.min(score, beta);
                     if (alpha >= beta) break;
-                    tileTotalScore += beta * probability;
-                    count++;
                 }
-                if (count != 0) {
-                    finalScore += (tileTotalScore / count);
-                }
+                // the score of the node is equal to the weighted average of the betas of its children
+                nodeScore += beta * probability;
             }
-            return finalScore;
+            return nodeScore;
         }
     }
 }
