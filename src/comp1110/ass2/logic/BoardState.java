@@ -43,9 +43,8 @@ public class BoardState{
         colourArray[12][13] = Colour.Green;
         pieceIDArray[12][12] = pieceID;
         pieceIDArray[12][13] = pieceID++;
-
-        updatePositonsAround(12,12);
-        updatePositonsAround(12,13);
+        updatePositionsAround(12,12);
+        updatePositionsAround(12,13);
     }
 
     /* Constructor for Board State given a valid placement string */
@@ -62,7 +61,7 @@ public class BoardState{
         }
     }
 
-    /* Constructor for Board State given an old state - i.e. makes a copy*/
+    /* Constructor for Board State given an old state - i.e. makes a copy */
     public BoardState(BoardState oldState) {
         this(oldState.getPlacementString());
         this.greenShapes = (LinkedList<Shape>) oldState.getGreenShapes().clone();
@@ -84,26 +83,23 @@ public class BoardState{
         Collections.shuffle(redShapes);
     }
 
+    // Get the linked list containing the pieces of a player
     public LinkedList<Shape> getShapes(Colour colour) {
-        if (colour == Colour.Green) {
+        if (colour == Colour.Green)
             return greenShapes;
-        } else {
+        else
             return redShapes;
-        }
     }
 
     public LinkedList<Shape> getGreenShapes() { return greenShapes; }
     public LinkedList<Shape> getRedShapes() { return redShapes; }
 
     // Return whose turn it is in colours
-    public Colour getPlayerTurn() {
-        return playerTurn;
-    }
+    public Colour getPlayerTurn() { return playerTurn; }
 
-    // Return if its green player's turn
-    public boolean isGreenTurn() {
-        return playerTurn == Colour.Green;
-    }
+    // Return if its green player's turn or red player's turn
+    public boolean isGreenTurn() { return playerTurn == Colour.Green; }
+    public boolean isRedTurn() { return playerTurn == Colour.Red; }
 
     // A tile must obey all the rules for it to be valid
     public boolean isTileValid(Tile tile) {
@@ -235,7 +231,7 @@ public class BoardState{
         colourArray[tile.getX(1)][tile.getY(1)] = tile.getShape().colourAtIndex(1);
         colourArray[tile.getX(2)][tile.getY(2)] = tile.getShape().colourAtIndex(2);
         // Update positions to check
-        updatePositonsToCheck(tile);
+        updatePositionsToCheck(tile);
         // Update height at board cells
         heightArray[tile.getX(0)][tile.getY(0)]++;
         heightArray[tile.getX(1)][tile.getY(1)]++;
@@ -257,13 +253,15 @@ public class BoardState{
 
     // Get the score of a player at the current board status
     public int getScore(boolean isGreen) {
-        return Score.getScore(this, isGreen);
+        return new Score(this, isGreen).getScore();
     }
 
     // Get the score based off a colour
     public int getScore(Colour player) {
-        if (player == Colour.Green) return Score.getScore(this, true);
-        else return Score.getScore(this, false);
+        if (player == Colour.Green)
+            return new Score(this, true).getScore();
+        else
+            return new Score(this, false).getScore();
     }
 
     // Get the placement string
@@ -271,54 +269,39 @@ public class BoardState{
         return placementString;
     }
 
-    public void updatePositonsToCheck(Tile tile) {
+    // FIXME: Comment this
+    public void updatePositionsToCheck(Tile tile) {
         int xCoord = tile.getX(0);
         int yCoord = tile.getY(0);
 
         if (heightArray[xCoord][yCoord] == 0) {
             possiblePosArray[xCoord][yCoord] = true;
-            updatePositonsAround(xCoord, yCoord);
-            updatePositonsAround(tile.getX(1), tile.getY(1));
-            updatePositonsAround(tile.getX(2), tile.getY(2));
+            updatePositionsAround(xCoord, yCoord);
+            updatePositionsAround(tile.getX(1), tile.getY(1));
+            updatePositionsAround(tile.getX(2), tile.getY(2));
         }
     }
 
-    public void updatePositonsAround(int x, int y) {
+    // FIXME: Comment this
+    public void updatePositionsAround(int x, int y) {
         boolean notOnLeft = (x % BOARD_SIZE != 0);
         boolean notOnRight = (x % BOARD_SIZE != BOARD_SIZE - 1);
         boolean notOnTop = (y % BOARD_SIZE != 0);
         boolean notOnBottom = (y % BOARD_SIZE != BOARD_SIZE - 1);
 
-        if (notOnLeft) {
-            possiblePosArray[x-1][y] = true;
-        }
-        if (notOnRight) {
-            possiblePosArray[x+1][y] = true;
-        }
-        if (notOnTop) {
-            possiblePosArray[x][y-1] = true;
-        }
-        if (notOnBottom) {
-            possiblePosArray[x][y+1] = true;
-        }
-        if (notOnLeft && notOnTop) {
-            possiblePosArray[x-1][y-1] = true;
-        }
-        if (notOnLeft && notOnBottom) {
-            possiblePosArray[x-1][y+1] = true;
-        }
-        if (notOnRight && notOnTop) {
-            possiblePosArray[x+1][y-1] = true;
-        }
-        if (notOnRight && notOnBottom) {
-            possiblePosArray[x+1][y+1] = true;
-        }
+        if (notOnLeft) possiblePosArray[x-1][y] = true;
+        if (notOnRight) possiblePosArray[x+1][y] = true;
+        if (notOnTop) possiblePosArray[x][y-1] = true;
+        if (notOnBottom) possiblePosArray[x][y+1] = true;
+        if (notOnLeft && notOnTop) possiblePosArray[x-1][y-1] = true;
+        if (notOnLeft && notOnBottom) possiblePosArray[x-1][y+1] = true;
+        if (notOnRight && notOnTop) possiblePosArray[x+1][y-1] = true;
+        if (notOnRight && notOnBottom) possiblePosArray[x+1][y+1] = true;
     }
 
     // Generate possible moves for a given shape and the current board state
     public LinkedList<Tile> generatePossibleMoves(Shape shape) {
         LinkedList<Tile> tileList = new LinkedList<>();
-
         // Loop through board grid
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -334,6 +317,7 @@ public class BoardState{
         return tileList;
     }
 
+    // FIXME: Comment this
     public void removeTile (Tile tile) {
         if (playerTurn == Colour.Green) {
             greenShapes.removeFirstOccurrence(tile.getShape());
@@ -342,6 +326,7 @@ public class BoardState{
         }
     }
 
+    // Check if game is finished - i.e. players have no pieces left
     public boolean isFinished() {
         return (getRedShapes().isEmpty());
     }

@@ -4,7 +4,6 @@ import comp1110.ass2.logic.BoardState;
 import comp1110.ass2.logic.Colour;
 import comp1110.ass2.logic.Shape;
 import comp1110.ass2.logic.Tile;
-import sun.awt.image.ImageWatched;
 
 import java.util.*;
 
@@ -22,20 +21,14 @@ class AlphaBeta {
         if (depth == 0 || node.isFinished())
             return node.getScore(myPlayer) - node.getScore(myPlayer.nextPlayer());
 
-        if (original - depth > 2) {
-            return imperfectAlphaBeta(node, depth, myPlayer, isMax, alpha, beta);
-        }
-
         // We can use normal alpha beta for the first 2 moves as the player has information to this
+        if (original - depth > 2)
+            return imperfectAlphaBeta(node, depth, myPlayer, isMax, alpha, beta);
+
         // Check if this instance is a maximising or minimising player
         if (isMax) {
-            Shape shape;
-            if (myPlayer.isGreen()) {
-                shape = node.getGreenShapes().getFirst();
-            } else {
-                shape = node.getRedShapes().getFirst();
-            }
-
+            Shape shape = (myPlayer.isGreen()) ? node.getGreenShapes().getFirst()
+                    : node.getRedShapes().getFirst();
             // Generate all the possible moves given the shape and loop through them
             LinkedList<Tile> possibleMoves = node.generatePossibleMoves(shape);
             for (Tile tile : possibleMoves) {
@@ -51,13 +44,8 @@ class AlphaBeta {
             }
             return alpha;
         } else {
-            Shape shape;
-            if (myPlayer.isGreen()) {
-                shape = node.getRedShapes().getFirst();
-            } else {
-                shape = node.getGreenShapes().getFirst();
-            }
-
+            Shape shape = (myPlayer.isGreen()) ? node.getRedShapes().getFirst()
+                    : node.getGreenShapes().getFirst();
             // Generate all the possible moves given the shape and loop through them
             LinkedList<Tile> possibleMoves = node.generatePossibleMoves(shape);
             for (Tile tile : possibleMoves) {
@@ -76,7 +64,8 @@ class AlphaBeta {
 
     }
 
-    static double imperfectAlphaBeta(BoardState node, int depth, Colour myPlayer, boolean isMax, double alpha, double beta) {
+    // FIXME: Comment all this extensively
+    private static double imperfectAlphaBeta(BoardState node, int depth, Colour myPlayer, boolean isMax, double alpha, double beta) {
         // If we run out of lookahead or the game is finished we return the heuristic
         if (depth == 0 || node.isFinished())
             return node.getScore(myPlayer) - node.getScore(myPlayer.nextPlayer());
@@ -98,7 +87,6 @@ class AlphaBeta {
                 int count = 0;
                 double tileTotalScore = 0;
                 double probability = (double)Collections.frequency(shapes, s) / shapes.size();
-
 
                 for (Tile tile : possibleMoves) {
                     // Create a new board state if the given tile is placed

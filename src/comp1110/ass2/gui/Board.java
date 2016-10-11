@@ -26,10 +26,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.awt.*;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * `Board` is the window in which games are played, it is
@@ -42,21 +39,10 @@ class Board extends Stage {
     private static final int BOARD_WIDTH = 933;
     private static final int BOARD_HEIGHT = 720;
     private static final int GRID_SIZE = 26;
-    // In pixels
+    // In pixels, used to help layout
     private static final int CELL_SIZE = 26;
     private static final int X_OFFSET = 135;
     private static final int Y_OFFSET = 45;
-
-    /* Class variables to store the board, and decks for the players, and state */
-    private BoardState boardState = new BoardState();
-    private Player greenState;
-    private Player redState;
-    private int greenDifficulty;
-    private int redDifficulty;
-    private int hintCount;
-    private int greenHintCount;
-    private int redHintCount;
-    private Orientation hoverOrientation = Orientation.A;
 
     /* Variables for JavaFX */
     private final Stage primaryStage = new Stage();
@@ -77,9 +63,20 @@ class Board extends Stage {
     private Label greenHintLbl;
     private Label redHintLbl;
 
+    /* Class variables to store the board, and associated options */
+    private BoardState boardState = new BoardState();
+    private Player greenState;
+    private Player redState;
+    private int greenDifficulty;
+    private int redDifficulty;
+    private int hintCount;
+    private int greenHintCount;
+    private int redHintCount;
+    private Orientation hoverOrientation = Orientation.A;
+
     /* Prepare everything accordingly for play */
     private void setupGame() {
-        // Large box identifiers
+        // Large box identifiers - i.e. panels
         Rectangle greenPanel = new Rectangle(X_OFFSET, 752);
         greenPanel.setFill(Color.GREEN);
         greenPanel.setOpacity(0.3);
@@ -92,7 +89,7 @@ class Board extends Stage {
         greyPanelTop.setOpacity(0.2);
         greyPanelTop.setTranslateX(X_OFFSET);
         root.getChildren().addAll(greenPanel, redPanel, greyPanelTop);
-        // Place labels to identify players
+        // Place labels to identify players. If they are bot we label the bot's difficulty
         Label greenPlayer = (greenState.isHuman()) ? new Label("Player Green")
                 : new Label(greenState.toString());
         greenPlayer.setFont(Font.font("System", FontWeight.BOLD, 18));
@@ -106,7 +103,7 @@ class Board extends Stage {
         redPlayer.setAlignment(Pos.CENTER);
         redPlayer.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE);
         redPlayer.setTranslateY(10);
-        // Change position of pieces left
+        // Set up the 'pieces left' labels
         greenPiecesLeft.setFont(Font.font("Open Sans", 16));
         greenPiecesLeft.setPrefWidth(X_OFFSET);
         greenPiecesLeft.setAlignment(Pos.CENTER);
@@ -116,15 +113,16 @@ class Board extends Stage {
         redPiecesLeft.setAlignment(Pos.CENTER);
         redPiecesLeft.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE - 5);
         redPiecesLeft.setTranslateY(180);
-        // Add labels for pieces left and whose turn it is
+        // Set up the main status label on the screen
         playerTurn.setFont(Font.font("System", FontWeight.BOLD, 18));
         playerTurn.setPrefWidth(BOARD_WIDTH - 2 * X_OFFSET);
         playerTurn.setTranslateX(X_OFFSET+5);
         playerTurn.setTranslateY(10);
         playerTurn.setAlignment(Pos.CENTER);
         root.getChildren().addAll(greenPlayer, redPlayer, greenPiecesLeft, redPiecesLeft, playerTurn);
-        // Hint button
+        // Setup hints if the player is human and we have allocated hints
         if (greenState.isHuman() && greenHintCount != 0) {
+            // Set up labels and buttons
             greenHintLbl = new Label("Hints Left: " + greenHintCount);
             greenHintLbl.setPrefWidth(X_OFFSET);
             greenHintLbl.setAlignment(Pos.CENTER);
@@ -136,7 +134,7 @@ class Board extends Stage {
             greenHint.setTranslateX(27);
             greenHint.setTranslateY(BOARD_HEIGHT - 50);
             root.getChildren().addAll(greenHintLbl, greenHint);
-            // Show hint by using EasyMove
+            // Show hint by using EasyBot
             greenHint.setOnAction(event -> {
                 if (greenHintCount == 0) {
                     greenHint.setDisable(true);
@@ -149,6 +147,7 @@ class Board extends Stage {
             });
         }
         if (redState.isHuman() && redHintCount != 0) {
+            // Set up labels and buttons
             redHintLbl = new Label("Hints Left: " + redHintCount);
             redHintLbl.setPrefWidth(X_OFFSET);
             redHintLbl.setAlignment(Pos.CENTER);
@@ -162,7 +161,7 @@ class Board extends Stage {
             redHint.setTranslateX(X_OFFSET + CELL_SIZE * GRID_SIZE + 27);
             redHint.setTranslateY(BOARD_HEIGHT - 50);
             root.getChildren().addAll(redHintLbl, redHint);
-            // Show hint by using EasyMove
+            // Show hint by using EasyBot
             redHint.setOnAction(event -> {
                 if (redHintCount == 0) {
                     redHint.setDisable(true);
@@ -181,7 +180,7 @@ class Board extends Stage {
     private void setupPlayerTiles() {
         // Create the pieces for the players
         boardState.createPlayerPieces();
-        // Show the tile previews and disable red player hint button
+        // Show the tile previews and disable red player hint button for green's turn
         previewTiles(true);
         previewTiles(false);
         redHint.setDisable(true);
@@ -195,13 +194,10 @@ class Board extends Stage {
         LinkedList<Shape> greenShapes = boardState.getGreenShapes();
         LinkedList<Shape> redShapes = boardState.getRedShapes();
 
-        greenPiecesLeft.setText(greenShapes.size() + " piece(s) left"
-                + "\nScore = " + boardState.getScore(true));
-        redPiecesLeft.setText(redShapes.size() + " piece(s) left"
-                + "\nScore = " + boardState.getScore(false));
-
-        // Show how many pieces a player has left and the score
+        // Show how many pieces a player has left and the current score
         if (isGreenTurn) {
+            greenPiecesLeft.setText(greenShapes.size() + " piece(s) left"
+                    + "\nScore = " + boardState.getScore(true));
             playerTurn.setTextFill(Color.RED);
             playerTurn.setText("Red Player's Turn");
             if (redHintCount != 0) redHint.setDisable(false);
@@ -209,6 +205,8 @@ class Board extends Stage {
             greenNextTile.setVisible(false);
             redNextTile.setVisible(true);
         } else {
+            redPiecesLeft.setText(redShapes.size() + " piece(s) left"
+                    + "\nScore = " + boardState.getScore(false));
             playerTurn.setTextFill(Color.GREEN);
             playerTurn.setText("Green Player's Turn");
             if (greenHintCount != 0) greenHint.setDisable(false);
@@ -217,7 +215,7 @@ class Board extends Stage {
             greenNextTile.setVisible(true);
         }
         
-        // Check if we are approaching the end game state
+        // Check if we are approaching the end game state, if so translate pieces left labels accordingly
         if (isGreenTurn && greenShapes.isEmpty()) {
             // Green runs out of pieces
             root.getChildren().remove(greenCurrentTile);
@@ -307,28 +305,51 @@ class Board extends Stage {
     }
 
     private void endGame() {
-        // Game state to terminal
+        // Print game state to terminal
         System.out.println("\nPlacement String: " + boardState.getPlacementString());
         // Update label text and disable grid, remove hint controls
         disableGrid();
         root.getChildren().removeAll(greenHint, greenHintLbl, redHint, redHintLbl);
-
-        // Show who has won the game and display scores
-        int greenScore = boardState.getScore(true);
-        int redScore = boardState.getScore(false);
-
         playerTurn.setTextFill(Color.DEEPPINK);
         playerTurn.setText("Game finished.");
 
-        if (greenScore > redScore) {
-            playerTurn.setText("Player Green wins! Green = " + greenScore + ", Red = " + redScore);
-            System.out.println("Player Green wins! Green = " + greenScore + ", Red = " + redScore);
-        } else if (redScore > greenScore) {
-            playerTurn.setText("Player Red wins! Green = " + greenScore + ", Red = " + redScore);
-            System.out.println("Player Red wins! Green = " + greenScore + ", Red = " + redScore);
+        // Show who has won the game and display scores
+        Score greenScore = new Score(boardState, Colour.Green);
+        Score redScore = new Score(boardState, Colour.Red);
+
+        scorecheck :
+        if (greenScore.getScore() > redScore.getScore()) {
+            playerTurn.setText("Player Green wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore());
+            System.out.println("Player Green wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore());
+        } else if (redScore.getScore() > greenScore.getScore()) {
+            playerTurn.setText("Player Red wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore());
+            System.out.println("Player Red wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore());
         } else {
-            playerTurn.setText("Tie! Green = " + greenScore + ", Red = " + redScore);
-            System.out.println("Tie! Green = " + greenScore + ", Red = " + redScore);
+            // Cascade down the value of the largest regions, no duplicates
+            TreeSet<Integer> greenSet = greenScore.getPrevArea();
+            TreeSet<Integer> redSet = redScore.getPrevArea();
+            while (greenSet.size() > 0 && redSet.size() > 0) {
+                int green = greenSet.pollFirst();
+                int red = redSet.pollFirst();
+                if (green > red) {
+                    playerTurn.setText("Player Green wins tie decision by larger area! Green = " + green + ", Red = " + red);
+                    System.out.println("Player Green wins tie decision by larger area! Green = " + green + ", Red = " + red);
+                    break scorecheck; // exit to main endGame() function
+                } else if (red > green) {
+                    playerTurn.setText("Player Red wins tie decision by larger area! Green = " + green + ", Red = " + red);
+                    System.out.println("Player Red wins tie decision by larger area! Green = " + green + ", Red = " + red);
+                    break scorecheck; // exit to main endGame() function
+                }
+            }
+            // Randomly select winner. 0 = GREEN, 1 = RED
+            int coin = new Random().nextInt(2);
+            if (coin == 0) {
+                playerTurn.setText("Player Green wins by coin toss!");
+                System.out.println("Player Green wins by coin toss!");
+            } else {
+                playerTurn.setText("Player Red wins by coin toss!");
+                System.out.println("Player Red wins by coin toss!");
+            }
         }
 
         /* Controls to set up new game if necessary */
@@ -349,6 +370,7 @@ class Board extends Stage {
         exit.setId("control-btn");
         exit.setPrefWidth(100);
         exit.setOnAction(event -> {
+            // Ask user if they want to exit the whole game
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                     "Do you really want to exit?", ButtonType.NO, ButtonType.YES);
             Optional<ButtonType> response = confirm.showAndWait();
@@ -367,9 +389,11 @@ class Board extends Stage {
 
     // Start new game
     private void resetGame() {
+        // Create new BoardState, reset hint count
         boardState = new BoardState();
         greenHintCount = hintCount;
         redHintCount = hintCount;
+        // Setup UI and bots for new game
         newGrid();
         setupGame();
         disableGrid();
@@ -394,7 +418,7 @@ class Board extends Stage {
         addCell('M', 'N', Colour.Green);
     }
 
-    // Disable the grid at end of game to prevent clicks or hovering, e.g. when bot is playing
+    // Disable the grid at end of game or when bot is thinking to prevent clicks or hovering
     private void disableGrid() {
         for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++)
             root.getChildren().get(i).setDisable(true);
@@ -405,7 +429,7 @@ class Board extends Stage {
             root.getChildren().get(i).setDisable(false);
     }
 
-    // Get the tile returned by the bot and show it on the screen
+    // Get the tile returned by the EasyBot and show it on the screen
     private void showHint(Tile tile) {
         char x = tile.getPosition().getCharX();
         char y = tile.getPosition().getCharY();
@@ -450,7 +474,7 @@ class Board extends Stage {
             endGame();
             return;
         }
-        // Get the shape to hover
+        // Get the shape we need to hover
         Shape shape = (boardState.isGreenTurn()) ? boardState.getGreenShapes().getFirst()
                 : boardState.getRedShapes().getFirst();
 
@@ -520,7 +544,7 @@ class Board extends Stage {
 
         // Add cells onto the board based on the tile orientation
         handleOrientation(tile);
-        previewTiles(!boardState.isGreenTurn());
+        previewTiles(boardState.isRedTurn());
 
         // Reset preview orientation and check if bot is playing
         hoverOrientation = Orientation.A;
@@ -537,7 +561,7 @@ class Board extends Stage {
         handleOrientation(tile);
 
         // Preview next tiles and play game for bot
-        previewTiles(!boardState.isGreenTurn());
+        previewTiles(boardState.isRedTurn());
         botPlay();
     }
 
@@ -595,6 +619,7 @@ class Board extends Stage {
             root.getChildren().set(getIndex(x, y), cell);
         }
 
+        // Disable cursor over boadr
         cell.setCursor(Cursor.NONE);
 
         /* Add a tile to the board state and GUI grid */
@@ -615,6 +640,7 @@ class Board extends Stage {
             // Remove the current tile preview and draw another one based on scroll direction
             root.getChildren().remove(hoverCurrentTile);
             hoverCurrentTile.getChildren().clear();
+            // Scroll down = clockwise, Scroll up = anti-clockwise
             if (event.getDeltaY() < 0)
                 hoverOrientation = hoverOrientation.next();
             else
@@ -627,7 +653,7 @@ class Board extends Stage {
     private int translateX(char x) { return (x - 'A') * CELL_SIZE + X_OFFSET; }
     private int translateY(char y) { return (y - 'A') * CELL_SIZE + Y_OFFSET; }
 
-    /* We get the index in the Scene `root`, of the position given */
+    /* We get the index in the Group `root`, of the position given */
     private int getIndex(char x, char y) {
         if (y - 'A' == 0) return x - 'A';
         else return (x - 'A')+(y - 'A')*26;
@@ -635,7 +661,7 @@ class Board extends Stage {
 
     private void botPlay() {
         // Check if the current player is human or not, or if it is the end of the game and act accordingly
-        if (boardState.isGreenTurn() && greenState.isHuman() || !boardState.isGreenTurn() && redState.isHuman()) {
+        if (boardState.isGreenTurn() && greenState.isHuman() || boardState.isRedTurn() && redState.isHuman()) {
             enableGrid();
             return;
         } else if (boardState.getRedShapes().isEmpty()) {
@@ -645,7 +671,7 @@ class Board extends Stage {
             playerTurn.setText(playerTurn.getText() + ". Bot thinking...");
             disableGrid();
         }
-        // Delay the play of the bot so we can see placements as they occur
+        // Delay the play of the bot so we can see placements as they occur, create a thread
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -668,10 +694,10 @@ class Board extends Stage {
             return;
         }
 
-        if (!boardState.isGreenTurn() && redState == Player.EasyBot) {
+        if (boardState.isRedTurn() && redState == Player.EasyBot) {
             EasyBot bot = new EasyBot(boardState, false);
             addTile(bot.getMove());
-        } else if (!boardState.isGreenTurn() && redState == Player.HardBot) {
+        } else if (boardState.isRedTurn() && redState == Player.HardBot) {
             HardBot bot = new HardBot(boardState, false, redDifficulty);
             addTile(bot.getMove());
         }
@@ -713,68 +739,75 @@ class Board extends Stage {
         scene.getStylesheets().add(style);
         Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Regular.ttf"), 16);
 
-        /* Rotate tiles if UP or DOWN arrow key is pressed - this isn't the best code */
-        scene.setOnKeyPressed(event -> {
-            // Consume and return if bot is thinking and key press
-            if (boardState.isGreenTurn() && !greenState.isHuman()
-                    || !boardState.isGreenTurn() && !redState.isHuman()) {
-                event.consume();
-                return;
-            }
-            // Get which grid (x, y) the mouse pointer is currently at
-            Point p = MouseInfo.getPointerInfo().getLocation();
-            Point2D local = root.screenToLocal(p.getX(), p.getY());
-            char x = (char)((local.getX() - X_OFFSET)/CELL_SIZE + 'A');
-            char y = (char)((local.getY() - Y_OFFSET)/CELL_SIZE + 'A');
-
-            // place piece with space bar
-            if ((event.getCode() == KeyCode.SPACE && boardState.isGreenTurn())
-                    || (event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn())) {
-                addTile(x, y);
-            }
-
-            // Rotate clockwise for down key and anticlockwise for up key
-            if (event.getCode() == KeyCode.Q && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.U && !boardState.isGreenTurn()) {
-                root.getChildren().remove(hoverCurrentTile);
-                hoverCurrentTile.getChildren().clear();
-                hoverOrientation = hoverOrientation.previous();
-                hoverTile(x, y);
-            } else if (event.getCode() == KeyCode.E && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.O && !boardState.isGreenTurn()) {
-                root.getChildren().remove(hoverCurrentTile);
-                hoverCurrentTile.getChildren().clear();
-                hoverOrientation = hoverOrientation.next();
-                hoverTile(x, y);
-            } else if (event.getCode() == KeyCode.W && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.I && !boardState.isGreenTurn()) {
-                // Must be within the game grid
-                if (x >= 'A' && x <= 'Z' && y > 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, x, (char)(y-1)))
-                    moveCursor(p.getX(), p.getY() - CELL_SIZE);
-            } else if (event.getCode() == KeyCode.A && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.J && !boardState.isGreenTurn()) {
-                if (x > 'A' && x <= 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, (char)(x-1), y))
-                    moveCursor(p.getX() - CELL_SIZE, p.getY());
-            } else if (event.getCode() == KeyCode.S && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.K && !boardState.isGreenTurn()) {
-                if (x >= 'A' && x <= 'Z' && y >= 'A' && y < 'Z' && Position.isOnBoard(hoverOrientation, x, (char)(y+1)))
-                    moveCursor(p.getX(), p.getY() + CELL_SIZE);
-            } else if (event.getCode() == KeyCode.D && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.L && !boardState.isGreenTurn()) {
-                if (x >= 'A' && x < 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, (char)(x+1), y))
-                    moveCursor(p.getX() + CELL_SIZE, p.getY());
-            } else if (event.getCode() == KeyCode.CAPS && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn()) {
-                if (x >= 'A' && x <= 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, x, y))
-                    addTile(x, y);
-            }
-        });
-
+        // Setup the game
         newGrid();
         setupGame();
         disableGrid();
         botPlay();
 
+                /* Let player's play with arrow keys. Player Green = WASD, Q and E to rotate and CAPS LOCK to place
+         * Player Red = IJKL, U and O to rotate and ENTER to place. */
+        scene.setOnKeyPressed(event -> {
+            // Consume and return if bot is thinking and human key press
+            if (boardState.isGreenTurn() && !greenState.isHuman()
+                    || boardState.isRedTurn() && !redState.isHuman()) {
+                event.consume();
+                return;
+            }
+            // Get which grid char-wise (x, y) the mouse pointer is currently at
+            Point p = MouseInfo.getPointerInfo().getLocation();
+            Point2D local = root.screenToLocal(p.getX(), p.getY());
+            char x = (char)((local.getX() - X_OFFSET)/CELL_SIZE + 'A');
+            char y = (char)((local.getY() - Y_OFFSET)/CELL_SIZE + 'A');
+
+
+            /* Place piece with space bar
+            if (event.getCode() == KeyCode.SPACE && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn()) {
+                addTile(x, y);
+            } */
+            
+            /* Rotate clockwise for E or O key and anticlockwise for Q or I key
+             * W = up, A = left, S = down, D = right, CAPS LOCK = place tile
+             * I = up, J = left, K = down, L = right, ENTER = place tile
+             * We update the preview of the tile accordingly with the key movements */
+            if (event.getCode() == KeyCode.Q && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.U && boardState.isRedTurn()) {
+                root.getChildren().remove(hoverCurrentTile);
+                hoverCurrentTile.getChildren().clear();
+                hoverOrientation = hoverOrientation.previous();
+                hoverTile(x, y);
+            } else if (event.getCode() == KeyCode.E && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.O && boardState.isRedTurn()) {
+                root.getChildren().remove(hoverCurrentTile);
+                hoverCurrentTile.getChildren().clear();
+                hoverOrientation = hoverOrientation.next();
+                hoverTile(x, y);
+            } else if (event.getCode() == KeyCode.W && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.I && boardState.isRedTurn()) {
+                // Must be within the game grid
+                if (x >= 'A' && x <= 'Z' && y > 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, x, (char)(y-1)))
+                    moveCursor(p.getX(), p.getY() - CELL_SIZE);
+            } else if (event.getCode() == KeyCode.A && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.J && boardState.isRedTurn()) {
+                if (x > 'A' && x <= 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, (char)(x-1), y))
+                    moveCursor(p.getX() - CELL_SIZE, p.getY());
+            } else if (event.getCode() == KeyCode.S && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.K && boardState.isRedTurn()) {
+                if (x >= 'A' && x <= 'Z' && y >= 'A' && y < 'Z' && Position.isOnBoard(hoverOrientation, x, (char)(y+1)))
+                    moveCursor(p.getX(), p.getY() + CELL_SIZE);
+            } else if (event.getCode() == KeyCode.D && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.L && boardState.isRedTurn()) {
+                if (x >= 'A' && x < 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, (char)(x+1), y))
+                    moveCursor(p.getX() + CELL_SIZE, p.getY());
+            } else if (event.getCode() == KeyCode.CAPS && boardState.isGreenTurn()
+                    || event.getCode() == KeyCode.ENTER && boardState.isRedTurn()) {
+                if (x >= 'A' && x <= 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, x, y))
+                    addTile(x, y);
+            }
+        });
+
+        // As of now, we cannot terminate a Bot vs Bot game as it is constantly recursively called
         primaryStage.setOnCloseRequest(event -> {
             if (!redState.isHuman() && !greenState.isHuman() && !boardState.isFinished()) {
                 Alert message = new Alert(Alert.AlertType.ERROR, "Bot vs Bot game in progress."
@@ -783,11 +816,13 @@ class Board extends Stage {
                 message.showAndWait();
                 event.consume();
             } else if (!boardState.isFinished()){
+                // If at least one player is human and the game isn't finished, gain user's confirmation
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                         "Game in progress. Do you really want to close?", ButtonType.NO, ButtonType.YES);
                 Optional<ButtonType> response = confirm.showAndWait();
                 if (response.isPresent() && ButtonType.NO.equals(response.get())) event.consume();
             } else {
+                // Game has finished here
                 primaryStage.close();
             }
         });
