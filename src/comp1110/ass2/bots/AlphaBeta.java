@@ -19,7 +19,7 @@ class AlphaBeta {
     static double start(BoardState node, int original, int depth, Colour myPlayer, boolean isMax, double alpha, double beta) {
         // If we run out of lookahead or the game is finished we return the heuristic
         if (depth == 0 || node.isFinished())
-            return node.getScore(myPlayer) - node.getScore(myPlayer.nextPlayer());
+            return (node.getScore(myPlayer) - node.getScore(myPlayer.nextPlayer()));
 
         // We can use normal alpha beta for the first 2 moves as the player has information to this
         if (original - depth > 2)
@@ -34,8 +34,8 @@ class AlphaBeta {
             for (Tile tile : possibleMoves) {
                 // Create a new board state if the given tile is placed
                 BoardState child = new BoardState(node);
-                child.addTile(tile);
                 child.removeTile(tile);
+                child.addTile(tile);
                 // Recursive call on Alpha-Beta bot as minimising player
                 double score = start(child, original, depth-1, myPlayer, false, alpha, beta);
                 // We break if we have an beta cut-off
@@ -51,8 +51,8 @@ class AlphaBeta {
             for (Tile tile : possibleMoves) {
                 // Create a new board state if the given tile is placed
                 BoardState child = new BoardState(node);
-                child.addTile(tile);
                 child.removeTile(tile);
+                child.addTile(tile);
                 // Recursive call on Alpha-Beta bot as maximising player
                 double score = start(child, original, depth-1, myPlayer, true, alpha, beta);
                 // We break if we have an alpha cut-off
@@ -97,8 +97,8 @@ class AlphaBeta {
                 for (Tile tile : possibleMoves) {
                     // Create a new board state if the given tile is placed
                     BoardState child = new BoardState(node);
-                    child.addTile(tile);
                     child.removeTile(tile);
+                    child.addTile(tile);
                     // Recursive call on Alpha-Beta bot as minimising player
                     double score = probabilisticAlphaBeta(child, depth - 1, myPlayer, false, alpha, beta);
                     // We break if we have an beta cut-off
@@ -135,8 +135,8 @@ class AlphaBeta {
                 for (Tile tile : possibleMoves) {
                     // Create a new board state if the given tile is placed
                     BoardState child = new BoardState(node);
-                    child.addTile(tile);
                     child.removeTile(tile);
+                    child.addTile(tile);
                     // Recursive call on Alpha-Beta bot as maximising player
                     double score = probabilisticAlphaBeta(child, depth-1, myPlayer, true, alpha, beta);
                     // We break if we have an alpha cut-off
