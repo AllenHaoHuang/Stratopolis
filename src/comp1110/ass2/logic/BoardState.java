@@ -343,6 +343,6 @@ public class BoardState{
     }
 
     public boolean isFinished() {
-        return (getGreenShapes().isEmpty() && getRedShapes().isEmpty());
+        return (getRedShapes().isEmpty());
     }
 }

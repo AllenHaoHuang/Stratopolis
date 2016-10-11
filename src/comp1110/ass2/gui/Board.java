@@ -195,10 +195,13 @@ class Board extends Stage {
         LinkedList<Shape> greenShapes = boardState.getGreenShapes();
         LinkedList<Shape> redShapes = boardState.getRedShapes();
 
+        greenPiecesLeft.setText(greenShapes.size() + " piece(s) left"
+                + "\nScore = " + boardState.getScore(true));
+        redPiecesLeft.setText(redShapes.size() + " piece(s) left"
+                + "\nScore = " + boardState.getScore(false));
+
         // Show how many pieces a player has left and the score
         if (isGreenTurn) {
-            greenPiecesLeft.setText(greenShapes.size() + " piece(s) left"
-                    + "\nScore = " + boardState.getScore(true));
             playerTurn.setTextFill(Color.RED);
             playerTurn.setText("Red Player's Turn");
             if (redHintCount != 0) redHint.setDisable(false);
@@ -206,8 +209,6 @@ class Board extends Stage {
             greenNextTile.setVisible(false);
             redNextTile.setVisible(true);
         } else {
-            redPiecesLeft.setText(redShapes.size() + " piece(s) left"
-                    + "\nScore = " + boardState.getScore(false));
             playerTurn.setTextFill(Color.GREEN);
             playerTurn.setText("Green Player's Turn");
             if (greenHintCount != 0) greenHint.setDisable(false);
@@ -727,11 +728,11 @@ class Board extends Stage {
             char y = (char)((local.getY() - Y_OFFSET)/CELL_SIZE + 'A');
 
             // place piece with space bar
-            if (event.getCode() == KeyCode.SPACE && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn()) {
+            if ((event.getCode() == KeyCode.SPACE && boardState.isGreenTurn())
+                    || (event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn())) {
                 addTile(x, y);
             }
-            
+
             // Rotate clockwise for down key and anticlockwise for up key
             if (event.getCode() == KeyCode.Q && boardState.isGreenTurn()
                     || event.getCode() == KeyCode.U && !boardState.isGreenTurn()) {
