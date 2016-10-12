@@ -760,13 +760,6 @@ class Board extends Stage {
             Point2D local = root.screenToLocal(p.getX(), p.getY());
             char x = (char)((local.getX() - X_OFFSET)/CELL_SIZE + 'A');
             char y = (char)((local.getY() - Y_OFFSET)/CELL_SIZE + 'A');
-
-
-            /* Place piece with space bar
-            if (event.getCode() == KeyCode.SPACE && boardState.isGreenTurn()
-                    || event.getCode() == KeyCode.ENTER && !boardState.isGreenTurn()) {
-                addTile(x, y);
-            } */
             
             /* Rotate clockwise for E or O key and anticlockwise for Q or I key
              * W = up, A = left, S = down, D = right, CAPS LOCK = place tile
@@ -801,7 +794,7 @@ class Board extends Stage {
                     || event.getCode() == KeyCode.L && boardState.isRedTurn()) {
                 if (x >= 'A' && x < 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, (char)(x+1), y))
                     moveCursor(p.getX() + CELL_SIZE, p.getY());
-            } else if (event.getCode() == KeyCode.CAPS && boardState.isGreenTurn()
+            } else if (event.getCode() == KeyCode.SPACE && boardState.isGreenTurn()
                     || event.getCode() == KeyCode.ENTER && boardState.isRedTurn()) {
                 if (x >= 'A' && x <= 'Z' && y >= 'A' && y <= 'Z' && Position.isOnBoard(hoverOrientation, x, y))
                     addTile(x, y);

@@ -63,18 +63,18 @@ class Instructions extends Stage {
 
         Text block = new Text("Player can choose either Green or Red. For each player, "
                 + "you have twenty tiles. By using the mouse, you can hover over to the "
-                + "position you want to place your tile on Alternatively, Player Green can use WASD and Caps Lock "
+                + "position you want to place your tile on. Alternatively, Player Green can use WASD and Spacebar "
                 + "and Player Red can use IJKL and Enter.\n\n"
-                + "There are two rules for a tile placement."
-                + "\n1. Your placement must be attached with another tile on grid (no colour constraints)."
+                + "There are two rules for a tile placement"
+                + "\n1. Your placement must be attached with another tile on grid."
                 + "\n2. You can place a tile above existing ones, but each colour may be stacked only on top of itself or black. "
-                + "There must also be no overhangs, and each stacked tile must straddle at least two tiles below\n\n"
+                + "There must also be no overhangs, and each stacked tile must straddle at least two tiles below.\n\n"
                 + "Your score is calculated by finding the largest region of "
-                + "connected tiles of your colour,and then multiplying the "
+                + "connected tiles of your colour, and then multiplying the "
                 + "number of squares forming the region by the maximum "
                 + "height of tiles in the region.\nThe player with the higher score wins. If the scores are equal, "
                 + "ties will be broken according to the value of the next largest region; cascading to smaller regions if ties persist;"
-                + "and ultimately to a random choice in the unlikely event that it remains unbroken.");
+                + " and ultimately to a random choice in the unlikely event that it remains unbroken.");
         block.setFont(Font.font("Open Sans", 15.5));
         block.setWrappingWidth(WIDTH - 140);
         block.setLayoutX(140);
