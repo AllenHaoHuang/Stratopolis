@@ -69,10 +69,9 @@ class Instructions extends Stage {
                 + "\n1. The tile must be next to or above another tile."
                 + "\n2. In order to place a tile above other tiles, each colour on the tile may only be stacked on top of itself or black. "
                 + "There must also be no overhangs, and each stacked tile must be over at least two different tiles.\n\n"
-                + "Score is calculated by finding the largest region of "
-                + "connected tiles of your colour, and then multiplying the "
-                + "number of squares forming the region by the maximum "
-                + "height of tiles in the region. The player with the higher score wins. If the scores are equal, "
+                + "Score is calculated by multiplying the number of squares in your largest region of "
+                + "connected tiles of your colour with the "
+                + "maximum height of tiles in that region. The player with the higher score wins. If the scores are equal, "
                 + "ties will be broken according to the value of the next largest region; cascading to smaller regions if ties persist;"
                 + " and ultimately to a random choice in the unlikely event that it remains unbroken.");
         block.setFont(Font.font("Open Sans", 15.5));
