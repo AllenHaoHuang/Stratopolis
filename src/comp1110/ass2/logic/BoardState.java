@@ -127,24 +127,6 @@ public class BoardState{
         return newColourArray;
     }
 
-    int getPieceID() {return pieceID;}
-
-    int[][] getPieceIDArray() {
-        int[][] newPieceIDArray = new int[BOARD_SIZE][BOARD_SIZE];
-        for (int i = 0; i < BOARD_SIZE; i++)
-            for (int j = 0; j < BOARD_SIZE; j++)
-                newPieceIDArray[i][j] = pieceIDArray[i][j];
-        return newPieceIDArray;
-    }
-
-    boolean[][] getPossiblePosArray() {
-        boolean[][] newPossiblePosArray = new boolean[BOARD_SIZE][BOARD_SIZE];
-        for (int i = 0; i < BOARD_SIZE; i++)
-            for (int j = 0; j < BOARD_SIZE; j++)
-                newPossiblePosArray[i][j] = possiblePosArray[i][j];
-        return newPossiblePosArray;
-    }
-
     // Check that the tile is adjacent to another tile by checking the height neighbouring cells
     private boolean isAdjacent(Tile tile) {
         int x = tile.getX(0);
@@ -269,7 +251,9 @@ public class BoardState{
         return placementString;
     }
 
-    // FIXME: Comment this
+    /* Given some tile, changes the possible positions array so that all positions directly next
+     * a tile is changed to true
+     */
     public void updatePositionsToCheck(Tile tile) {
         int xCoord = tile.getX(0);
         int yCoord = tile.getY(0);
@@ -282,7 +266,7 @@ public class BoardState{
         }
     }
 
-    // FIXME: Comment this
+    // For each part of a tile, update the positions directly around that tile for the possible positions array
     public void updatePositionsAround(int x, int y) {
         boolean notOnLeft = (x % BOARD_SIZE != 0);
         boolean notOnRight = (x % BOARD_SIZE != BOARD_SIZE - 1);
@@ -317,7 +301,7 @@ public class BoardState{
         return tileList;
     }
 
-    // FIXME: Comment this
+    // Function that removes a some tile from the tile list
     public void removeTile (Tile tile) {
         if (playerTurn == Colour.Green) {
             greenShapes.removeFirstOccurrence(tile.getShape());
