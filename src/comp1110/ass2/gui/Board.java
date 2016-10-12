@@ -318,40 +318,9 @@ class Board extends Stage {
         Score greenScore = new Score(boardState, Colour.Green);
         Score redScore = new Score(boardState, Colour.Red);
 
-        scorecheck :
-        if (greenScore.getScore() > redScore.getScore()) {
-            playerTurn.setText("Player Green wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore());
-            System.out.println("Player Green wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore());
-        } else if (redScore.getScore() > greenScore.getScore()) {
-            playerTurn.setText("Player Red wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore());
-            System.out.println("Player Red wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore());
-        } else {
-            // Cascade down the value of the largest regions, no duplicates
-            TreeSet<Integer> greenSet = greenScore.getPrevArea();
-            TreeSet<Integer> redSet = redScore.getPrevArea();
-            while (greenSet.size() > 0 && redSet.size() > 0) {
-                int green = greenSet.pollFirst();
-                int red = redSet.pollFirst();
-                if (green > red) {
-                    playerTurn.setText("Player Green wins tie decision by larger area! Green = " + green + ", Red = " + red);
-                    System.out.println("Player Green wins tie decision by larger area! Green = " + green + ", Red = " + red);
-                    break scorecheck; // exit to main endGame() function
-                } else if (red > green) {
-                    playerTurn.setText("Player Red wins tie decision by larger area! Green = " + green + ", Red = " + red);
-                    System.out.println("Player Red wins tie decision by larger area! Green = " + green + ", Red = " + red);
-                    break scorecheck; // exit to main endGame() function
-                }
-            }
-            // Randomly select winner. 0 = GREEN, 1 = RED
-            int coin = new Random().nextInt(2);
-            if (coin == 0) {
-                playerTurn.setText("Player Green wins by coin toss!");
-                System.out.println("Player Green wins by coin toss!");
-            } else {
-                playerTurn.setText("Player Red wins by coin toss!");
-                System.out.println("Player Red wins by coin toss!");
-            }
-        }
+        String result = Score.getWinner(greenScore, redScore);
+        playerTurn.setText(result);
+        System.out.println(result);
 
         /* Controls to set up new game if necessary */
         Button playAgain = new Button("Play\nAgain");

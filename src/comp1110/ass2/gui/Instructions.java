@@ -107,6 +107,7 @@ class Instructions extends Stage {
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         primaryStage.setScene(scene);
 
+
         // Add CSS Stylesheet for buttons and load font
         String style = getClass().getResource("assets/theme.css").toExternalForm();
         scene.getStylesheets().add(style);

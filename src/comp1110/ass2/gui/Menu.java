@@ -406,6 +406,11 @@ public class Menu extends Application {
         Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Regular.ttf"), 16);
         Font.loadFont(getClass().getResourceAsStream("assets/OpenSans-Bold.ttf"), 16);
 
+        // Ensure game closes properly
+        primaryStage.setOnCloseRequest(event -> {
+            System.exit(0);
+        });
+
         // Add components to root
         addPanels();
         addTop();

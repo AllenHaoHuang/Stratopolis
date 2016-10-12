@@ -1,6 +1,7 @@
 package comp1110.ass2.logic;
 
 
+import java.util.Random;
 import java.util.TreeSet;
 
 /**
@@ -24,7 +25,7 @@ public class Score {
     private static int exploreHeight = 0;
     private static Colour searchColour;
 
-    public Score(BoardState board, boolean isGreen) {
+    Score(BoardState board, boolean isGreen) {
         // Initialise the arrays and variables
         colourArray = board.getColourArray();
         heightArray = board.getHeightArray();
@@ -110,6 +111,41 @@ public class Score {
     }
 
     public int getScore() { return maxArea * maxHeight; }
-    public TreeSet<Integer> getPrevArea() { return prevArea; }
+    private TreeSet<Integer> getPrevArea() { return prevArea; }
+
+    // Find the winner of a game, will break ties. Return relevant string message
+    public static String getWinner(Score greenScore, Score redScore) {
+        // Check if player green's score is bigger than player red's and vice versa
+        if (greenScore.getScore() > redScore.getScore()) {
+            return "Player Green wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore();
+        } else if (redScore.getScore() > redScore.getScore()) {
+            return "Player Red wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore();
+        } else {
+            // Tie situation - start cascading the values of the next largest regions with no duplicates
+            TreeSet<Integer> greenSet = greenScore.getPrevArea();
+            TreeSet<Integer> redSet = redScore.getPrevArea();
+            System.out.println("Green Unique Areas: " + greenSet);
+            System.out.println("Red Unique Areas: " + redSet);
+            // Loop through TreeSet
+            while (greenSet.size() > 0 && redSet.size() > 0) {
+                // Get and remove first element of the set
+                int green = greenSet.pollFirst();
+                int red = redSet.pollFirst();
+                // Check bigger score, if any. If not, keep looping
+                if (green > red)
+                    return "Player Green wins tie decision by larger area! Green = " + green + ", Red = " + red;
+                else if (red > green)
+                    return "Player Red wins tie decision by larger area! Green = " + green + ", Red = " + red;
+
+            }
+            /* Here there are no more areas to check: very unlike situation!
+               Randomly Select Winner with 'coin flip'. 0 = Green, 1 = Red */
+            int coin = new Random().nextInt(2);
+            if (coin == 0)
+                return "Player Green wins by coin toss!";
+            else
+                return "Player Red wins by coin toss!";
+        }
+    }
 }
 
