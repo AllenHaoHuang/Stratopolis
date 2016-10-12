@@ -328,6 +328,7 @@ public class Menu extends Application {
                     // Warn user they do not have saved values, and save and close accordingly
                     Alert alert = new Alert(Alert.AlertType.WARNING, "You have unsaved changes. Do you" +
                             " want to save the new difficulties?", ButtonType.NO, ButtonType.YES);
+                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.isPresent() && result.get() == ButtonType.YES) {
                         redDifficulty = redSlider.getValue();

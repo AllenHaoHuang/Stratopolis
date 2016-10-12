@@ -813,6 +813,7 @@ class Board extends Stage {
                 // If at least one player is human and the game isn't finished, gain user's confirmation
                 Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                         "Game in progress. Do you really want to close?", ButtonType.NO, ButtonType.YES);
+                confirm.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                 Optional<ButtonType> response = confirm.showAndWait();
                 if (response.isPresent() && ButtonType.NO.equals(response.get())) event.consume();
             } else {
