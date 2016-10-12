@@ -61,18 +61,18 @@ class Instructions extends Stage {
         topicMain.setLayoutX(140);
         topicMain.setLayoutY(100);
 
-        Text block = new Text("Player can choose either Green or Red. For each player, "
-                + "you have twenty tiles. By using the mouse, you can hover over to the "
-                + "position you want to place your tile on. Alternatively, Player Green can use WASD and Spacebar "
-                + "and Player Red can use IJKL and Enter.\n\n"
+        Text block = new Text("Players can choose either Green or Red. Each player, "
+                + "starts with twenty randomly shuffled tiles. By using the mouse, you can hover over to the "
+                + "position you want to place your tile on. Player Green can also use WASD to position, QE to rotate and Spacebar to place the tile. "
+                + "Player Red can use IJKL to position, UO to rotate and Enter to place the tile.\n\n"
                 + "There are two rules for a tile placement"
-                + "\n1. Your placement must be attached with another tile on grid."
-                + "\n2. You can place a tile above existing ones, but each colour may be stacked only on top of itself or black. "
-                + "There must also be no overhangs, and each stacked tile must straddle at least two tiles below.\n\n"
-                + "Your score is calculated by finding the largest region of "
+                + "\n1. The tile must be next to or above another tile."
+                + "\n2. In order to place a tile above other tiles, each colour on the tile may only be stacked on top of itself or black. "
+                + "There must also be no overhangs, and each stacked tile must be over at least two different tiles.\n\n"
+                + "Score is calculated by finding the largest region of "
                 + "connected tiles of your colour, and then multiplying the "
                 + "number of squares forming the region by the maximum "
-                + "height of tiles in the region.\nThe player with the higher score wins. If the scores are equal, "
+                + "height of tiles in the region. The player with the higher score wins. If the scores are equal, "
                 + "ties will be broken according to the value of the next largest region; cascading to smaller regions if ties persist;"
                 + " and ultimately to a random choice in the unlikely event that it remains unbroken.");
         block.setFont(Font.font("Open Sans", 15.5));
