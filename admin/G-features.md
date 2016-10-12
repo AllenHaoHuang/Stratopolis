@@ -17,6 +17,7 @@ additional features...
  - Instruction and Help Window/Messages
  - Advanced computer opponent difficulty selection
  - Advanced and Modern GUI interface (with the help of CSS)
+ - Easy to use and intuitive UI
  - Bot vs Bot capability
  - Keyboard Support for human players
- -
+ - Tile placement hover preview for human players
