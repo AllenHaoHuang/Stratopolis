@@ -310,7 +310,7 @@ public class BoardState{
         }
     }
 
-    // Check if game is finished - i.e. players have no pieces left
+    // Check if game is finished - i.e. either players have no pieces left
     public boolean isFinished() {
         return (getRedShapes().isEmpty() || getGreenShapes().isEmpty());
     }
