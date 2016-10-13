@@ -118,7 +118,7 @@ public class Score {
         // Check if player green's score is bigger than player red's and vice versa
         if (greenScore.getScore() > redScore.getScore()) {
             return "Player Green wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore();
-        } else if (redScore.getScore() > redScore.getScore()) {
+        } else if (redScore.getScore() > greenScore.getScore()) {
             return "Player Red wins! Green = " + greenScore.getScore() + ", Red = " + redScore.getScore();
         } else {
             // Tie situation - start cascading the values of the next largest regions with no duplicates

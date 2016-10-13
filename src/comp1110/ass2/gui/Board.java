@@ -306,6 +306,10 @@ class Board extends Stage {
     }
 
     private void endGame() {
+        // Update label scores - ensure nothing goes wrong
+        greenPiecesLeft.setText("0 pieces left \nScore = " + boardState.getScore(true));
+        redPiecesLeft.setText("0 pieces left \nScore = " + boardState.getScore(false));
+
         // Print game state to terminal
         System.out.println("\nPlacement String: " + boardState.getPlacementString());
         // Update label text and disable grid, remove hint controls
@@ -715,7 +719,7 @@ class Board extends Stage {
         disableGrid();
         botPlay();
 
-                /* Let player's play with arrow keys. Player Green = WASD, Q and E to rotate and CAPS LOCK to place
+        /* Let player's play with arrow keys. Player Green = WASD, Q and E to rotate and SPACE to place
          * Player Red = IJKL, U and O to rotate and ENTER to place. */
         scene.setOnKeyPressed(event -> {
             // Consume and return if bot is thinking and human key press
