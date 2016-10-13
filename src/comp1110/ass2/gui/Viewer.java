@@ -251,6 +251,6 @@ class Viewer extends Stage {
 
         defaultGrid();
         makeControls();
-        primaryStage.show();
+        primaryStage.showAndWait();
     }
 }
