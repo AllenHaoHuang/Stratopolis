@@ -12,10 +12,13 @@ of our project implements the following features:
  - Advanced computer opponent
 
 additional features...
+ - Options menu
  - Music
- - Hints for human players
+ - Hints for human players (can set limit to this)
  - Instruction and Help Window/Messages
+ - Useful confirmation and warning messages
  - Advanced computer opponent difficulty selection
+ - Probabilistic advanced computer opponent
  - Advanced and Modern GUI interface (with the help of CSS)
  - Easy to use and intuitive UI
  - Bot vs Bot capability
