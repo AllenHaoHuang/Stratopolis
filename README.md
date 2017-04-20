@@ -12,12 +12,12 @@ ___
 ___
 ## Screenshots
 #### Menu
-<img src="menu-0.png" alt="Menu" style="width: 200px;">
-<img src="menu-1.png" alt="Menu" style="width: 200px;">
+<img src="img/menu-0.png" alt="Menu" style="width: 200px;">
+<img src="img/menu-1.png" alt="Menu" style="width: 200px;">
 
 #### Viewer
-<img src="viewer.png" alt="Viewer" style="width: 250px;">
+<img src="img/viewer.png" alt="Viewer" style="width: 250px;">
 
 #### Gameplay
-<img src="gameplay-0.png" alt="Gameplay" style="width: 250px;">
-<img src="gameplay-1.png" alt="Gameplay" style="width: 250px;">
+<img src="img/gameplay-0.png" alt="Gameplay" style="width: 250px;">
+<img src="img/gameplay-1.png" alt="Gameplay" style="width: 250px;">
